@@ -12,6 +12,11 @@ import CompareProducts from "./pages/CompareProducts";
 import Resources from "./pages/Resources";
 import News from "./pages/News";
 import Contact from "./pages/Contact";
+import DistributorDashboard from "./pages/distributor/DistributorDashboard";
+import OrderManagement from "./pages/distributor/OrderManagement";
+import InventoryManagement from "./pages/distributor/InventoryManagement";
+import Messages from "./pages/distributor/Messages";
+import Profile from "./pages/distributor/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +37,12 @@ const App = () => (
             <Route path="/resources" element={<Resources />} />
             <Route path="/news" element={<News />} />
             <Route path="/contact" element={<Contact />} />
+            {/* Distributor Portal */}
+            <Route path="/distributor" element={<DistributorDashboard />} />
+            <Route path="/distributor/orders" element={<OrderManagement />} />
+            <Route path="/distributor/inventory" element={<InventoryManagement />} />
+            <Route path="/distributor/messages" element={<Messages />} />
+            <Route path="/distributor/profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
