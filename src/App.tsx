@@ -25,6 +25,7 @@ import OrderManagement from "./pages/distributor/OrderManagement";
 import InventoryManagement from "./pages/distributor/InventoryManagement";
 import Messages from "./pages/distributor/Messages";
 import Profile from "./pages/distributor/Profile";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
