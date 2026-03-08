@@ -25,6 +25,7 @@ import OrderManagement from "./pages/distributor/OrderManagement";
 import InventoryManagement from "./pages/distributor/InventoryManagement";
 import Messages from "./pages/distributor/Messages";
 import Profile from "./pages/distributor/Profile";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -60,6 +61,9 @@ const App = () => (
               <Route path="/distributor/inventory" element={<ProtectedRoute><InventoryManagement /></ProtectedRoute>} />
               <Route path="/distributor/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
               <Route path="/distributor/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+
+              {/* Admin route */}
+              <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>
