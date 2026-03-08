@@ -1,13 +1,12 @@
 import { useSearchParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-import { getProductById, Product } from "@/data/products";
-import { ArrowLeft, X } from "lucide-react";
+import { useComparison } from "@/hooks/use-product-comparison";
+import { Product } from "@/types/product";
+import { ArrowLeft } from "lucide-react";
 
 const CompareProducts = () => {
-  const [searchParams] = useSearchParams();
-  const ids = searchParams.get("ids")?.split(",") || [];
-  const products = ids.map(getProductById).filter(Boolean) as Product[];
+  const { items: products } = useComparison();
 
   if (products.length < 2) {
     return (
@@ -30,6 +29,7 @@ const CompareProducts = () => {
     { label: "Target Pests", getValue: (p) => p.targetPests.length > 0 ? p.targetPests.join(", ") : "N/A" },
     { label: "Pack Sizes", getValue: (p) => p.packSizes.join(", ") },
     { label: "Key Features", getValue: (p) => p.features.join(" • ") },
+    { label: "Price", getValue: (p) => p.price ? `₹${p.price.toLocaleString()}` : "Contact us" },
   ];
 
   return (
@@ -48,7 +48,6 @@ const CompareProducts = () => {
 
           <div className="overflow-x-auto">
             <table className="w-full min-w-[600px]">
-              {/* Product Headers */}
               <thead>
                 <tr>
                   <th className="w-48 p-4 text-left text-sm font-medium text-muted-foreground bg-muted rounded-tl-xl">Specification</th>

@@ -183,8 +183,13 @@ export type Database = {
           id: string
           image_url: string | null
           is_active: boolean
+          is_new: boolean
+          mode_of_action: string | null
           name: string
+          pack_sizes: string[] | null
+          popularity: number
           price: number | null
+          safety_precautions: string[] | null
           short_description: string | null
           slug: string
           target_crops: string[] | null
@@ -203,8 +208,13 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          is_new?: boolean
+          mode_of_action?: string | null
           name: string
+          pack_sizes?: string[] | null
+          popularity?: number
           price?: number | null
+          safety_precautions?: string[] | null
           short_description?: string | null
           slug: string
           target_crops?: string[] | null
@@ -223,8 +233,13 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          is_new?: boolean
+          mode_of_action?: string | null
           name?: string
+          pack_sizes?: string[] | null
+          popularity?: number
           price?: number | null
+          safety_precautions?: string[] | null
           short_description?: string | null
           slug?: string
           target_crops?: string[] | null
