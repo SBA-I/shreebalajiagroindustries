@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, User } from "lucide-react";
+import { Menu, X, ChevronDown, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
 
 const navItems = [
@@ -26,6 +27,7 @@ const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -77,12 +79,26 @@ const Header = () => {
 
         {/* Desktop Actions */}
         <div className="hidden lg:flex items-center gap-3">
-          <Link to="/login">
-            <Button variant="outline" size="sm" className="gap-2">
-              <User className="h-4 w-4" />
-              Distributor Login
-            </Button>
-          </Link>
+          {user ? (
+            <>
+              <Link to="/distributor">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <User className="h-4 w-4" />
+                  Dashboard
+                </Button>
+              </Link>
+              <Button variant="ghost" size="sm" onClick={signOut} className="gap-2 text-muted-foreground">
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </>
+          ) : (
+            <Link to="/login">
+              <Button variant="outline" size="sm" className="gap-2">
+                <User className="h-4 w-4" />
+                Distributor Login
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Mobile Toggle */}
@@ -126,12 +142,27 @@ const Header = () => {
               </div>
             ))}
             <div className="pt-3 border-t border-border">
-              <Link to="/login" onClick={() => setMobileOpen(false)}>
-                <Button variant="default" size="sm" className="w-full gap-2">
-                  <User className="h-4 w-4" />
-                  Distributor Login
-                </Button>
-              </Link>
+              {user ? (
+                <div className="space-y-2">
+                  <Link to="/distributor" onClick={() => setMobileOpen(false)}>
+                    <Button variant="default" size="sm" className="w-full gap-2">
+                      <User className="h-4 w-4" />
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <Button variant="outline" size="sm" className="w-full gap-2" onClick={() => { signOut(); setMobileOpen(false); }}>
+                    <LogOut className="h-4 w-4" />
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <Link to="/login" onClick={() => setMobileOpen(false)}>
+                  <Button variant="default" size="sm" className="w-full gap-2">
+                    <User className="h-4 w-4" />
+                    Distributor Login
+                  </Button>
+                </Link>
+              )}
             </div>
           </nav>
         </div>
