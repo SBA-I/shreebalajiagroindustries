@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { GitCompareArrows, Check } from "lucide-react";
-import { Product } from "@/data/products";
+import { Product } from "@/types/product";
 import { useComparison } from "@/hooks/use-product-comparison";
 
 interface ProductCardProps {

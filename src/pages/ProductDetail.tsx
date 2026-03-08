@@ -1,8 +1,9 @@
 import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-import { getProductById, getRelatedProducts } from "@/data/products";
-import { ArrowLeft, Shield, AlertTriangle, Beaker, Leaf, Package, FileText, Send } from "lucide-react";
+import { useProductById, useProducts } from "@/hooks/use-db-products";
+import { getRelatedProducts } from "@/types/product";
+import { ArrowLeft, Shield, AlertTriangle, Beaker, Leaf, Package, FileText, Send, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,9 +11,20 @@ import { toast } from "sonner";
 
 const ProductDetail = () => {
   const { productId } = useParams();
-  const product = getProductById(productId || "");
+  const { data: product, isLoading } = useProductById(productId || "");
+  const { data: allProducts = [] } = useProducts();
   const [activeTab, setActiveTab] = useState<"details" | "safety" | "documents">("details");
   const [inquiryForm, setInquiryForm] = useState({ name: "", email: "", message: "" });
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </Layout>
+    );
+  }
 
   if (!product) {
     return (
@@ -25,7 +37,7 @@ const ProductDetail = () => {
     );
   }
 
-  const related = getRelatedProducts(product);
+  const related = getRelatedProducts(product, allProducts);
 
   const handleInquiry = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,53 +78,38 @@ const ProductDetail = () => {
           </Link>
 
           <div className="grid lg:grid-cols-2 gap-10">
-            {/* Image */}
             <div className="bg-muted rounded-2xl flex items-center justify-center p-8 lg:p-12 relative">
               <img src={product.image} alt={product.name} className="max-h-80 object-contain" />
               {product.isNew && (
-                <span className="absolute top-4 right-4 text-sm font-bold bg-accent text-accent-foreground px-3 py-1 rounded-full">
-                  NEW
-                </span>
+                <span className="absolute top-4 right-4 text-sm font-bold bg-accent text-accent-foreground px-3 py-1 rounded-full">NEW</span>
               )}
             </div>
 
-            {/* Info */}
             <div className="space-y-5">
-              <span className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">
-                {product.categoryLabel}
-              </span>
+              <span className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">{product.categoryLabel}</span>
               <h1 className="font-heading text-3xl md:text-4xl font-bold text-foreground">{product.name}</h1>
               <p className="text-lg text-muted-foreground leading-relaxed">{product.tagline}</p>
               <p className="text-foreground leading-relaxed">{product.description}</p>
 
-              {/* Key specs grid */}
+              {product.price && (
+                <p className="text-2xl font-bold text-primary">₹{product.price.toLocaleString()} / {product.formulation?.includes("Powder") ? "kg" : "L"}</p>
+              )}
+
               <div className="grid grid-cols-2 gap-4 pt-2">
                 <div className="bg-muted rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Beaker className="h-4 w-4 text-primary" />
-                    <span className="text-xs font-medium text-muted-foreground">Composition</span>
-                  </div>
+                  <div className="flex items-center gap-2 mb-1"><Beaker className="h-4 w-4 text-primary" /><span className="text-xs font-medium text-muted-foreground">Composition</span></div>
                   <p className="text-sm font-medium text-foreground">{product.composition}</p>
                 </div>
                 <div className="bg-muted rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Shield className="h-4 w-4 text-primary" />
-                    <span className="text-xs font-medium text-muted-foreground">Formulation</span>
-                  </div>
+                  <div className="flex items-center gap-2 mb-1"><Shield className="h-4 w-4 text-primary" /><span className="text-xs font-medium text-muted-foreground">Formulation</span></div>
                   <p className="text-sm font-medium text-foreground">{product.formulation}</p>
                 </div>
                 <div className="bg-muted rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Leaf className="h-4 w-4 text-primary" />
-                    <span className="text-xs font-medium text-muted-foreground">Dosage</span>
-                  </div>
+                  <div className="flex items-center gap-2 mb-1"><Leaf className="h-4 w-4 text-primary" /><span className="text-xs font-medium text-muted-foreground">Dosage</span></div>
                   <p className="text-sm font-medium text-foreground">{product.dosage}</p>
                 </div>
                 <div className="bg-muted rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Package className="h-4 w-4 text-primary" />
-                    <span className="text-xs font-medium text-muted-foreground">Pack Sizes</span>
-                  </div>
+                  <div className="flex items-center gap-2 mb-1"><Package className="h-4 w-4 text-primary" /><span className="text-xs font-medium text-muted-foreground">Pack Sizes</span></div>
                   <p className="text-sm font-medium text-foreground">{product.packSizes.join(", ")}</p>
                 </div>
               </div>
@@ -130,39 +127,30 @@ const ProductDetail = () => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                  activeTab === tab.id ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <tab.icon className="h-4 w-4" />
-                {tab.label}
+                <tab.icon className="h-4 w-4" />{tab.label}
               </button>
             ))}
           </div>
 
           {activeTab === "details" && (
             <div className="grid lg:grid-cols-2 gap-8">
-              {/* Mode of Action */}
               <div className="bg-card rounded-xl border border-border p-6">
                 <h3 className="font-heading font-semibold text-foreground mb-3">Mode of Action</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">{product.modeOfAction}</p>
               </div>
-
-              {/* Features */}
               <div className="bg-card rounded-xl border border-border p-6">
                 <h3 className="font-heading font-semibold text-foreground mb-3">Key Features</h3>
                 <ul className="space-y-2">
                   {product.features.map((f, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
-                      {f}
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />{f}
                     </li>
                   ))}
                 </ul>
               </div>
-
-              {/* Target Crops */}
               <div className="bg-card rounded-xl border border-border p-6">
                 <h3 className="font-heading font-semibold text-foreground mb-3">Target Crops</h3>
                 <div className="flex flex-wrap gap-2">
@@ -171,8 +159,6 @@ const ProductDetail = () => {
                   ))}
                 </div>
               </div>
-
-              {/* Target Pests */}
               {product.targetPests.length > 0 && (
                 <div className="bg-card rounded-xl border border-border p-6">
                   <h3 className="font-heading font-semibold text-foreground mb-3">Target Pests / Diseases</h3>
@@ -196,9 +182,7 @@ const ProductDetail = () => {
                 <ul className="space-y-3">
                   {product.safetyPrecautions.map((s, i) => (
                     <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
-                      <span className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center text-xs font-bold text-accent-foreground shrink-0">
-                        {i + 1}
-                      </span>
+                      <span className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center text-xs font-bold text-accent-foreground shrink-0">{i + 1}</span>
                       {s}
                     </li>
                   ))}
@@ -212,9 +196,7 @@ const ProductDetail = () => {
               <div className="bg-card rounded-xl border border-border p-6 text-center">
                 <FileText className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
                 <h3 className="font-heading font-semibold text-foreground mb-2">Technical Documents</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Technical data sheets, MSDS, and compliance certificates will be available for download once backend integration is complete.
-                </p>
+                <p className="text-sm text-muted-foreground mb-4">Technical data sheets, MSDS, and compliance certificates will be available for download soon.</p>
                 <Button variant="outline" disabled>Coming Soon</Button>
               </div>
             </div>
@@ -230,22 +212,14 @@ const ProductDetail = () => {
             <p className="text-sm text-muted-foreground mb-6">Have questions? Send us an inquiry and our team will respond promptly.</p>
             <form onSubmit={handleInquiry} className="space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Name</label>
-                  <Input value={inquiryForm.name} onChange={(e) => setInquiryForm({ ...inquiryForm, name: e.target.value })} required />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Email</label>
-                  <Input type="email" value={inquiryForm.email} onChange={(e) => setInquiryForm({ ...inquiryForm, email: e.target.value })} required />
-                </div>
+                <div><label className="text-sm font-medium text-foreground mb-1.5 block">Name</label>
+                  <Input value={inquiryForm.name} onChange={(e) => setInquiryForm({ ...inquiryForm, name: e.target.value })} required /></div>
+                <div><label className="text-sm font-medium text-foreground mb-1.5 block">Email</label>
+                  <Input type="email" value={inquiryForm.email} onChange={(e) => setInquiryForm({ ...inquiryForm, email: e.target.value })} required /></div>
               </div>
-              <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Message</label>
-                <Textarea rows={4} value={inquiryForm.message} onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })} required />
-              </div>
-              <Button type="submit" className="gap-2">
-                Send Inquiry <Send className="h-4 w-4" />
-              </Button>
+              <div><label className="text-sm font-medium text-foreground mb-1.5 block">Message</label>
+                <Textarea rows={4} value={inquiryForm.message} onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })} required /></div>
+              <Button type="submit" className="gap-2">Send Inquiry <Send className="h-4 w-4" /></Button>
             </form>
           </div>
         </div>
