@@ -1,91 +1,273 @@
+import { useState, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import { Search, Filter } from "lucide-react";
+import ProductCard from "@/components/products/ProductCard";
+import ComparisonBar from "@/components/products/ComparisonBar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Shield, Bug, Droplets, Sprout } from "lucide-react";
+import { products, categoryLabels, type ProductCategory } from "@/data/products";
+import { Search, SlidersHorizontal, X, ChevronLeft, ChevronRight } from "lucide-react";
 
-const categories = [
-  { name: "All Products", icon: Filter, count: 48 },
-  { name: "Insecticides", icon: Bug, count: 15 },
-  { name: "Fungicides", icon: Shield, count: 12 },
-  { name: "Herbicides", icon: Droplets, count: 10 },
-  { name: "Plant Growth Regulators", icon: Sprout, count: 11 },
+const ITEMS_PER_PAGE = 9;
+
+const sortOptions = [
+  { value: "popularity", label: "Most Popular" },
+  { value: "name-asc", label: "Name A–Z" },
+  { value: "name-desc", label: "Name Z–A" },
+  { value: "newest", label: "Newest First" },
 ];
 
-const sampleProducts = Array.from({ length: 8 }, (_, i) => ({
-  id: i + 1,
-  name: `Product ${i + 1}`,
-  category: categories[1 + (i % 4)].name,
-  description: "Advanced crop protection formulation for effective pest control and enhanced yield.",
-}));
-
 const Products = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("popularity");
+  const [page, setPage] = useState(1);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
+  const activeCategory = searchParams.get("category") as ProductCategory | null;
+
+  const toggleCategory = (cat: ProductCategory) => {
+    const params = new URLSearchParams(searchParams);
+    if (activeCategory === cat) {
+      params.delete("category");
+    } else {
+      params.set("category", cat);
+    }
+    setSearchParams(params);
+    setPage(1);
+  };
+
+  const filtered = useMemo(() => {
+    let result = [...products];
+
+    if (activeCategory) {
+      result = result.filter((p) => p.category === activeCategory);
+    }
+
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.tagline.toLowerCase().includes(q) ||
+          p.composition.toLowerCase().includes(q) ||
+          p.targetCrops.some((c) => c.toLowerCase().includes(q)) ||
+          p.targetPests.some((c) => c.toLowerCase().includes(q))
+      );
+    }
+
+    switch (sort) {
+      case "name-asc":
+        result.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case "name-desc":
+        result.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case "newest":
+        result.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
+        break;
+      default:
+        result.sort((a, b) => b.popularity - a.popularity);
+    }
+
+    return result;
+  }, [activeCategory, search, sort]);
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+
+  const Sidebar = () => (
+    <div className="space-y-6">
+      <div>
+        <h3 className="font-heading font-semibold text-foreground mb-3">Categories</h3>
+        <ul className="space-y-1">
+          <li>
+            <button
+              onClick={() => { setSearchParams({}); setPage(1); }}
+              className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors flex justify-between ${
+                !activeCategory ? "bg-primary/10 text-primary font-medium" : "hover:bg-muted text-foreground"
+              }`}
+            >
+              All Products
+              <span className="text-xs text-muted-foreground">{products.length}</span>
+            </button>
+          </li>
+          {(Object.keys(categoryLabels) as ProductCategory[]).map((cat) => {
+            const count = products.filter((p) => p.category === cat).length;
+            return (
+              <li key={cat}>
+                <button
+                  onClick={() => toggleCategory(cat)}
+                  className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors flex justify-between ${
+                    activeCategory === cat ? "bg-primary/10 text-primary font-medium" : "hover:bg-muted text-foreground"
+                  }`}
+                >
+                  {categoryLabels[cat]}
+                  <span className="text-xs text-muted-foreground">{count}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      {/* Formulation filter info */}
+      <div>
+        <h3 className="font-heading font-semibold text-foreground mb-3">Quick Info</h3>
+        <div className="bg-muted rounded-lg p-4 text-sm text-muted-foreground space-y-2">
+          <p><span className="font-medium text-foreground">SL</span> – Soluble Liquid</p>
+          <p><span className="font-medium text-foreground">EC</span> – Emulsifiable Concentrate</p>
+          <p><span className="font-medium text-foreground">WP</span> – Wettable Powder</p>
+          <p><span className="font-medium text-foreground">L</span> – Liquid</p>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <Layout>
+      {/* Hero */}
       <section className="bg-primary py-16">
         <div className="container mx-auto px-4 lg:px-8 text-center">
-          <h1 className="font-heading text-4xl md:text-5xl font-bold text-primary-foreground mb-4">Our Products</h1>
+          <h1 className="font-heading text-4xl md:text-5xl font-bold text-primary-foreground mb-4">
+            Our Products
+          </h1>
           <p className="text-primary-foreground/80 max-w-2xl mx-auto text-lg">
             Comprehensive range of crop protection solutions for every farming need.
           </p>
         </div>
       </section>
 
-      <section className="py-12">
+      <section className="py-10">
         <div className="container mx-auto px-4 lg:px-8">
-          {/* Search */}
+          {/* Search & Sort Bar */}
           <div className="flex flex-col sm:flex-row gap-4 mb-8">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search products..." className="pl-10" />
+              <Input
+                placeholder="Search by product, crop, pest, or composition..."
+                value={search}
+                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                className="pl-10"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
-            <Button variant="outline" className="gap-2">
-              <Filter className="h-4 w-4" /> Filters
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm min-w-[160px]"
+            >
+              {sortOptions.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+            <Button
+              variant="outline"
+              className="lg:hidden gap-2"
+              onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+            >
+              <SlidersHorizontal className="h-4 w-4" /> Filters
             </Button>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Sidebar */}
-            <aside className="lg:w-64 shrink-0">
-              <h3 className="font-heading font-semibold text-foreground mb-4">Categories</h3>
-              <ul className="space-y-1">
-                {categories.map((cat) => (
-                  <li key={cat.name}>
-                    <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm hover:bg-primary/5 hover:text-primary transition-colors text-left">
-                      <span className="flex items-center gap-2">
-                        <cat.icon className="h-4 w-4" />
-                        {cat.name}
-                      </span>
-                      <span className="text-xs text-muted-foreground">{cat.count}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
+          {/* Active filter badge */}
+          {activeCategory && (
+            <div className="flex items-center gap-2 mb-6">
+              <span className="text-sm text-muted-foreground">Filtering by:</span>
+              <span className="inline-flex items-center gap-1 bg-primary/10 text-primary text-sm font-medium px-3 py-1 rounded-full">
+                {categoryLabels[activeCategory]}
+                <button onClick={() => setSearchParams({})}><X className="h-3 w-3" /></button>
+              </span>
+            </div>
+          )}
+
+          <div className="flex gap-8">
+            {/* Desktop Sidebar */}
+            <aside className="hidden lg:block w-64 shrink-0">
+              <Sidebar />
             </aside>
 
-            {/* Grid */}
-            <div className="flex-1">
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {sampleProducts.map((product) => (
-                  <div key={product.id} className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-elevated transition-all group">
-                    <div className="h-40 bg-muted flex items-center justify-center">
-                      <Shield className="h-12 w-12 text-muted-foreground/30 group-hover:text-primary/30 transition-colors" />
-                    </div>
-                    <div className="p-5">
-                      <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                        {product.category}
-                      </span>
-                      <h3 className="font-heading font-semibold text-foreground mt-2 mb-1">{product.name}</h3>
-                      <p className="text-sm text-muted-foreground line-clamp-2">{product.description}</p>
-                      <Button variant="link" className="px-0 mt-2">View Details →</Button>
-                    </div>
+            {/* Mobile Sidebar */}
+            {mobileFiltersOpen && (
+              <div className="fixed inset-0 z-50 bg-foreground/50 lg:hidden" onClick={() => setMobileFiltersOpen(false)}>
+                <div className="absolute left-0 top-0 bottom-0 w-72 bg-card p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="font-heading font-bold text-foreground">Filters</h2>
+                    <button onClick={() => setMobileFiltersOpen(false)}>
+                      <X className="h-5 w-5" />
+                    </button>
                   </div>
-                ))}
+                  <Sidebar />
+                </div>
               </div>
+            )}
+
+            {/* Product Grid */}
+            <div className="flex-1">
+              {paginated.length === 0 ? (
+                <div className="text-center py-16">
+                  <p className="text-lg text-muted-foreground">No products found matching your criteria.</p>
+                  <Button variant="link" onClick={() => { setSearch(""); setSearchParams({}); }}>
+                    Clear all filters
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Showing {(page - 1) * ITEMS_PER_PAGE + 1}–{Math.min(page * ITEMS_PER_PAGE, filtered.length)} of {filtered.length} products
+                  </p>
+                  <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {paginated.map((product) => (
+                      <ProductCard key={product.id} product={product} />
+                    ))}
+                  </div>
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="flex justify-center items-center gap-2 mt-10">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={page === 1}
+                        onClick={() => setPage((p) => p - 1)}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      {Array.from({ length: totalPages }, (_, i) => (
+                        <Button
+                          key={i + 1}
+                          variant={page === i + 1 ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setPage(i + 1)}
+                        >
+                          {i + 1}
+                        </Button>
+                      ))}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={page === totalPages}
+                        onClick={() => setPage((p) => p + 1)}
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
       </section>
+
+      <ComparisonBar />
     </Layout>
   );
 };
