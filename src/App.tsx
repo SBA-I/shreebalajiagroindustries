@@ -62,6 +62,9 @@ const App = () => (
               <Route path="/distributor/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
               <Route path="/distributor/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
+              {/* Admin route */}
+              <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AuthProvider>
