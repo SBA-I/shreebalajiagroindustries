@@ -2,12 +2,14 @@ import Layout from "@/components/layout/Layout";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, MapPin, Clock, Send } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, Send, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { faqs } from "@/data/content";
 
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", type: "general", message: "" });
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,11 +52,19 @@ const Contact = () => {
                   </div>
                 ))}
               </div>
+
+              {/* Emergency */}
+              <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-5">
+                <h3 className="font-heading font-semibold text-foreground mb-2">Emergency Contact</h3>
+                <p className="text-sm text-muted-foreground mb-2">For urgent product safety or chemical emergency:</p>
+                <p className="text-sm font-bold text-destructive">+91 XXXXX XXXXX (24/7 Helpline)</p>
+              </div>
             </div>
 
             {/* Form */}
             <div className="lg:col-span-3">
               <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-border p-8 shadow-card space-y-5">
+                <h3 className="font-heading text-lg font-semibold text-foreground">Send Us a Message</h3>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-foreground mb-1.5 block">Name</label>
@@ -76,6 +86,7 @@ const Contact = () => {
                     <option value="product">Product Inquiry</option>
                     <option value="distribution">Distribution Partnership</option>
                     <option value="support">Technical Support</option>
+                    <option value="complaint">Complaint / Feedback</option>
                   </select>
                 </div>
                 <div>
@@ -87,6 +98,34 @@ const Contact = () => {
                 </Button>
               </form>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-12 bg-muted">
+        <div className="container mx-auto px-4 lg:px-8 max-w-3xl">
+          <div className="text-center mb-10">
+            <p className="text-sm font-semibold text-primary uppercase tracking-wider mb-2">Support</p>
+            <h2 className="font-heading text-3xl font-bold text-foreground">Frequently Asked Questions</h2>
+          </div>
+          <div className="space-y-3">
+            {faqs.map((faq, i) => (
+              <div key={i} className="bg-card rounded-xl border border-border overflow-hidden">
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="w-full flex items-center justify-between p-5 text-left"
+                >
+                  <span className="font-medium text-foreground pr-4">{faq.question}</span>
+                  <ChevronDown className={`h-5 w-5 text-muted-foreground shrink-0 transition-transform ${openFaq === i ? "rotate-180" : ""}`} />
+                </button>
+                {openFaq === i && (
+                  <div className="px-5 pb-5 -mt-1">
+                    <p className="text-sm text-muted-foreground leading-relaxed">{faq.answer}</p>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </section>

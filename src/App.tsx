@@ -10,7 +10,9 @@ import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
 import CompareProducts from "./pages/CompareProducts";
 import Resources from "./pages/Resources";
+import ArticleDetail from "./pages/ArticleDetail";
 import News from "./pages/News";
+import NewsDetail from "./pages/NewsDetail";
 import Contact from "./pages/Contact";
 import DistributorDashboard from "./pages/distributor/DistributorDashboard";
 import OrderManagement from "./pages/distributor/OrderManagement";
@@ -35,7 +37,9 @@ const App = () => (
             <Route path="/products/compare" element={<CompareProducts />} />
             <Route path="/products/:productId" element={<ProductDetail />} />
             <Route path="/resources" element={<Resources />} />
+            <Route path="/resources/:slug" element={<ArticleDetail />} />
             <Route path="/news" element={<News />} />
+            <Route path="/news/:slug" element={<NewsDetail />} />
             <Route path="/contact" element={<Contact />} />
             {/* Distributor Portal */}
             <Route path="/distributor" element={<DistributorDashboard />} />
