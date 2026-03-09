@@ -6,15 +6,31 @@ import { Phone, Mail, MapPin, Clock, Send, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { faqs } from "@/data/content";
+import { supabase } from "@/integrations/supabase/client";
 
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", type: "general", message: "" });
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Thank you! We'll get back to you soon.");
-    setForm({ name: "", email: "", type: "general", message: "" });
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.from("contact_inquiries" as any).insert({
+        name: form.name,
+        email: form.email,
+        inquiry_type: form.type,
+        message: form.message,
+      });
+      if (error) throw error;
+      toast.success("Thank you! We'll get back to you soon.");
+      setForm({ name: "", email: "", type: "general", message: "" });
+    } catch {
+      toast.error("Failed to send message. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -36,9 +52,10 @@ const Contact = () => {
               <h2 className="font-heading text-2xl font-bold text-foreground">Get In Touch</h2>
               <div className="space-y-4">
                 {[
-                  { icon: MapPin, label: "Address", value: "Industrial Area, Rajasthan, India" },
-                  { icon: Phone, label: "Phone", value: "+91 XXXXX XXXXX" },
-                  { icon: Mail, label: "Email", value: "info@shreebalajiagro.com" },
+                  { icon: MapPin, label: "Registered Office", value: "2404/B1, Lane No. 6, Dhule-424001 (M.S.)" },
+                  { icon: MapPin, label: "Factory", value: "Plot No. E-35, M.I.D.C., Awdhan, Dhule-424311" },
+                  { icon: Phone, label: "Mobile", value: "+91 98605 32515" },
+                  { icon: Mail, label: "Email", value: "sbaindia44@gmail.com" },
                   { icon: Clock, label: "Business Hours", value: "Mon–Sat: 9:00 AM – 6:00 PM" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-start gap-3">
@@ -57,7 +74,7 @@ const Contact = () => {
               <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-5">
                 <h3 className="font-heading font-semibold text-foreground mb-2">Emergency Contact</h3>
                 <p className="text-sm text-muted-foreground mb-2">For urgent product safety or chemical emergency:</p>
-                <p className="text-sm font-bold text-destructive">+91 XXXXX XXXXX (24/7 Helpline)</p>
+                <p className="text-sm font-bold text-destructive">+91 98605 32515 (24/7 Helpline)</p>
               </div>
             </div>
 
@@ -93,8 +110,8 @@ const Contact = () => {
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Message</label>
                   <Textarea rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} required />
                 </div>
-                <Button type="submit" className="gap-2">
-                  Send Message <Send className="h-4 w-4" />
+                <Button type="submit" className="gap-2" disabled={submitting}>
+                  {submitting ? "Sending..." : "Send Message"} <Send className="h-4 w-4" />
                 </Button>
               </form>
             </div>

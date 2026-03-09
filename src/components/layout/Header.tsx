@@ -12,10 +12,10 @@ const navItems = [
     label: "Products",
     path: "/products",
     children: [
-      { label: "Pesticides", path: "/products?category=pesticides" },
       { label: "Insecticides", path: "/products?category=insecticides" },
       { label: "Fungicides", path: "/products?category=fungicides" },
       { label: "Herbicides", path: "/products?category=herbicides" },
+      { label: "PGR", path: "/products?category=pgr" },
     ],
   },
   { label: "Resources", path: "/resources" },
