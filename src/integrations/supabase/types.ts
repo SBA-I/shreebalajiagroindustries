@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      contact_inquiries: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          inquiry_type: string
+          is_resolved: boolean
+          message: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          inquiry_type?: string
+          is_resolved?: boolean
+          message: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          inquiry_type?: string
+          is_resolved?: boolean
+          message?: string
+          name?: string
+        }
+        Relationships: []
+      }
       inventory: {
         Row: {
           current_stock: number
