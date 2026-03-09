@@ -38,7 +38,7 @@ const Footer = () => {
           <div>
             <h4 className="font-heading text-sm font-semibold uppercase tracking-wider mb-4 text-accent">Products</h4>
             <ul className="space-y-2">
-              {["Pesticides", "Insecticides", "Fungicides", "Herbicides"].map((p) => (
+              {["Insecticides", "Fungicides", "Herbicides", "PGR"].map((p) => (
                 <li key={p}>
                   <Link to={`/products?category=${p.toLowerCase()}`} className="text-sm text-primary-foreground/70 hover:text-accent transition-colors">
                     {p}
