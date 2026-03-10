@@ -159,7 +159,7 @@ const Header = () => {
             <div className="pt-3 border-t border-border">
               {user ? (
                 <div className="space-y-2">
-                  <Link to="/distributor" onClick={() => setMobileOpen(false)}>
+                  <Link to={getDashboardPath(userRole)} onClick={() => setMobileOpen(false)}>
                     <Button variant="default" size="sm" className="w-full gap-2">
                       <User className="h-4 w-4" />
                       Dashboard
