@@ -23,6 +23,8 @@ import ResetPassword from "./pages/ResetPassword";
 import FarmerLogin from "./pages/FarmerLogin";
 import DistributorDashboard from "./pages/distributor/DistributorDashboard";
 import OrderManagement from "./pages/distributor/OrderManagement";
+import ProductCatalog from "./pages/distributor/ProductCatalog";
+import DistributorAnalytics from "./pages/distributor/DistributorAnalytics";
 import InventoryManagement from "./pages/distributor/InventoryManagement";
 import Messages from "./pages/distributor/Messages";
 import Profile from "./pages/distributor/Profile";
