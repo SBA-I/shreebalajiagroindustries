@@ -86,7 +86,7 @@ const FarmerLogin = () => {
     setLoading(true);
     const { data, error } = await supabase.auth.signUp({
       email: pseudoEmail(cleanPhone),
-      password: pin,
+      password: paddedPin(pin),
       options: {
         data: {
           full_name: name.trim(),
