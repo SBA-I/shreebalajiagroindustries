@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Loader2, Eye, EyeOff, ShieldCheck, Store, ArrowLeft, MapPin } from "lucide-react";
 import logoImg from "@/assets/logo-sbai.png";
 
-type LoginRole = "dealer" | "admin" | null;
+type LoginRole = "dealer" | "admin" | "field_officer" | null;
 
 const Login = () => {
   const [selectedRole, setSelectedRole] = useState<LoginRole>(null);
