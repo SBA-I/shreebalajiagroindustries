@@ -46,7 +46,7 @@ export function DistributorSidebar() {
       <SidebarContent>
         {/* Logo area */}
         <div className="p-4 flex items-center gap-2">
-          <Leaf className="h-6 w-6 text-primary shrink-0" />
+          <img src={logoImg} alt="SBAI" className="h-7 w-7 object-contain shrink-0" />
           {!collapsed && (
             <Link to="/" className="font-heading text-sm font-bold text-primary leading-tight">
               Shree Balaji Agro
