@@ -5,6 +5,8 @@ import {
   User,
   MessageSquare,
   LogOut,
+  Store,
+  BarChart3,
 } from "lucide-react";
 import logoImg from "@/assets/logo-sbai.png";
 import { NavLink } from "@/components/NavLink";
