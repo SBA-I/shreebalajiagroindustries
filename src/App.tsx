@@ -26,6 +26,12 @@ import InventoryManagement from "./pages/distributor/InventoryManagement";
 import Messages from "./pages/distributor/Messages";
 import Profile from "./pages/distributor/Profile";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import FieldOfficerDashboard from "./pages/field-officer/FieldOfficerDashboard";
+import DealerVisits from "./pages/field-officer/DealerVisits";
+import FarmerMeetings from "./pages/field-officer/FarmerMeetings";
+import FieldOfficerOrders from "./pages/field-officer/FieldOfficerOrders";
+import SalesTargets from "./pages/field-officer/SalesTargets";
+import FieldOfficerProfile from "./pages/field-officer/FieldOfficerProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
