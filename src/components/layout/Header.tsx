@@ -88,7 +88,7 @@ const Header = () => {
         <div className="hidden lg:flex items-center gap-3">
           {user ? (
             <>
-              <Link to="/distributor">
+              <Link to={getDashboardPath(userRole)}>
                 <Button variant="outline" size="sm" className="gap-2">
                   <User className="h-4 w-4" />
                   Dashboard
