@@ -5,10 +5,13 @@ import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Leaf, Loader2, Eye, EyeOff } from "lucide-react";
+import { Loader2, Eye, EyeOff, Store } from "lucide-react";
+import logoImg from "@/assets/logo-sbai.png";
 
 const Signup = () => {
   const [fullName, setFullName] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,7 +29,7 @@ const Signup = () => {
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: { full_name: fullName, company_name: companyName, phone },
         emailRedirectTo: window.location.origin,
       },
     });
@@ -34,7 +37,7 @@ const Signup = () => {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success("Account created! Check your email to confirm.");
+      toast.success("Registration submitted! Check your email to confirm. Your account will be activated after admin approval.");
       navigate("/login");
     }
   };
@@ -45,14 +48,16 @@ const Signup = () => {
       <div className="hidden lg:flex lg:w-1/2 bg-secondary relative items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-secondary via-secondary/90 to-primary" />
         <div className="relative z-10 px-12 text-secondary-foreground">
-          <div className="flex items-center gap-3 mb-8">
-            <Leaf className="h-10 w-10" />
-            <span className="font-heading text-3xl font-bold">SB Agrochemicals</span>
-          </div>
-          <h1 className="font-heading text-4xl font-bold mb-4">Join Our Network</h1>
+          <img src={logoImg} alt="SBAI" className="h-20 w-20 mb-6 object-contain" />
+          <h1 className="font-heading text-4xl font-bold mb-4">Become a Dealer</h1>
           <p className="text-lg opacity-90 max-w-md">
-            Become a distributor and access premium agrochemical products, competitive pricing, and dedicated support.
+            Register to access wholesale pricing, bulk orders, and dedicated support from Shree Balaji Agro Industries.
           </p>
+          <div className="mt-8 p-4 bg-white/10 backdrop-blur-sm rounded-lg">
+            <p className="text-sm opacity-80">
+              ⏳ After registration, your account will be reviewed and approved by our admin team within 24-48 hours.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -60,33 +65,36 @@ const Signup = () => {
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2 mb-8 justify-center">
-            <Leaf className="h-8 w-8 text-primary" />
-            <span className="font-heading text-2xl font-bold text-foreground">SB Agrochemicals</span>
+            <img src={logoImg} alt="SBAI" className="h-10 w-10 object-contain" />
+            <span className="font-heading text-xl font-bold text-foreground">Shree Balaji Agro</span>
           </div>
 
-          <h2 className="font-heading text-2xl font-bold text-foreground mb-1">Create your account</h2>
-          <p className="text-muted-foreground mb-8">Start your journey as a distributor partner</p>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Store className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="font-heading text-xl font-bold text-foreground">Dealer Registration</h2>
+              <p className="text-sm text-muted-foreground">Create your dealer/distributor account</p>
+            </div>
+          </div>
 
-          <form onSubmit={handleSignup} className="space-y-5">
+          <form onSubmit={handleSignup} className="space-y-4">
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Full Name</label>
-              <Input
-                type="text"
-                placeholder="Your full name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-              />
+              <Input type="text" placeholder="Your full name" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground mb-1.5 block">Company / Firm Name</label>
+              <Input type="text" placeholder="Your firm name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground mb-1.5 block">Phone Number</label>
+              <Input type="tel" placeholder="+91 98765 43210" value={phone} onChange={(e) => setPhone(e.target.value)} />
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Email</label>
-              <Input
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <Input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Password</label>
@@ -110,7 +118,7 @@ const Signup = () => {
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Create Account
+              Submit Registration
             </Button>
           </form>
 
@@ -133,31 +141,17 @@ const Signup = () => {
             Continue with Google
           </Button>
 
-          <Button
-            variant="outline"
-            className="w-full gap-2 mt-2"
-            onClick={async () => {
-              const { error } = await lovable.auth.signInWithOAuth("apple", {
-                redirect_uri: window.location.origin,
-              });
-              if (error) toast.error("Apple sign-in failed");
-            }}
-          >
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
-            Continue with Apple
-          </Button>
+          <p className="mt-6 p-3 bg-muted/50 rounded-lg text-xs text-muted-foreground text-center">
+            ⏳ After registration, your account will be reviewed and approved by our team within 24-48 hours.
+          </p>
 
-          <p className="mt-8 text-center text-sm text-muted-foreground">
+          <p className="mt-6 text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link to="/login" className="text-primary font-medium hover:underline">
-              Sign in
-            </Link>
+            <Link to="/login" className="text-primary font-medium hover:underline">Sign in</Link>
           </p>
 
           <p className="mt-4 text-center">
-            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
-              ← Back to home
-            </Link>
+            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">← Back to home</Link>
           </p>
         </div>
       </div>
