@@ -158,6 +158,45 @@ const OverviewTab = () => {
     { label: "Open Inquiries", value: unresolvedInquiries ?? 0, icon: MessageSquare, color: "text-blue-600 bg-blue-100" },
   ];
 
+  // Analytics data
+  const { data: allOrders } = useQuery({
+    queryKey: ["admin-orders-analytics"],
+    queryFn: async () => {
+      const { data } = await supabase.from("orders").select("created_at, total, status");
+      return data ?? [];
+    },
+  });
+  const { data: productsByCategory } = useQuery({
+    queryKey: ["admin-products-by-category"],
+    queryFn: async () => {
+      const { data } = await supabase.from("products").select("category").eq("is_active", true);
+      return data ?? [];
+    },
+  });
+
+  const monthlyData = (() => {
+    if (!allOrders) return [];
+    const map: Record<string, { month: string; revenue: number; orders: number }> = {};
+    allOrders.forEach((o) => {
+      const d = new Date(o.created_at);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const label = d.toLocaleDateString("en-IN", { month: "short", year: "2-digit" });
+      if (!map[key]) map[key] = { month: label, revenue: 0, orders: 0 };
+      map[key].revenue += Number(o.total);
+      map[key].orders += 1;
+    });
+    return Object.values(map).slice(-6);
+  })();
+
+  const categoryData = (() => {
+    if (!productsByCategory) return [];
+    const map: Record<string, number> = {};
+    productsByCategory.forEach((p) => { map[p.category] = (map[p.category] || 0) + 1; });
+    return Object.entries(map).map(([name, value]) => ({ name, value }));
+  })();
+
+  const totalRevenue = allOrders?.reduce((s, o) => s + Number(o.total), 0) ?? 0;
+
   return (
     <div>
       <h1 className="font-heading text-2xl font-bold text-foreground mb-6">Dashboard Overview</h1>
