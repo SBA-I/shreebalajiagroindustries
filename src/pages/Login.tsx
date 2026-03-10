@@ -64,8 +64,8 @@ const Login = () => {
       return;
     }
 
-    // Check approval for dealers/distributors
-    if (["distributor", "dealer"].includes(userRole ?? "")) {
+    // Check approval for dealers/distributors/field officers
+    if (["distributor", "dealer", "field_officer"].includes(userRole ?? "")) {
       const { data: profile } = await supabase
         .from("profiles")
         .select("is_approved")
