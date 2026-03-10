@@ -1,6 +1,6 @@
 import FarmerLayout from "@/components/farmer/FarmerLayout";
 import { Link } from "react-router-dom";
-import { ShoppingBag, Sprout, MapPin, MessageSquare, FileText } from "lucide-react";
+import { ShoppingBag, Sprout, MapPin, MessageSquare, FileText, Bot } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +11,7 @@ const quickLinks = [
   { label: "Find Nearest Dealer", icon: MapPin, path: "/farmer/dealers", color: "bg-orange-100 text-orange-700", desc: "Locate authorized dealers near you" },
   { label: "Ask a Question", icon: MessageSquare, path: "/farmer/questions", color: "bg-purple-100 text-purple-700", desc: "Get expert help for crop problems" },
   { label: "Usage Guides", icon: FileText, path: "/farmer/guides", color: "bg-teal-100 text-teal-700", desc: "Download product usage instructions" },
+  { label: "🌱 Ask Balaji AI", icon: Bot, path: "/ask-ai", color: "bg-emerald-100 text-emerald-700", desc: "AI-powered crop advisory & pest detection" },
 ];
 
 const FarmerDashboard = () => {

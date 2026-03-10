@@ -5,7 +5,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import DistributorLayout from "@/components/distributor/DistributorLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, Eye, X, Loader2 } from "lucide-react";
+import { Search, Plus, Eye, X, Loader2, Download } from "lucide-react";
+import InvoiceDownload from "@/components/distributor/InvoiceDownload";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
@@ -116,7 +117,8 @@ const OrderManagement = () => {
                           {order.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-6 py-4 text-right space-x-1">
+                        <InvoiceDownload order={order} />
                         <Button variant="ghost" size="sm" onClick={() => setSelectedOrder(order)}>
                           <Eye className="h-4 w-4" />
                         </Button>
@@ -175,6 +177,9 @@ const OrderManagement = () => {
               {selectedOrder.notes && (
                 <p className="text-sm text-muted-foreground italic bg-muted rounded-lg p-3">{selectedOrder.notes}</p>
               )}
+              <div className="pt-2">
+                <InvoiceDownload order={selectedOrder} />
+              </div>
             </div>
           )}
         </DialogContent>

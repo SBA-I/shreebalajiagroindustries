@@ -10,10 +10,14 @@ import { Badge } from "@/components/ui/badge";
 import {
   LayoutDashboard, Package, Users, ShoppingCart, Shield, LogOut,
   Search, Plus, Pencil, Trash2, ChevronLeft, CheckCircle, XCircle,
-  MessageSquare, UserCheck, MapPin,
+  MessageSquare, UserCheck, MapPin, TrendingUp,
 } from "lucide-react";
 import { Link, Navigate } from "react-router-dom";
 import logoImg from "@/assets/logo-sbai.png";
+import {
+  BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, Legend,
+} from "recharts";
 
 type Tab = "overview" | "products" | "users" | "orders" | "approvals" | "inquiries" | "field-officers";
 
@@ -107,6 +111,8 @@ const AdminDashboard = () => {
 };
 
 /* ==================== OVERVIEW ==================== */
+const CHART_COLORS = ["hsl(142, 76%, 36%)", "hsl(221, 83%, 53%)", "hsl(45, 93%, 47%)", "hsl(271, 91%, 65%)"];
+
 const OverviewTab = () => {
   const { data: products } = useQuery({
     queryKey: ["admin-products-count"],
@@ -152,11 +158,52 @@ const OverviewTab = () => {
     { label: "Open Inquiries", value: unresolvedInquiries ?? 0, icon: MessageSquare, color: "text-blue-600 bg-blue-100" },
   ];
 
+  // Analytics data
+  const { data: allOrders } = useQuery({
+    queryKey: ["admin-orders-analytics"],
+    queryFn: async () => {
+      const { data } = await supabase.from("orders").select("created_at, total, status");
+      return data ?? [];
+    },
+  });
+  const { data: productsByCategory } = useQuery({
+    queryKey: ["admin-products-by-category"],
+    queryFn: async () => {
+      const { data } = await supabase.from("products").select("category").eq("is_active", true);
+      return data ?? [];
+    },
+  });
+
+  const monthlyData = (() => {
+    if (!allOrders) return [];
+    const map: Record<string, { month: string; revenue: number; orders: number }> = {};
+    allOrders.forEach((o) => {
+      const d = new Date(o.created_at);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const label = d.toLocaleDateString("en-IN", { month: "short", year: "2-digit" });
+      if (!map[key]) map[key] = { month: label, revenue: 0, orders: 0 };
+      map[key].revenue += Number(o.total);
+      map[key].orders += 1;
+    });
+    return Object.values(map).slice(-6);
+  })();
+
+  const categoryData = (() => {
+    if (!productsByCategory) return [];
+    const map: Record<string, number> = {};
+    productsByCategory.forEach((p) => { map[p.category] = (map[p.category] || 0) + 1; });
+    return Object.entries(map).map(([name, value]) => ({ name, value }));
+  })();
+
+  const totalRevenue = allOrders?.reduce((s, o) => s + Number(o.total), 0) ?? 0;
+
   return (
-    <div>
-      <h1 className="font-heading text-2xl font-bold text-foreground mb-6">Dashboard Overview</h1>
+    <div className="space-y-8">
+      <h1 className="font-heading text-2xl font-bold text-foreground">Dashboard Overview</h1>
+
+      {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-        {stats.map((s) => (
+        {[...stats.slice(0, 3), { label: "Total Revenue", value: `₹${totalRevenue.toLocaleString("en-IN")}`, icon: TrendingUp, color: "text-emerald-600 bg-emerald-100" }, ...stats.slice(3)].map((s) => (
           <div key={s.label} className="bg-card rounded-xl border border-border p-5 shadow-card">
             <div className="flex items-center gap-3">
               <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${s.color}`}>
@@ -164,11 +211,49 @@ const OverviewTab = () => {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">{s.label}</p>
-                <p className="font-heading text-2xl font-bold text-foreground">{s.value}</p>
+                <p className="font-heading text-xl font-bold text-foreground">{s.value}</p>
               </div>
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Charts */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-xl border border-border p-6 shadow-card">
+          <h3 className="font-heading font-bold text-foreground mb-4">Monthly Revenue</h3>
+          {monthlyData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={monthlyData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip formatter={(v: number) => `₹${v.toLocaleString("en-IN")}`} />
+                <Bar dataKey="revenue" fill="hsl(142, 76%, 36%)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-12">No order data yet</p>
+          )}
+        </div>
+
+        <div className="bg-card rounded-xl border border-border p-6 shadow-card">
+          <h3 className="font-heading font-bold text-foreground mb-4">Products by Category</h3>
+          {categoryData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie data={categoryData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label={({ name, value }) => `${name} (${value})`}>
+                  {categoryData.map((_, i) => (
+                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-12">No products yet</p>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -277,8 +362,19 @@ const ProductFormDialog = ({ open, onClose, product, onSaved }: {
   const [category, setCategory] = useState<string>(product?.category ?? "Insecticides");
   const [price, setPrice] = useState(product?.price ? String(product.price) : "");
   const [description, setDescription] = useState(product?.description ?? "");
+  const [shortDesc, setShortDesc] = useState(product?.short_description ?? "");
   const [technicalName, setTechnicalName] = useState(product?.technical_name ?? "");
+  const [formulation, setFormulation] = useState(product?.formulation ?? "");
+  const [dosage, setDosage] = useState(product?.dosage ?? "");
+  const [modeOfAction, setModeOfAction] = useState(product?.mode_of_action ?? "");
+  const [targetCrops, setTargetCrops] = useState(product?.target_crops?.join(", ") ?? "");
+  const [targetPests, setTargetPests] = useState(product?.target_pests?.join(", ") ?? "");
+  const [packSizes, setPackSizes] = useState(product?.pack_sizes?.join(", ") ?? "");
+  const [features, setFeatures] = useState(product?.features?.join(", ") ?? "");
+  const [safetyPrecautions, setSafetyPrecautions] = useState(product?.safety_precautions?.join(", ") ?? "");
   const [loading, setLoading] = useState(false);
+
+  const csvToArray = (s: string) => s ? s.split(",").map((x) => x.trim()).filter(Boolean) : null;
 
   const handleSave = async () => {
     if (!name || !slug) { toast.error("Name and slug are required"); return; }
@@ -288,7 +384,16 @@ const ProductFormDialog = ({ open, onClose, product, onSaved }: {
       category: category as any,
       price: price ? parseFloat(price) : null,
       description: description || null,
+      short_description: shortDesc || null,
       technical_name: technicalName || null,
+      formulation: formulation || null,
+      dosage: dosage || null,
+      mode_of_action: modeOfAction || null,
+      target_crops: csvToArray(targetCrops),
+      target_pests: csvToArray(targetPests),
+      pack_sizes: csvToArray(packSizes),
+      features: csvToArray(features),
+      safety_precautions: csvToArray(safetyPrecautions),
     };
     if (product) {
       const { error } = await supabase.from("products").update(payload).eq("id", product.id);
@@ -302,35 +407,68 @@ const ProductFormDialog = ({ open, onClose, product, onSaved }: {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-heading">{product ? "Edit" : "Add"} Product</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div><label className="text-sm font-medium text-foreground mb-1 block">Name</label>
-            <Input value={name} onChange={(e) => { setName(e.target.value); if (!product) setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")); }} />
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div><label className="text-xs font-medium text-foreground mb-1 block">Name *</label>
+              <Input value={name} onChange={(e) => { setName(e.target.value); if (!product) setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")); }} />
+            </div>
+            <div><label className="text-xs font-medium text-foreground mb-1 block">Slug *</label>
+              <Input value={slug} onChange={(e) => setSlug(e.target.value)} />
+            </div>
           </div>
-          <div><label className="text-sm font-medium text-foreground mb-1 block">Slug</label>
-            <Input value={slug} onChange={(e) => setSlug(e.target.value)} />
+          <div className="grid grid-cols-2 gap-3">
+            <div><label className="text-xs font-medium text-foreground mb-1 block">Category</label>
+              <select value={category} onChange={(e) => setCategory(e.target.value)} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                <option value="Insecticides">Insecticides</option>
+                <option value="Fungicides">Fungicides</option>
+                <option value="Herbicides">Herbicides</option>
+                <option value="PGR">PGR</option>
+              </select>
+            </div>
+            <div><label className="text-xs font-medium text-foreground mb-1 block">Price (₹)</label>
+              <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
+            </div>
           </div>
-          <div><label className="text-sm font-medium text-foreground mb-1 block">Category</label>
-            <select value={category} onChange={(e) => setCategory(e.target.value)} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
-              <option value="Insecticides">Insecticides</option>
-              <option value="Fungicides">Fungicides</option>
-              <option value="Herbicides">Herbicides</option>
-              <option value="PGR">PGR</option>
-            </select>
+          <div className="grid grid-cols-2 gap-3">
+            <div><label className="text-xs font-medium text-foreground mb-1 block">Technical Name</label>
+              <Input value={technicalName} onChange={(e) => setTechnicalName(e.target.value)} placeholder="e.g., Imidacloprid 17.8% SL" />
+            </div>
+            <div><label className="text-xs font-medium text-foreground mb-1 block">Formulation</label>
+              <Input value={formulation} onChange={(e) => setFormulation(e.target.value)} placeholder="e.g., SL, WP, EC" />
+            </div>
           </div>
-          <div><label className="text-sm font-medium text-foreground mb-1 block">Technical Name</label>
-            <Input value={technicalName} onChange={(e) => setTechnicalName(e.target.value)} placeholder="e.g., Imidacloprid 17.8% SL" />
+          <div><label className="text-xs font-medium text-foreground mb-1 block">Dosage</label>
+            <Input value={dosage} onChange={(e) => setDosage(e.target.value)} placeholder="e.g., 1.5-2 ml per liter of water" />
           </div>
-          <div><label className="text-sm font-medium text-foreground mb-1 block">Price (₹)</label>
-            <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
+          <div><label className="text-xs font-medium text-foreground mb-1 block">Mode of Action</label>
+            <Input value={modeOfAction} onChange={(e) => setModeOfAction(e.target.value)} placeholder="e.g., Systemic, Contact" />
           </div>
-          <div><label className="text-sm font-medium text-foreground mb-1 block">Description</label>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full h-20 rounded-md border border-input bg-background px-3 py-2 text-sm resize-none" />
+          <div><label className="text-xs font-medium text-foreground mb-1 block">Short Description</label>
+            <Input value={shortDesc} onChange={(e) => setShortDesc(e.target.value)} />
           </div>
-          <div className="flex gap-3">
+          <div><label className="text-xs font-medium text-foreground mb-1 block">Full Description</label>
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full h-16 rounded-md border border-input bg-background px-3 py-2 text-sm resize-none" />
+          </div>
+          <div><label className="text-xs font-medium text-foreground mb-1 block">Target Crops (comma-separated)</label>
+            <Input value={targetCrops} onChange={(e) => setTargetCrops(e.target.value)} placeholder="Cotton, Rice, Soybean" />
+          </div>
+          <div><label className="text-xs font-medium text-foreground mb-1 block">Target Pests (comma-separated)</label>
+            <Input value={targetPests} onChange={(e) => setTargetPests(e.target.value)} placeholder="Whitefly, Aphid, Bollworm" />
+          </div>
+          <div><label className="text-xs font-medium text-foreground mb-1 block">Pack Sizes (comma-separated)</label>
+            <Input value={packSizes} onChange={(e) => setPackSizes(e.target.value)} placeholder="100ml, 250ml, 500ml, 1L" />
+          </div>
+          <div><label className="text-xs font-medium text-foreground mb-1 block">Features (comma-separated)</label>
+            <Input value={features} onChange={(e) => setFeatures(e.target.value)} placeholder="Fast acting, Long lasting" />
+          </div>
+          <div><label className="text-xs font-medium text-foreground mb-1 block">Safety Precautions (comma-separated)</label>
+            <Input value={safetyPrecautions} onChange={(e) => setSafetyPrecautions(e.target.value)} placeholder="Wear gloves, Avoid contact with eyes" />
+          </div>
+          <div className="flex gap-3 pt-2">
             <Button onClick={handleSave} disabled={loading} className="flex-1">{product ? "Update" : "Create"}</Button>
             <Button variant="outline" onClick={onClose}>Cancel</Button>
           </div>

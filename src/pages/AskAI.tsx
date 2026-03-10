@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Trash2, Sprout, ArrowLeft, Calculator, Lightbulb } from "lucide-react";
+import { Send, Trash2, Sprout, ArrowLeft, Calculator, Lightbulb, Camera } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAiChat } from "@/hooks/use-ai-chat";
 import SprayCalculator from "@/components/ai/SprayCalculator";
+import CropImageDetector from "@/components/ai/CropImageDetector";
 import ReactMarkdown from "react-markdown";
 import Layout from "@/components/layout/Layout";
 
@@ -61,6 +62,9 @@ const AskAI = () => {
             </TabsTrigger>
             <TabsTrigger value="calculator" className="gap-1.5">
               <Calculator className="h-4 w-4" /> Spray Calculator
+            </TabsTrigger>
+            <TabsTrigger value="detect" className="gap-1.5">
+              <Camera className="h-4 w-4" /> Disease Detector
             </TabsTrigger>
           </TabsList>
 
@@ -161,6 +165,12 @@ const AskAI = () => {
           <TabsContent value="calculator">
             <div className="max-w-md mx-auto">
               <SprayCalculator />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="detect">
+            <div className="max-w-lg mx-auto">
+              <CropImageDetector />
             </div>
           </TabsContent>
         </Tabs>
