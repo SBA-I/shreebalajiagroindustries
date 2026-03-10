@@ -57,6 +57,13 @@ const Login = () => {
       return;
     }
 
+    if (selectedRole === "field_officer" && userRole !== "field_officer") {
+      await supabase.auth.signOut();
+      setLoading(false);
+      toast.error("You don't have field officer access. Please contact admin.");
+      return;
+    }
+
     // Check approval for dealers/distributors
     if (["distributor", "dealer"].includes(userRole ?? "")) {
       const { data: profile } = await supabase
