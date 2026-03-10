@@ -155,8 +155,8 @@ const Login = () => {
     );
   }
 
-  const roleLabel = selectedRole === "admin" ? "Admin" : "Dealer / Distributor";
-  const RoleIcon = selectedRole === "admin" ? ShieldCheck : Store;
+  const roleLabel = selectedRole === "admin" ? "Admin" : selectedRole === "field_officer" ? "Field Officer" : "Dealer / Distributor";
+  const RoleIcon = selectedRole === "admin" ? ShieldCheck : selectedRole === "field_officer" ? MapPin : Store;
 
   return (
     <div className="min-h-screen bg-background flex">
