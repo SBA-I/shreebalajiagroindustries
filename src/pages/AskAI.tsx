@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Trash2, Sprout, ArrowLeft, Calculator, Lightbulb } from "lucide-react";
+import { Send, Trash2, Sprout, ArrowLeft, Calculator, Lightbulb, Camera } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAiChat } from "@/hooks/use-ai-chat";
 import SprayCalculator from "@/components/ai/SprayCalculator";
+import CropImageDetector from "@/components/ai/CropImageDetector";
 import ReactMarkdown from "react-markdown";
 import Layout from "@/components/layout/Layout";
 
