@@ -15,7 +15,7 @@ const FarmerProducts = () => {
 
   const filtered = (products ?? []).filter((p) => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
-      (p.technicalName ?? "").toLowerCase().includes(search.toLowerCase());
+      p.composition.toLowerCase().includes(search.toLowerCase());
     const matchCat = category === "All" || p.category === category;
     return matchSearch && matchCat;
   });
