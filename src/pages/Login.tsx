@@ -87,6 +87,8 @@ const Login = () => {
       navigate(from, { replace: true });
     } else if (userRole === "admin") {
       navigate("/admin", { replace: true });
+    } else if (userRole === "field_officer") {
+      navigate("/field-officer", { replace: true });
     } else {
       navigate("/distributor", { replace: true });
     }
