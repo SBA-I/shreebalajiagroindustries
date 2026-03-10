@@ -167,6 +167,12 @@ const AskAI = () => {
               <SprayCalculator />
             </div>
           </TabsContent>
+
+          <TabsContent value="detect">
+            <div className="max-w-lg mx-auto">
+              <CropImageDetector />
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
     </Layout>
