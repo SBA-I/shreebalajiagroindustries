@@ -40,6 +40,8 @@ import DealerLocator from "./pages/farmer/DealerLocator";
 import AskQuestion from "./pages/farmer/AskQuestion";
 import ProductGuides from "./pages/farmer/ProductGuides";
 import FarmerProfile from "./pages/farmer/FarmerProfile";
+import AskAI from "./pages/AskAI";
+import AiChatWidget from "./components/ai/AiChatWidget";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -67,6 +69,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/farmer-login" element={<FarmerLogin />} />
+              <Route path="/ask-ai" element={<AskAI />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
 
@@ -99,6 +102,7 @@ const App = () => (
 
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <AiChatWidget />
           </AuthProvider>
         </BrowserRouter>
       </ComparisonProvider>
