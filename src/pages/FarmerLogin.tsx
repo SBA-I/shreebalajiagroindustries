@@ -19,6 +19,7 @@ const FarmerLogin = () => {
   const navigate = useNavigate();
 
   const pseudoEmail = (ph: string) => `${ph.replace(/\D/g, "")}@${FARMER_EMAIL_DOMAIN}`;
+  const paddedPin = (p: string) => `sbai${p}00`; // pad 4-digit PIN to 8 chars for Supabase
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +36,7 @@ const FarmerLogin = () => {
     setLoading(true);
     const { data, error } = await supabase.auth.signInWithPassword({
       email: pseudoEmail(cleanPhone),
-      password: pin,
+      password: paddedPin(pin),
     });
 
     if (error) {
@@ -85,7 +86,7 @@ const FarmerLogin = () => {
     setLoading(true);
     const { data, error } = await supabase.auth.signUp({
       email: pseudoEmail(cleanPhone),
-      password: pin,
+      password: paddedPin(pin),
       options: {
         data: {
           full_name: name.trim(),
