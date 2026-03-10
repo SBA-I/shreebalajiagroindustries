@@ -61,18 +61,18 @@ const FarmerProducts = () => {
                 to={`/products/${product.slug}`}
                 className="group p-4 rounded-xl border border-border bg-card hover:shadow-lg transition-all"
               >
-                {product.imageUrl && (
-                  <img src={product.imageUrl} alt={product.name} className="w-full h-40 object-contain rounded-lg mb-3 bg-muted/30" />
+                {product.image && (
+                  <img src={product.image} alt={product.name} className="w-full h-40 object-contain rounded-lg mb-3 bg-muted/30" />
                 )}
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="font-heading font-semibold text-foreground group-hover:text-green-700">{product.name}</p>
-                    {product.technicalName && <p className="text-xs text-muted-foreground">{product.technicalName}</p>}
+                    {product.composition && <p className="text-xs text-muted-foreground">{product.composition}</p>}
                   </div>
-                  <Badge variant="secondary" className="shrink-0 text-xs">{product.category}</Badge>
+                  <Badge variant="secondary" className="shrink-0 text-xs">{product.categoryLabel}</Badge>
                 </div>
-                {product.shortDescription && (
-                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{product.shortDescription}</p>
+                {product.tagline && (
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{product.tagline}</p>
                 )}
                 {product.dosage && (
                   <p className="text-xs text-green-700 mt-2 font-medium">Dosage: {product.dosage}</p>

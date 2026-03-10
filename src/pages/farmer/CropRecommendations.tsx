@@ -73,10 +73,10 @@ const CropRecommendations = () => {
                   className="group p-4 rounded-xl border border-border bg-card hover:shadow-lg transition-all"
                 >
                   <div className="flex items-start gap-3">
-                    {p.imageUrl && <img src={p.imageUrl} alt={p.name} className="h-16 w-16 object-contain rounded bg-muted/30 shrink-0" />}
+                    {p.image && <img src={p.image} alt={p.name} className="h-16 w-16 object-contain rounded bg-muted/30 shrink-0" />}
                     <div className="flex-1 min-w-0">
                       <p className="font-heading font-semibold group-hover:text-green-700">{p.name}</p>
-                      <Badge variant="secondary" className="text-xs mt-1">{p.category}</Badge>
+                      <Badge variant="secondary" className="text-xs mt-1">{p.categoryLabel}</Badge>
                       {p.dosage && <p className="text-xs text-green-700 mt-1">Dosage: {p.dosage}</p>}
                       {p.targetPests && p.targetPests.length > 0 && (
                         <p className="text-xs text-muted-foreground mt-1">Targets: {p.targetPests.slice(0, 3).join(", ")}</p>
