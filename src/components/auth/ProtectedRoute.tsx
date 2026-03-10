@@ -32,6 +32,7 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
     if (!hasAccess) {
       if (userRole === "admin") return <Navigate to="/admin" replace />;
       if (userRole === "distributor" || userRole === "dealer") return <Navigate to="/distributor" replace />;
+      if (userRole === "field_officer") return <Navigate to="/field-officer" replace />;
       return <Navigate to="/" replace />;
     }
   }

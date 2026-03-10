@@ -5,10 +5,10 @@ import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Loader2, Eye, EyeOff, ShieldCheck, Store, ArrowLeft } from "lucide-react";
+import { Loader2, Eye, EyeOff, ShieldCheck, Store, ArrowLeft, MapPin } from "lucide-react";
 import logoImg from "@/assets/logo-sbai.png";
 
-type LoginRole = "dealer" | "admin" | null;
+type LoginRole = "dealer" | "admin" | "field_officer" | null;
 
 const Login = () => {
   const [selectedRole, setSelectedRole] = useState<LoginRole>(null);
@@ -57,8 +57,15 @@ const Login = () => {
       return;
     }
 
-    // Check approval for dealers/distributors
-    if (["distributor", "dealer"].includes(userRole ?? "")) {
+    if (selectedRole === "field_officer" && userRole !== "field_officer") {
+      await supabase.auth.signOut();
+      setLoading(false);
+      toast.error("You don't have field officer access. Please contact admin.");
+      return;
+    }
+
+    // Check approval for dealers/distributors/field officers
+    if (["distributor", "dealer", "field_officer"].includes(userRole ?? "")) {
       const { data: profile } = await supabase
         .from("profiles")
         .select("is_approved")
@@ -80,6 +87,8 @@ const Login = () => {
       navigate(from, { replace: true });
     } else if (userRole === "admin") {
       navigate("/admin", { replace: true });
+    } else if (userRole === "field_officer") {
+      navigate("/field-officer", { replace: true });
     } else {
       navigate("/distributor", { replace: true });
     }
@@ -120,6 +129,19 @@ const Login = () => {
                 <p className="text-sm text-muted-foreground">Full control panel & analytics</p>
               </div>
             </button>
+
+            <button
+              onClick={() => setSelectedRole("field_officer")}
+              className="group flex items-center gap-4 p-5 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-lg transition-all text-left"
+            >
+              <div className="h-12 w-12 rounded-lg bg-secondary/20 flex items-center justify-center shrink-0 group-hover:bg-secondary/30 transition-colors">
+                <MapPin className="h-6 w-6 text-secondary" />
+              </div>
+              <div>
+                <p className="font-heading font-semibold text-foreground">Field Officer</p>
+                <p className="text-sm text-muted-foreground">Visit reports, GPS logging & targets</p>
+              </div>
+            </button>
           </div>
 
           <p className="mt-8 text-sm text-muted-foreground">
@@ -135,8 +157,8 @@ const Login = () => {
     );
   }
 
-  const roleLabel = selectedRole === "admin" ? "Admin" : "Dealer / Distributor";
-  const RoleIcon = selectedRole === "admin" ? ShieldCheck : Store;
+  const roleLabel = selectedRole === "admin" ? "Admin" : selectedRole === "field_officer" ? "Field Officer" : "Dealer / Distributor";
+  const RoleIcon = selectedRole === "admin" ? ShieldCheck : selectedRole === "field_officer" ? MapPin : Store;
 
   return (
     <div className="min-h-screen bg-background flex">

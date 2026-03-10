@@ -26,6 +26,12 @@ import InventoryManagement from "./pages/distributor/InventoryManagement";
 import Messages from "./pages/distributor/Messages";
 import Profile from "./pages/distributor/Profile";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import FieldOfficerDashboard from "./pages/field-officer/FieldOfficerDashboard";
+import DealerVisits from "./pages/field-officer/DealerVisits";
+import FarmerMeetings from "./pages/field-officer/FarmerMeetings";
+import FieldOfficerOrders from "./pages/field-officer/FieldOfficerOrders";
+import SalesTargets from "./pages/field-officer/SalesTargets";
+import FieldOfficerProfile from "./pages/field-officer/FieldOfficerProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -64,6 +70,14 @@ const App = () => (
 
               {/* Admin route */}
               <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
+
+              {/* Field Officer routes */}
+              <Route path="/field-officer" element={<ProtectedRoute requiredRole="field_officer"><FieldOfficerDashboard /></ProtectedRoute>} />
+              <Route path="/field-officer/visits" element={<ProtectedRoute requiredRole="field_officer"><DealerVisits /></ProtectedRoute>} />
+              <Route path="/field-officer/meetings" element={<ProtectedRoute requiredRole="field_officer"><FarmerMeetings /></ProtectedRoute>} />
+              <Route path="/field-officer/orders" element={<ProtectedRoute requiredRole="field_officer"><FieldOfficerOrders /></ProtectedRoute>} />
+              <Route path="/field-officer/targets" element={<ProtectedRoute requiredRole="field_officer"><SalesTargets /></ProtectedRoute>} />
+              <Route path="/field-officer/profile" element={<ProtectedRoute requiredRole="field_officer"><FieldOfficerProfile /></ProtectedRoute>} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>

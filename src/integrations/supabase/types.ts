@@ -44,6 +44,102 @@ export type Database = {
         }
         Relationships: []
       }
+      dealer_visits: {
+        Row: {
+          created_at: string
+          dealer_location: string | null
+          dealer_name: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          notes: string | null
+          officer_id: string
+          order_amount: number | null
+          order_placed: boolean
+          purpose: string | null
+          updated_at: string
+          visit_date: string
+        }
+        Insert: {
+          created_at?: string
+          dealer_location?: string | null
+          dealer_name: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          notes?: string | null
+          officer_id: string
+          order_amount?: number | null
+          order_placed?: boolean
+          purpose?: string | null
+          updated_at?: string
+          visit_date?: string
+        }
+        Update: {
+          created_at?: string
+          dealer_location?: string | null
+          dealer_name?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          notes?: string | null
+          officer_id?: string
+          order_amount?: number | null
+          order_placed?: boolean
+          purpose?: string | null
+          updated_at?: string
+          visit_date?: string
+        }
+        Relationships: []
+      }
+      farmer_meetings: {
+        Row: {
+          created_at: string
+          crop: string | null
+          farmer_name: string
+          farmer_phone: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          meeting_date: string
+          notes: string | null
+          officer_id: string
+          problem_reported: string | null
+          product_recommended: string | null
+          village: string | null
+        }
+        Insert: {
+          created_at?: string
+          crop?: string | null
+          farmer_name: string
+          farmer_phone?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          meeting_date?: string
+          notes?: string | null
+          officer_id: string
+          problem_reported?: string | null
+          product_recommended?: string | null
+          village?: string | null
+        }
+        Update: {
+          created_at?: string
+          crop?: string | null
+          farmer_name?: string
+          farmer_phone?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          meeting_date?: string
+          notes?: string | null
+          officer_id?: string
+          problem_reported?: string | null
+          product_recommended?: string | null
+          village?: string | null
+        }
+        Relationships: []
+      }
       inventory: {
         Row: {
           current_stock: number
@@ -337,6 +433,39 @@ export type Database = {
         }
         Relationships: []
       }
+      sales_targets: {
+        Row: {
+          achieved_amount: number
+          created_at: string
+          id: string
+          month: number
+          officer_id: string
+          target_amount: number
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          achieved_amount?: number
+          created_at?: string
+          id?: string
+          month: number
+          officer_id: string
+          target_amount?: number
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          achieved_amount?: number
+          created_at?: string
+          id?: string
+          month?: number
+          officer_id?: string
+          target_amount?: number
+          updated_at?: string
+          year?: number
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -369,7 +498,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "distributor" | "dealer" | "farmer"
+      app_role: "admin" | "distributor" | "dealer" | "farmer" | "field_officer"
       message_type: "support" | "announcement" | "order" | "general"
       order_status:
         | "pending"
@@ -506,7 +635,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "distributor", "dealer", "farmer"],
+      app_role: ["admin", "distributor", "dealer", "farmer", "field_officer"],
       message_type: ["support", "announcement", "order", "general"],
       order_status: [
         "pending",
