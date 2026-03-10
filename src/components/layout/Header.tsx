@@ -92,12 +92,20 @@ const Header = () => {
               </Button>
             </>
           ) : (
-            <Link to="/login">
-              <Button size="sm" className="gap-2">
-                <User className="h-4 w-4" />
-                Login
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link to="/farmer-login">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Sprout className="h-4 w-4" />
+                  Farmer
+                </Button>
+              </Link>
+              <Link to="/login">
+                <Button size="sm" className="gap-2">
+                  <User className="h-4 w-4" />
+                  Login
+                </Button>
+              </Link>
+            </div>
           )}
         </div>
 
