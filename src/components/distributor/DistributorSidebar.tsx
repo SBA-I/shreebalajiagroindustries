@@ -5,6 +5,8 @@ import {
   User,
   MessageSquare,
   LogOut,
+  Store,
+  BarChart3,
 } from "lucide-react";
 import logoImg from "@/assets/logo-sbai.png";
 import { NavLink } from "@/components/NavLink";
@@ -25,8 +27,10 @@ import { Link } from "react-router-dom";
 
 const menuItems = [
   { title: "Dashboard", url: "/distributor", icon: LayoutDashboard },
+  { title: "Product Catalog", url: "/distributor/catalog", icon: Store },
   { title: "Orders", url: "/distributor/orders", icon: ShoppingCart },
   { title: "Inventory", url: "/distributor/inventory", icon: Package },
+  { title: "Analytics", url: "/distributor/analytics", icon: BarChart3 },
   { title: "Messages", url: "/distributor/messages", icon: MessageSquare },
   { title: "Profile", url: "/distributor/profile", icon: User },
 ];

@@ -23,6 +23,8 @@ import ResetPassword from "./pages/ResetPassword";
 import FarmerLogin from "./pages/FarmerLogin";
 import DistributorDashboard from "./pages/distributor/DistributorDashboard";
 import OrderManagement from "./pages/distributor/OrderManagement";
+import ProductCatalog from "./pages/distributor/ProductCatalog";
+import DistributorAnalytics from "./pages/distributor/DistributorAnalytics";
 import InventoryManagement from "./pages/distributor/InventoryManagement";
 import Messages from "./pages/distributor/Messages";
 import Profile from "./pages/distributor/Profile";
@@ -75,7 +77,9 @@ const App = () => (
 
               {/* Protected distributor routes */}
               <Route path="/distributor" element={<ProtectedRoute requiredRole="distributor"><DistributorDashboard /></ProtectedRoute>} />
+              <Route path="/distributor/catalog" element={<ProtectedRoute requiredRole="distributor"><ProductCatalog /></ProtectedRoute>} />
               <Route path="/distributor/orders" element={<ProtectedRoute requiredRole="distributor"><OrderManagement /></ProtectedRoute>} />
+              <Route path="/distributor/analytics" element={<ProtectedRoute requiredRole="distributor"><DistributorAnalytics /></ProtectedRoute>} />
               <Route path="/distributor/inventory" element={<ProtectedRoute requiredRole="distributor"><InventoryManagement /></ProtectedRoute>} />
               <Route path="/distributor/messages" element={<ProtectedRoute requiredRole="distributor"><Messages /></ProtectedRoute>} />
               <Route path="/distributor/profile" element={<ProtectedRoute requiredRole="distributor"><Profile /></ProtectedRoute>} />
