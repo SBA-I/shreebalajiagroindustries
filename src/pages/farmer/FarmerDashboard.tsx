@@ -1,6 +1,6 @@
 import FarmerLayout from "@/components/farmer/FarmerLayout";
 import { Link } from "react-router-dom";
-import { ShoppingBag, Sprout, MapPin, MessageSquare, FileText } from "lucide-react";
+import { ShoppingBag, Sprout, MapPin, MessageSquare, FileText, Bot } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
