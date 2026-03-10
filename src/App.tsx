@@ -20,6 +20,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import FarmerLogin from "./pages/FarmerLogin";
 import DistributorDashboard from "./pages/distributor/DistributorDashboard";
 import OrderManagement from "./pages/distributor/OrderManagement";
 import InventoryManagement from "./pages/distributor/InventoryManagement";
@@ -32,6 +33,13 @@ import FarmerMeetings from "./pages/field-officer/FarmerMeetings";
 import FieldOfficerOrders from "./pages/field-officer/FieldOfficerOrders";
 import SalesTargets from "./pages/field-officer/SalesTargets";
 import FieldOfficerProfile from "./pages/field-officer/FieldOfficerProfile";
+import FarmerDashboard from "./pages/farmer/FarmerDashboard";
+import FarmerProducts from "./pages/farmer/FarmerProducts";
+import CropRecommendations from "./pages/farmer/CropRecommendations";
+import DealerLocator from "./pages/farmer/DealerLocator";
+import AskQuestion from "./pages/farmer/AskQuestion";
+import ProductGuides from "./pages/farmer/ProductGuides";
+import FarmerProfile from "./pages/farmer/FarmerProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -58,6 +66,7 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/farmer-login" element={<FarmerLogin />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
 
@@ -78,6 +87,15 @@ const App = () => (
               <Route path="/field-officer/orders" element={<ProtectedRoute requiredRole="field_officer"><FieldOfficerOrders /></ProtectedRoute>} />
               <Route path="/field-officer/targets" element={<ProtectedRoute requiredRole="field_officer"><SalesTargets /></ProtectedRoute>} />
               <Route path="/field-officer/profile" element={<ProtectedRoute requiredRole="field_officer"><FieldOfficerProfile /></ProtectedRoute>} />
+
+              {/* Farmer routes */}
+              <Route path="/farmer" element={<ProtectedRoute requiredRole="farmer"><FarmerDashboard /></ProtectedRoute>} />
+              <Route path="/farmer/products" element={<ProtectedRoute requiredRole="farmer"><FarmerProducts /></ProtectedRoute>} />
+              <Route path="/farmer/recommendations" element={<ProtectedRoute requiredRole="farmer"><CropRecommendations /></ProtectedRoute>} />
+              <Route path="/farmer/dealers" element={<ProtectedRoute requiredRole="farmer"><DealerLocator /></ProtectedRoute>} />
+              <Route path="/farmer/questions" element={<ProtectedRoute requiredRole="farmer"><AskQuestion /></ProtectedRoute>} />
+              <Route path="/farmer/guides" element={<ProtectedRoute requiredRole="farmer"><ProductGuides /></ProtectedRoute>} />
+              <Route path="/farmer/profile" element={<ProtectedRoute requiredRole="farmer"><FarmerProfile /></ProtectedRoute>} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>

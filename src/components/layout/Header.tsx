@@ -1,9 +1,16 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, User, LogOut } from "lucide-react";
+import { Menu, X, ChevronDown, User, LogOut, Sprout } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo-sbai.png";
+
+const getDashboardPath = (role: string | null) => {
+  if (role === "admin") return "/admin";
+  if (role === "field_officer") return "/field-officer";
+  if (role === "farmer") return "/farmer";
+  return "/distributor";
+};
 
 const navItems = [
   { label: "Home", path: "/" },
@@ -27,7 +34,7 @@ const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const location = useLocation();
-  const { user, signOut } = useAuth();
+  const { user, signOut, userRole } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -81,7 +88,7 @@ const Header = () => {
         <div className="hidden lg:flex items-center gap-3">
           {user ? (
             <>
-              <Link to="/distributor">
+              <Link to={getDashboardPath(userRole)}>
                 <Button variant="outline" size="sm" className="gap-2">
                   <User className="h-4 w-4" />
                   Dashboard
@@ -92,12 +99,20 @@ const Header = () => {
               </Button>
             </>
           ) : (
-            <Link to="/login">
-              <Button size="sm" className="gap-2">
-                <User className="h-4 w-4" />
-                Login
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link to="/farmer-login">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Sprout className="h-4 w-4" />
+                  Farmer
+                </Button>
+              </Link>
+              <Link to="/login">
+                <Button size="sm" className="gap-2">
+                  <User className="h-4 w-4" />
+                  Login
+                </Button>
+              </Link>
+            </div>
           )}
         </div>
 
@@ -144,7 +159,7 @@ const Header = () => {
             <div className="pt-3 border-t border-border">
               {user ? (
                 <div className="space-y-2">
-                  <Link to="/distributor" onClick={() => setMobileOpen(false)}>
+                  <Link to={getDashboardPath(userRole)} onClick={() => setMobileOpen(false)}>
                     <Button variant="default" size="sm" className="w-full gap-2">
                       <User className="h-4 w-4" />
                       Dashboard
@@ -156,12 +171,20 @@ const Header = () => {
                   </Button>
                 </div>
               ) : (
-                <Link to="/login" onClick={() => setMobileOpen(false)}>
-                  <Button variant="default" size="sm" className="w-full gap-2">
-                    <User className="h-4 w-4" />
-                    Login
-                  </Button>
-                </Link>
+                <div className="space-y-2">
+                  <Link to="/farmer-login" onClick={() => setMobileOpen(false)}>
+                    <Button variant="outline" size="sm" className="w-full gap-2">
+                      <Sprout className="h-4 w-4" />
+                      Farmer Login
+                    </Button>
+                  </Link>
+                  <Link to="/login" onClick={() => setMobileOpen(false)}>
+                    <Button variant="default" size="sm" className="w-full gap-2">
+                      <User className="h-4 w-4" />
+                      Login
+                    </Button>
+                  </Link>
+                </div>
               )}
             </div>
           </nav>
