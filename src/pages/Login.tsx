@@ -127,6 +127,19 @@ const Login = () => {
                 <p className="text-sm text-muted-foreground">Full control panel & analytics</p>
               </div>
             </button>
+
+            <button
+              onClick={() => setSelectedRole("field_officer")}
+              className="group flex items-center gap-4 p-5 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-lg transition-all text-left"
+            >
+              <div className="h-12 w-12 rounded-lg bg-secondary/20 flex items-center justify-center shrink-0 group-hover:bg-secondary/30 transition-colors">
+                <MapPin className="h-6 w-6 text-secondary" />
+              </div>
+              <div>
+                <p className="font-heading font-semibold text-foreground">Field Officer</p>
+                <p className="text-sm text-muted-foreground">Visit reports, GPS logging & targets</p>
+              </div>
+            </button>
           </div>
 
           <p className="mt-8 text-sm text-muted-foreground">
