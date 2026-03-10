@@ -177,6 +177,9 @@ const OrderManagement = () => {
               {selectedOrder.notes && (
                 <p className="text-sm text-muted-foreground italic bg-muted rounded-lg p-3">{selectedOrder.notes}</p>
               )}
+              <div className="pt-2">
+                <InvoiceDownload order={selectedOrder} />
+              </div>
             </div>
           )}
         </DialogContent>
