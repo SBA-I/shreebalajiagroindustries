@@ -5,6 +5,13 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo-sbai.png";
 
+const getDashboardPath = (role: string | null) => {
+  if (role === "admin") return "/admin";
+  if (role === "field_officer") return "/field-officer";
+  if (role === "farmer") return "/farmer";
+  return "/distributor";
+};
+
 const navItems = [
   { label: "Home", path: "/" },
   { label: "About Us", path: "/about" },
