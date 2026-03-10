@@ -63,6 +63,9 @@ const AskAI = () => {
             <TabsTrigger value="calculator" className="gap-1.5">
               <Calculator className="h-4 w-4" /> Spray Calculator
             </TabsTrigger>
+            <TabsTrigger value="detect" className="gap-1.5">
+              <Camera className="h-4 w-4" /> Disease Detector
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="chat">
