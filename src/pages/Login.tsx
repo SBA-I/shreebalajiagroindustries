@@ -146,7 +146,7 @@ const Login = () => {
 
           <p className="mt-8 text-sm text-muted-foreground">
             Are you a farmer?{" "}
-            <Link to="/products" className="text-primary font-medium hover:underline">Browse our products</Link>
+            <Link to="/farmer-login" className="text-primary font-medium hover:underline">Login as Farmer</Link>
           </p>
 
           <p className="mt-4">
