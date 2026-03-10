@@ -40,6 +40,8 @@ import DealerLocator from "./pages/farmer/DealerLocator";
 import AskQuestion from "./pages/farmer/AskQuestion";
 import ProductGuides from "./pages/farmer/ProductGuides";
 import FarmerProfile from "./pages/farmer/FarmerProfile";
+import AskAI from "./pages/AskAI";
+import AiChatWidget from "./components/ai/AiChatWidget";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
