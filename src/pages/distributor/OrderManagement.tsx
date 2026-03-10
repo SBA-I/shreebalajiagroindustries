@@ -5,7 +5,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import DistributorLayout from "@/components/distributor/DistributorLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, Eye, X, Loader2 } from "lucide-react";
+import { Search, Plus, Eye, X, Loader2, Download } from "lucide-react";
+import InvoiceDownload from "@/components/distributor/InvoiceDownload";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
