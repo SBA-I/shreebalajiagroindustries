@@ -291,6 +291,7 @@ export type Database = {
           full_name: string | null
           gst_number: string | null
           id: string
+          is_approved: boolean
           phone: string | null
           pincode: string | null
           state: string | null
@@ -308,6 +309,7 @@ export type Database = {
           full_name?: string | null
           gst_number?: string | null
           id?: string
+          is_approved?: boolean
           phone?: string | null
           pincode?: string | null
           state?: string | null
@@ -325,6 +327,7 @@ export type Database = {
           full_name?: string | null
           gst_number?: string | null
           id?: string
+          is_approved?: boolean
           phone?: string | null
           pincode?: string | null
           state?: string | null

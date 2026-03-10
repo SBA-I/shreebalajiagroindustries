@@ -56,14 +56,14 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPassword />} />
 
               {/* Protected distributor routes */}
-              <Route path="/distributor" element={<ProtectedRoute><DistributorDashboard /></ProtectedRoute>} />
-              <Route path="/distributor/orders" element={<ProtectedRoute><OrderManagement /></ProtectedRoute>} />
-              <Route path="/distributor/inventory" element={<ProtectedRoute><InventoryManagement /></ProtectedRoute>} />
-              <Route path="/distributor/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
-              <Route path="/distributor/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/distributor" element={<ProtectedRoute requiredRole="distributor"><DistributorDashboard /></ProtectedRoute>} />
+              <Route path="/distributor/orders" element={<ProtectedRoute requiredRole="distributor"><OrderManagement /></ProtectedRoute>} />
+              <Route path="/distributor/inventory" element={<ProtectedRoute requiredRole="distributor"><InventoryManagement /></ProtectedRoute>} />
+              <Route path="/distributor/messages" element={<ProtectedRoute requiredRole="distributor"><Messages /></ProtectedRoute>} />
+              <Route path="/distributor/profile" element={<ProtectedRoute requiredRole="distributor"><Profile /></ProtectedRoute>} />
 
               {/* Admin route */}
-              <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>

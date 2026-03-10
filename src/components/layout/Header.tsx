@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ChevronDown, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-sbai.png";
 
 const navItems = [
   { label: "Home", path: "/" },
@@ -93,9 +93,9 @@ const Header = () => {
             </>
           ) : (
             <Link to="/login">
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button size="sm" className="gap-2">
                 <User className="h-4 w-4" />
-                Distributor Login
+                Login
               </Button>
             </Link>
           )}
@@ -159,7 +159,7 @@ const Header = () => {
                 <Link to="/login" onClick={() => setMobileOpen(false)}>
                   <Button variant="default" size="sm" className="w-full gap-2">
                     <User className="h-4 w-4" />
-                    Distributor Login
+                    Login
                   </Button>
                 </Link>
               )}
