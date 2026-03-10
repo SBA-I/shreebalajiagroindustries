@@ -34,7 +34,7 @@ const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const location = useLocation();
-  const { user, signOut } = useAuth();
+  const { user, signOut, userRole } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
 
