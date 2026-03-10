@@ -111,6 +111,8 @@ const AdminDashboard = () => {
 };
 
 /* ==================== OVERVIEW ==================== */
+const CHART_COLORS = ["hsl(142, 76%, 36%)", "hsl(221, 83%, 53%)", "hsl(45, 93%, 47%)", "hsl(271, 91%, 65%)"];
+
 const OverviewTab = () => {
   const { data: products } = useQuery({
     queryKey: ["admin-products-count"],
