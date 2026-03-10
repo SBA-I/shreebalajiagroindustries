@@ -362,8 +362,19 @@ const ProductFormDialog = ({ open, onClose, product, onSaved }: {
   const [category, setCategory] = useState<string>(product?.category ?? "Insecticides");
   const [price, setPrice] = useState(product?.price ? String(product.price) : "");
   const [description, setDescription] = useState(product?.description ?? "");
+  const [shortDesc, setShortDesc] = useState(product?.short_description ?? "");
   const [technicalName, setTechnicalName] = useState(product?.technical_name ?? "");
+  const [formulation, setFormulation] = useState(product?.formulation ?? "");
+  const [dosage, setDosage] = useState(product?.dosage ?? "");
+  const [modeOfAction, setModeOfAction] = useState(product?.mode_of_action ?? "");
+  const [targetCrops, setTargetCrops] = useState(product?.target_crops?.join(", ") ?? "");
+  const [targetPests, setTargetPests] = useState(product?.target_pests?.join(", ") ?? "");
+  const [packSizes, setPackSizes] = useState(product?.pack_sizes?.join(", ") ?? "");
+  const [features, setFeatures] = useState(product?.features?.join(", ") ?? "");
+  const [safetyPrecautions, setSafetyPrecautions] = useState(product?.safety_precautions?.join(", ") ?? "");
   const [loading, setLoading] = useState(false);
+
+  const csvToArray = (s: string) => s ? s.split(",").map((x) => x.trim()).filter(Boolean) : null;
 
   const handleSave = async () => {
     if (!name || !slug) { toast.error("Name and slug are required"); return; }
@@ -373,7 +384,16 @@ const ProductFormDialog = ({ open, onClose, product, onSaved }: {
       category: category as any,
       price: price ? parseFloat(price) : null,
       description: description || null,
+      short_description: shortDesc || null,
       technical_name: technicalName || null,
+      formulation: formulation || null,
+      dosage: dosage || null,
+      mode_of_action: modeOfAction || null,
+      target_crops: csvToArray(targetCrops),
+      target_pests: csvToArray(targetPests),
+      pack_sizes: csvToArray(packSizes),
+      features: csvToArray(features),
+      safety_precautions: csvToArray(safetyPrecautions),
     };
     if (product) {
       const { error } = await supabase.from("products").update(payload).eq("id", product.id);
@@ -387,35 +407,68 @@ const ProductFormDialog = ({ open, onClose, product, onSaved }: {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-heading">{product ? "Edit" : "Add"} Product</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div><label className="text-sm font-medium text-foreground mb-1 block">Name</label>
-            <Input value={name} onChange={(e) => { setName(e.target.value); if (!product) setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")); }} />
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div><label className="text-xs font-medium text-foreground mb-1 block">Name *</label>
+              <Input value={name} onChange={(e) => { setName(e.target.value); if (!product) setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")); }} />
+            </div>
+            <div><label className="text-xs font-medium text-foreground mb-1 block">Slug *</label>
+              <Input value={slug} onChange={(e) => setSlug(e.target.value)} />
+            </div>
           </div>
-          <div><label className="text-sm font-medium text-foreground mb-1 block">Slug</label>
-            <Input value={slug} onChange={(e) => setSlug(e.target.value)} />
+          <div className="grid grid-cols-2 gap-3">
+            <div><label className="text-xs font-medium text-foreground mb-1 block">Category</label>
+              <select value={category} onChange={(e) => setCategory(e.target.value)} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                <option value="Insecticides">Insecticides</option>
+                <option value="Fungicides">Fungicides</option>
+                <option value="Herbicides">Herbicides</option>
+                <option value="PGR">PGR</option>
+              </select>
+            </div>
+            <div><label className="text-xs font-medium text-foreground mb-1 block">Price (₹)</label>
+              <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
+            </div>
           </div>
-          <div><label className="text-sm font-medium text-foreground mb-1 block">Category</label>
-            <select value={category} onChange={(e) => setCategory(e.target.value)} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
-              <option value="Insecticides">Insecticides</option>
-              <option value="Fungicides">Fungicides</option>
-              <option value="Herbicides">Herbicides</option>
-              <option value="PGR">PGR</option>
-            </select>
+          <div className="grid grid-cols-2 gap-3">
+            <div><label className="text-xs font-medium text-foreground mb-1 block">Technical Name</label>
+              <Input value={technicalName} onChange={(e) => setTechnicalName(e.target.value)} placeholder="e.g., Imidacloprid 17.8% SL" />
+            </div>
+            <div><label className="text-xs font-medium text-foreground mb-1 block">Formulation</label>
+              <Input value={formulation} onChange={(e) => setFormulation(e.target.value)} placeholder="e.g., SL, WP, EC" />
+            </div>
           </div>
-          <div><label className="text-sm font-medium text-foreground mb-1 block">Technical Name</label>
-            <Input value={technicalName} onChange={(e) => setTechnicalName(e.target.value)} placeholder="e.g., Imidacloprid 17.8% SL" />
+          <div><label className="text-xs font-medium text-foreground mb-1 block">Dosage</label>
+            <Input value={dosage} onChange={(e) => setDosage(e.target.value)} placeholder="e.g., 1.5-2 ml per liter of water" />
           </div>
-          <div><label className="text-sm font-medium text-foreground mb-1 block">Price (₹)</label>
-            <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
+          <div><label className="text-xs font-medium text-foreground mb-1 block">Mode of Action</label>
+            <Input value={modeOfAction} onChange={(e) => setModeOfAction(e.target.value)} placeholder="e.g., Systemic, Contact" />
           </div>
-          <div><label className="text-sm font-medium text-foreground mb-1 block">Description</label>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full h-20 rounded-md border border-input bg-background px-3 py-2 text-sm resize-none" />
+          <div><label className="text-xs font-medium text-foreground mb-1 block">Short Description</label>
+            <Input value={shortDesc} onChange={(e) => setShortDesc(e.target.value)} />
           </div>
-          <div className="flex gap-3">
+          <div><label className="text-xs font-medium text-foreground mb-1 block">Full Description</label>
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full h-16 rounded-md border border-input bg-background px-3 py-2 text-sm resize-none" />
+          </div>
+          <div><label className="text-xs font-medium text-foreground mb-1 block">Target Crops (comma-separated)</label>
+            <Input value={targetCrops} onChange={(e) => setTargetCrops(e.target.value)} placeholder="Cotton, Rice, Soybean" />
+          </div>
+          <div><label className="text-xs font-medium text-foreground mb-1 block">Target Pests (comma-separated)</label>
+            <Input value={targetPests} onChange={(e) => setTargetPests(e.target.value)} placeholder="Whitefly, Aphid, Bollworm" />
+          </div>
+          <div><label className="text-xs font-medium text-foreground mb-1 block">Pack Sizes (comma-separated)</label>
+            <Input value={packSizes} onChange={(e) => setPackSizes(e.target.value)} placeholder="100ml, 250ml, 500ml, 1L" />
+          </div>
+          <div><label className="text-xs font-medium text-foreground mb-1 block">Features (comma-separated)</label>
+            <Input value={features} onChange={(e) => setFeatures(e.target.value)} placeholder="Fast acting, Long lasting" />
+          </div>
+          <div><label className="text-xs font-medium text-foreground mb-1 block">Safety Precautions (comma-separated)</label>
+            <Input value={safetyPrecautions} onChange={(e) => setSafetyPrecautions(e.target.value)} placeholder="Wear gloves, Avoid contact with eyes" />
+          </div>
+          <div className="flex gap-3 pt-2">
             <Button onClick={handleSave} disabled={loading} className="flex-1">{product ? "Update" : "Create"}</Button>
             <Button variant="outline" onClick={onClose}>Cancel</Button>
           </div>
