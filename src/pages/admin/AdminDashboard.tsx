@@ -10,10 +10,14 @@ import { Badge } from "@/components/ui/badge";
 import {
   LayoutDashboard, Package, Users, ShoppingCart, Shield, LogOut,
   Search, Plus, Pencil, Trash2, ChevronLeft, CheckCircle, XCircle,
-  MessageSquare, UserCheck, MapPin,
+  MessageSquare, UserCheck, MapPin, TrendingUp,
 } from "lucide-react";
 import { Link, Navigate } from "react-router-dom";
 import logoImg from "@/assets/logo-sbai.png";
+import {
+  BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, Legend,
+} from "recharts";
 
 type Tab = "overview" | "products" | "users" | "orders" | "approvals" | "inquiries" | "field-officers";
 
