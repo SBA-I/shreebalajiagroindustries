@@ -5,8 +5,8 @@ import {
   User,
   MessageSquare,
   LogOut,
-  Leaf,
 } from "lucide-react";
+import logoImg from "@/assets/logo-sbai.png";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {

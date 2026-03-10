@@ -159,7 +159,7 @@ const Header = () => {
                 <Link to="/login" onClick={() => setMobileOpen(false)}>
                   <Button variant="default" size="sm" className="w-full gap-2">
                     <User className="h-4 w-4" />
-                    Distributor Login
+                    Login
                   </Button>
                 </Link>
               )}
