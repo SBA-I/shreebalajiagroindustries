@@ -117,7 +117,8 @@ const OrderManagement = () => {
                           {order.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-6 py-4 text-right space-x-1">
+                        <InvoiceDownload order={order} />
                         <Button variant="ghost" size="sm" onClick={() => setSelectedOrder(order)}>
                           <Eye className="h-4 w-4" />
                         </Button>
