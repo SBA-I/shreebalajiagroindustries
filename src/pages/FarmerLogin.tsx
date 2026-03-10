@@ -36,7 +36,7 @@ const FarmerLogin = () => {
     setLoading(true);
     const { data, error } = await supabase.auth.signInWithPassword({
       email: pseudoEmail(cleanPhone),
-      password: pin,
+      password: paddedPin(pin),
     });
 
     if (error) {
