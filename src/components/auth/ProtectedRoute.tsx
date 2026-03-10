@@ -23,11 +23,17 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (requiredRole && userRole !== requiredRole) {
-    // Redirect to appropriate dashboard based on role
-    if (userRole === "admin") return <Navigate to="/admin" replace />;
-    if (userRole === "distributor" || userRole === "dealer") return <Navigate to="/distributor" replace />;
-    return <Navigate to="/" replace />;
+  // Check role - treat "dealer" and "distributor" as equivalent for distributor routes
+  if (requiredRole) {
+    const hasAccess = requiredRole === "distributor"
+      ? (userRole === "distributor" || userRole === "dealer")
+      : userRole === requiredRole;
+
+    if (!hasAccess) {
+      if (userRole === "admin") return <Navigate to="/admin" replace />;
+      if (userRole === "distributor" || userRole === "dealer") return <Navigate to="/distributor" replace />;
+      return <Navigate to="/" replace />;
+    }
   }
 
   return <>{children}</>;
