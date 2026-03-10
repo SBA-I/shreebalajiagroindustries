@@ -198,10 +198,12 @@ const OverviewTab = () => {
   const totalRevenue = allOrders?.reduce((s, o) => s + Number(o.total), 0) ?? 0;
 
   return (
-    <div>
-      <h1 className="font-heading text-2xl font-bold text-foreground mb-6">Dashboard Overview</h1>
+    <div className="space-y-8">
+      <h1 className="font-heading text-2xl font-bold text-foreground">Dashboard Overview</h1>
+
+      {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-        {stats.map((s) => (
+        {[...stats.slice(0, 3), { label: "Total Revenue", value: `₹${totalRevenue.toLocaleString("en-IN")}`, icon: TrendingUp, color: "text-emerald-600 bg-emerald-100" }, ...stats.slice(3)].map((s) => (
           <div key={s.label} className="bg-card rounded-xl border border-border p-5 shadow-card">
             <div className="flex items-center gap-3">
               <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${s.color}`}>
@@ -209,11 +211,49 @@ const OverviewTab = () => {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">{s.label}</p>
-                <p className="font-heading text-2xl font-bold text-foreground">{s.value}</p>
+                <p className="font-heading text-xl font-bold text-foreground">{s.value}</p>
               </div>
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Charts */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-xl border border-border p-6 shadow-card">
+          <h3 className="font-heading font-bold text-foreground mb-4">Monthly Revenue</h3>
+          {monthlyData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={monthlyData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip formatter={(v: number) => `₹${v.toLocaleString("en-IN")}`} />
+                <Bar dataKey="revenue" fill="hsl(142, 76%, 36%)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-12">No order data yet</p>
+          )}
+        </div>
+
+        <div className="bg-card rounded-xl border border-border p-6 shadow-card">
+          <h3 className="font-heading font-bold text-foreground mb-4">Products by Category</h3>
+          {categoryData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie data={categoryData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label={({ name, value }) => `${name} (${value})`}>
+                  {categoryData.map((_, i) => (
+                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-12">No products yet</p>
+          )}
+        </div>
       </div>
     </div>
   );
