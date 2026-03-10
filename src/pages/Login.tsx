@@ -5,7 +5,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Loader2, Eye, EyeOff, ShieldCheck, Store, ArrowLeft } from "lucide-react";
+import { Loader2, Eye, EyeOff, ShieldCheck, Store, ArrowLeft, MapPin } from "lucide-react";
 import logoImg from "@/assets/logo-sbai.png";
 
 type LoginRole = "dealer" | "admin" | null;
