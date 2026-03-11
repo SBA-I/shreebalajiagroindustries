@@ -25,19 +25,8 @@ const AdminDashboard = () => {
   const { user, userRole, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>("overview");
 
+  // ProtectedRoute handles auth & role check; this is a safety fallback
   if (!user) return <Navigate to="/login" replace />;
-  if (userRole !== "admin") {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <Shield className="h-12 w-12 text-destructive mx-auto mb-4" />
-          <h1 className="font-heading text-2xl font-bold text-foreground mb-2">Access Denied</h1>
-          <p className="text-muted-foreground mb-4">You need admin privileges to access this page.</p>
-          <Link to="/"><Button>Go Home</Button></Link>
-        </div>
-      </div>
-    );
-  }
 
   const tabs = [
     { id: "overview" as Tab, label: "Overview", icon: LayoutDashboard },

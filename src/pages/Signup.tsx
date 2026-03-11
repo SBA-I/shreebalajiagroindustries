@@ -25,7 +25,7 @@ const Signup = () => {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -33,13 +33,25 @@ const Signup = () => {
         emailRedirectTo: window.location.origin,
       },
     });
-    setLoading(false);
+    
     if (error) {
+      setLoading(false);
       toast.error(error.message);
-    } else {
-      toast.success("Registration submitted! Check your email to confirm. Your account will be activated after admin approval.");
-      navigate("/login");
+      return;
     }
+
+    // Update profile with company & phone info
+    const userId = data.user?.id;
+    if (userId) {
+      await supabase.from("profiles").update({
+        company_name: companyName || null,
+        phone: phone || null,
+      }).eq("user_id", userId);
+    }
+
+    setLoading(false);
+    toast.success("Registration submitted! Your account will be activated after admin approval.");
+    navigate("/login");
   };
 
   return (
