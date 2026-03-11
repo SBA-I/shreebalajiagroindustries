@@ -110,13 +110,25 @@ const FarmerLogin = () => {
     const userId = data.user?.id;
     if (!userId) { setLoading(false); return; }
 
-    // Assign farmer role
-    await supabase.from("user_roles").insert({ user_id: userId, role: "farmer" as any });
+    // Check if farmer role already exists (trigger assigns 'dealer' by default, but farmer emails are excluded)
+    const { data: existingRole } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (!existingRole) {
+      // Assign farmer role
+      await supabase.from("user_roles").insert({ user_id: userId, role: "farmer" as any });
+    } else if (existingRole.role !== "farmer") {
+      // Update to farmer role
+      await supabase.from("user_roles").update({ role: "farmer" as any }).eq("user_id", userId);
+    }
 
     // Update profile with phone & village
     await supabase
       .from("profiles")
-      .update({ phone: cleanPhone, city: village.trim() })
+      .update({ phone: cleanPhone, city: village.trim(), is_approved: true })
       .eq("user_id", userId);
 
     setLoading(false);

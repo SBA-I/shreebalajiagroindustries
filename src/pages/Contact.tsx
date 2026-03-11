@@ -17,7 +17,7 @@ const Contact = () => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const { error } = await supabase.from("contact_inquiries" as any).insert({
+      const { error } = await supabase.from("contact_inquiries").insert({
         name: form.name,
         email: form.email,
         inquiry_type: form.type,
