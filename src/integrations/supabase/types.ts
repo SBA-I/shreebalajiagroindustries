@@ -489,6 +489,33 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_dealer_profiles: {
+        Args: never
+        Returns: {
+          address: string | null
+          avatar_url: string | null
+          city: string | null
+          company_name: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          gst_number: string | null
+          id: string
+          is_approved: boolean
+          phone: string | null
+          pincode: string | null
+          state: string | null
+          territory: string | null
+          updated_at: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
