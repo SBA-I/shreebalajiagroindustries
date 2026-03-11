@@ -160,12 +160,12 @@ const Header = () => {
             <div className="pt-3 border-t border-border">
               {user ? (
                 <div className="space-y-2">
-                  <Link to={getDashboardPath(userRole)} onClick={() => setMobileOpen(false)}>
-                    <Button variant="default" size="sm" className="w-full gap-2">
+                  <Button variant="default" size="sm" className="w-full gap-2" asChild>
+                    <Link to={getDashboardPath(userRole)} onClick={() => setMobileOpen(false)}>
                       <User className="h-4 w-4" />
                       Dashboard
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                   <Button variant="outline" size="sm" className="w-full gap-2" onClick={() => { signOut(); setMobileOpen(false); }}>
                     <LogOut className="h-4 w-4" />
                     Sign Out
