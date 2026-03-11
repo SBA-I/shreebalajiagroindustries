@@ -7,22 +7,8 @@ const DealerLocator = () => {
   const { data: dealers, isLoading } = useQuery({
     queryKey: ["dealer-profiles"],
     queryFn: async () => {
-      // Get all approved dealers/distributors via a join with user_roles
-      const { data: roles } = await supabase
-        .from("user_roles")
-        .select("user_id, role")
-        .in("role", ["dealer", "distributor"]);
-
-      if (!roles || roles.length === 0) return [];
-
-      const userIds = roles.map((r) => r.user_id);
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("*")
-        .in("user_id", userIds)
-        .eq("is_approved", true);
-
-      return profiles ?? [];
+      const { data } = await supabase.rpc("get_dealer_profiles");
+      return (data ?? []) as any[];
     },
   });
 
