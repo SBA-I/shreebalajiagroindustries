@@ -5,7 +5,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Loader2, Eye, EyeOff, ShieldCheck, Store, ArrowLeft, MapPin } from "lucide-react";
+import { Loader2, Eye, EyeOff, ShieldCheck, Store, ArrowLeft, MapPin, UserPlus } from "lucide-react";
 import logoImg from "@/assets/logo-sbai.png";
 
 type LoginRole = "dealer" | "admin" | "field_officer" | null;
@@ -16,6 +16,14 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Field officer signup state
+  const [foMode, setFoMode] = useState<"login" | "signup">("login");
+  const [foName, setFoName] = useState("");
+  const [foEmployeeId, setFoEmployeeId] = useState("");
+  const [foPhone, setFoPhone] = useState("");
+  const [foRegion, setFoRegion] = useState("");
+
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname;
@@ -25,73 +33,78 @@ const Login = () => {
     setLoading(true);
 
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setLoading(false);
-      toast.error(error.message);
-      return;
-    }
+    if (error) { setLoading(false); toast.error(error.message); return; }
 
-    // Check role matches selection
     const userId = data.user?.id;
     if (!userId) { setLoading(false); return; }
 
-    const { data: roleData } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .maybeSingle();
-
+    const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", userId).maybeSingle();
     const userRole = roleData?.role;
 
     if (selectedRole === "admin" && userRole !== "admin") {
-      await supabase.auth.signOut();
-      setLoading(false);
-      toast.error("You don't have admin access.");
-      return;
+      await supabase.auth.signOut(); setLoading(false);
+      toast.error("You don't have admin access."); return;
     }
-
     if (selectedRole === "dealer" && !["distributor", "dealer"].includes(userRole ?? "")) {
-      await supabase.auth.signOut();
-      setLoading(false);
-      toast.error("You don't have dealer/distributor access. Please contact admin.");
-      return;
+      await supabase.auth.signOut(); setLoading(false);
+      toast.error("You don't have dealer/distributor access."); return;
     }
-
     if (selectedRole === "field_officer" && userRole !== "field_officer") {
-      await supabase.auth.signOut();
-      setLoading(false);
-      toast.error("You don't have field officer access. Please contact admin.");
-      return;
+      await supabase.auth.signOut(); setLoading(false);
+      toast.error("You don't have field officer access."); return;
     }
 
-    // Check approval for dealers/distributors/field officers
     if (["distributor", "dealer", "field_officer"].includes(userRole ?? "")) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("is_approved")
-        .eq("user_id", userId)
-        .maybeSingle();
-
+      const { data: profile } = await supabase.from("profiles").select("is_approved").eq("user_id", userId).maybeSingle();
       if (!profile?.is_approved) {
-        await supabase.auth.signOut();
-        setLoading(false);
-        toast.error("Your account is pending approval. Please contact admin.");
-        return;
+        await supabase.auth.signOut(); setLoading(false);
+        toast.error("Your account is pending approval. Please contact admin."); return;
       }
     }
 
     setLoading(false);
     toast.success("Welcome back!");
+    if (from) navigate(from, { replace: true });
+    else if (userRole === "admin") navigate("/admin", { replace: true });
+    else if (userRole === "field_officer") navigate("/field-officer", { replace: true });
+    else navigate("/distributor", { replace: true });
+  };
 
-    if (from) {
-      navigate(from, { replace: true });
-    } else if (userRole === "admin") {
-      navigate("/admin", { replace: true });
-    } else if (userRole === "field_officer") {
-      navigate("/field-officer", { replace: true });
-    } else {
-      navigate("/distributor", { replace: true });
+  const handleFieldOfficerSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password.length < 6) { toast.error("Password must be at least 6 characters"); return; }
+    if (!foName.trim()) { toast.error("Please enter your name"); return; }
+    if (!foEmployeeId.trim()) { toast.error("Please enter your Employee ID"); return; }
+
+    setLoading(true);
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: foName.trim(), phone: foPhone, employee_id: foEmployeeId.trim() },
+        emailRedirectTo: window.location.origin,
+      },
+    });
+
+    if (error) { setLoading(false); toast.error(error.message); return; }
+
+    const userId = data.user?.id;
+    if (userId) {
+      // Update role to field_officer
+      await supabase.from("user_roles").upsert({ user_id: userId, role: "field_officer" as any }, { onConflict: "user_id,role" });
+      // Also delete the auto-assigned dealer role if it exists
+      await supabase.from("user_roles").delete().eq("user_id", userId).neq("role", "field_officer" as any);
+
+      await supabase.from("profiles").update({
+        phone: foPhone || null,
+        employee_id: foEmployeeId.trim() || null,
+        territory: foRegion.trim() || null,
+      } as any).eq("user_id", userId);
     }
+
+    setLoading(false);
+    toast.success("Registration submitted! Your account will be activated after admin approval.");
+    setFoMode("login");
   };
 
   // Role selection screen
@@ -104,10 +117,8 @@ const Login = () => {
           <p className="text-muted-foreground mb-10">Select your login type to continue</p>
 
           <div className="grid gap-4 max-w-sm mx-auto">
-            <button
-              onClick={() => setSelectedRole("dealer")}
-              className="group flex items-center gap-4 p-5 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-lg transition-all text-left"
-            >
+            <button onClick={() => setSelectedRole("dealer")}
+              className="group flex items-center gap-4 p-5 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-lg transition-all text-left">
               <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
                 <Store className="h-6 w-6 text-primary" />
               </div>
@@ -117,10 +128,8 @@ const Login = () => {
               </div>
             </button>
 
-            <button
-              onClick={() => setSelectedRole("admin")}
-              className="group flex items-center gap-4 p-5 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-lg transition-all text-left"
-            >
+            <button onClick={() => setSelectedRole("admin")}
+              className="group flex items-center gap-4 p-5 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-lg transition-all text-left">
               <div className="h-12 w-12 rounded-lg bg-accent/20 flex items-center justify-center shrink-0 group-hover:bg-accent/30 transition-colors">
                 <ShieldCheck className="h-6 w-6 text-accent" />
               </div>
@@ -130,15 +139,13 @@ const Login = () => {
               </div>
             </button>
 
-            <button
-              onClick={() => setSelectedRole("field_officer")}
-              className="group flex items-center gap-4 p-5 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-lg transition-all text-left"
-            >
+            <button onClick={() => setSelectedRole("field_officer")}
+              className="group flex items-center gap-4 p-5 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-lg transition-all text-left">
               <div className="h-12 w-12 rounded-lg bg-secondary/20 flex items-center justify-center shrink-0 group-hover:bg-secondary/30 transition-colors">
                 <MapPin className="h-6 w-6 text-secondary" />
               </div>
               <div>
-                <p className="font-heading font-semibold text-foreground">Field Officer</p>
+                <p className="font-heading font-semibold text-foreground">Field Officer / Sales Staff</p>
                 <p className="text-sm text-muted-foreground">Visit reports, GPS logging & targets</p>
               </div>
             </button>
@@ -160,6 +167,8 @@ const Login = () => {
   const roleLabel = selectedRole === "admin" ? "Admin" : selectedRole === "field_officer" ? "Field Officer" : "Dealer / Distributor";
   const RoleIcon = selectedRole === "admin" ? ShieldCheck : selectedRole === "field_officer" ? MapPin : Store;
 
+  const isFieldOfficerSignup = selectedRole === "field_officer" && foMode === "signup";
+
   return (
     <div className="min-h-screen bg-background flex">
       {/* Left panel */}
@@ -171,20 +180,19 @@ const Login = () => {
           <p className="text-lg opacity-90 max-w-md">
             {selectedRole === "admin"
               ? "Manage products, dealers, orders, and analytics from your central dashboard."
+              : selectedRole === "field_officer"
+              ? "Log dealer visits, farmer meetings, GPS location, and track sales targets."
               : "Access wholesale pricing, place bulk orders, and manage your inventory."}
           </p>
         </div>
       </div>
 
       {/* Right panel */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12">
+      <div className="flex-1 flex items-center justify-center px-6 py-12 overflow-y-auto">
         <div className="w-full max-w-md">
-          <button
-            onClick={() => setSelectedRole(null)}
-            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Change login type
+          <button onClick={() => { setSelectedRole(null); setFoMode("login"); }}
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
+            <ArrowLeft className="h-4 w-4" /> Change login type
           </button>
 
           <div className="flex items-center gap-3 mb-6">
@@ -192,50 +200,65 @@ const Login = () => {
               <RoleIcon className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h2 className="font-heading text-xl font-bold text-foreground">{roleLabel} Sign In</h2>
-              <p className="text-sm text-muted-foreground">Enter your credentials</p>
+              <h2 className="font-heading text-xl font-bold text-foreground">
+                {isFieldOfficerSignup ? "Field Officer Registration" : `${roleLabel} Sign In`}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {isFieldOfficerSignup ? "Register your account for admin approval" : "Enter your credentials"}
+              </p>
             </div>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={isFieldOfficerSignup ? handleFieldOfficerSignup : handleLogin} className="space-y-4">
+            {isFieldOfficerSignup && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Full Name *</label>
+                  <Input placeholder="Your name" value={foName} onChange={(e) => setFoName(e.target.value)} required />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Employee ID *</label>
+                    <Input placeholder="e.g. EMP-001" value={foEmployeeId} onChange={(e) => setFoEmployeeId(e.target.value)} required />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Mobile Number</label>
+                    <Input type="tel" placeholder="+91 98765 43210" value={foPhone} onChange={(e) => setFoPhone(e.target.value)} />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Region / Territory</label>
+                  <Input placeholder="e.g. Western Maharashtra" value={foRegion} onChange={(e) => setFoRegion(e.target.value)} />
+                </div>
+              </>
+            )}
+
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Email</label>
-              <Input
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <Input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-sm font-medium text-foreground">Password</label>
-                <Link to="/forgot-password" className="text-sm text-primary hover:underline">
-                  Forgot password?
-                </Link>
+                {!isFieldOfficerSignup && (
+                  <Link to="/forgot-password" className="text-sm text-primary hover:underline">Forgot password?</Link>
+                )}
               </div>
               <div className="relative">
                 <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="pr-10"
+                  type={showPassword ? "text" : "password"} placeholder="••••••••"
+                  value={password} onChange={(e) => setPassword(e.target.value)} required className="pr-10"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
+                <button type="button" onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>
+
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Sign In
+              {isFieldOfficerSignup ? "Submit Registration" : "Sign In"}
             </Button>
           </form>
 
@@ -246,27 +269,35 @@ const Login = () => {
                 <div className="relative flex justify-center text-xs"><span className="bg-background px-2 text-muted-foreground">Or continue with</span></div>
               </div>
 
-              <Button
-                variant="outline"
-                className="w-full gap-2"
-                onClick={async () => {
-                  const { error } = await lovable.auth.signInWithOAuth("google", {
-                    redirect_uri: window.location.origin,
-                  });
-                  if (error) toast.error("Google sign-in failed");
-                }}
-              >
+              <Button variant="outline" className="w-full gap-2" onClick={async () => {
+                const { error } = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+                if (error) toast.error("Google sign-in failed");
+              }}>
                 <svg className="h-4 w-4" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
                 Continue with Google
               </Button>
 
               <p className="mt-8 text-center text-sm text-muted-foreground">
                 Don't have an account?{" "}
-                <Link to="/signup" className="text-primary font-medium hover:underline">
-                  Register as Dealer
-                </Link>
+                <Link to="/signup" className="text-primary font-medium hover:underline">Register as Dealer</Link>
               </p>
             </>
+          )}
+
+          {selectedRole === "field_officer" && (
+            <p className="mt-6 text-center text-sm text-muted-foreground">
+              {foMode === "login" ? (
+                <>New field officer?{" "}<button onClick={() => setFoMode("signup")} className="text-primary font-medium hover:underline">Register here</button></>
+              ) : (
+                <>Already registered?{" "}<button onClick={() => setFoMode("login")} className="text-primary font-medium hover:underline">Sign in</button></>
+              )}
+            </p>
+          )}
+
+          {isFieldOfficerSignup && (
+            <p className="mt-4 p-3 bg-muted/50 rounded-lg text-xs text-muted-foreground text-center">
+              ⏳ After registration, your account will be reviewed and approved by admin within 24-48 hours.
+            </p>
           )}
 
           <p className="mt-4 text-center">

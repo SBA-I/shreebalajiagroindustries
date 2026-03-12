@@ -3,35 +3,44 @@ import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2, Sprout, ArrowLeft, Phone } from "lucide-react";
 import logoImg from "@/assets/logo-sbai.png";
 
 const FARMER_EMAIL_DOMAIN = "farmer.sbai.local";
 
+const INDIAN_STATES = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
+  "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram",
+  "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
+  "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
+];
+
+const CROPS = ["Cotton", "Soybean", "Wheat", "Rice", "Sugarcane", "Maize", "Groundnut", "Chilli", "Onion", "Tomato", "Grape", "Pomegranate", "Other"];
+
 const FarmerLogin = () => {
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [phone, setPhone] = useState("");
   const [pin, setPin] = useState("");
   const [name, setName] = useState("");
+  const [state, setState] = useState("");
+  const [district, setDistrict] = useState("");
   const [village, setVillage] = useState("");
+  const [mainCrop, setMainCrop] = useState("");
+  const [farmSize, setFarmSize] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const pseudoEmail = (ph: string) => `${ph.replace(/\D/g, "")}@${FARMER_EMAIL_DOMAIN}`;
-  const paddedPin = (p: string) => `sbai${p}00`; // pad 4-digit PIN to 8 chars for Supabase
+  const paddedPin = (p: string) => `sbai${p}00`;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanPhone = phone.replace(/\D/g, "");
-    if (cleanPhone.length !== 10) {
-      toast.error("Please enter a valid 10-digit mobile number");
-      return;
-    }
-    if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
-      toast.error("Please enter a 4-digit PIN");
-      return;
-    }
+    if (cleanPhone.length !== 10) { toast.error("Please enter a valid 10-digit mobile number"); return; }
+    if (pin.length !== 4 || !/^\d{4}$/.test(pin)) { toast.error("Please enter a 4-digit PIN"); return; }
 
     setLoading(true);
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -39,22 +48,12 @@ const FarmerLogin = () => {
       password: paddedPin(pin),
     });
 
-    if (error) {
-      setLoading(false);
-      toast.error("Invalid mobile number or PIN. Please try again.");
-      return;
-    }
+    if (error) { setLoading(false); toast.error("Invalid mobile number or PIN."); return; }
 
     const userId = data.user?.id;
     if (!userId) { setLoading(false); return; }
 
-    // Verify farmer role
-    const { data: roleData } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .maybeSingle();
-
+    const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", userId).maybeSingle();
     if (roleData?.role !== "farmer") {
       await supabase.auth.signOut();
       setLoading(false);
@@ -70,29 +69,17 @@ const FarmerLogin = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanPhone = phone.replace(/\D/g, "");
-    if (cleanPhone.length !== 10) {
-      toast.error("Please enter a valid 10-digit mobile number");
-      return;
-    }
-    if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
-      toast.error("Please set a 4-digit PIN");
-      return;
-    }
-    if (!name.trim()) {
-      toast.error("Please enter your name");
-      return;
-    }
+    if (cleanPhone.length !== 10) { toast.error("Please enter a valid 10-digit mobile number"); return; }
+    if (pin.length !== 4 || !/^\d{4}$/.test(pin)) { toast.error("Please set a 4-digit PIN"); return; }
+    if (!name.trim()) { toast.error("Please enter your name"); return; }
+    if (!state) { toast.error("Please select your state"); return; }
 
     setLoading(true);
     const { data, error } = await supabase.auth.signUp({
       email: pseudoEmail(cleanPhone),
       password: paddedPin(pin),
       options: {
-        data: {
-          full_name: name.trim(),
-          phone: cleanPhone,
-          village: village.trim(),
-        },
+        data: { full_name: name.trim(), phone: cleanPhone },
       },
     });
 
@@ -110,26 +97,22 @@ const FarmerLogin = () => {
     const userId = data.user?.id;
     if (!userId) { setLoading(false); return; }
 
-    // Check if farmer role already exists (trigger assigns 'dealer' by default, but farmer emails are excluded)
-    const { data: existingRole } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .maybeSingle();
-
+    const { data: existingRole } = await supabase.from("user_roles").select("role").eq("user_id", userId).maybeSingle();
     if (!existingRole) {
-      // Assign farmer role
       await supabase.from("user_roles").insert({ user_id: userId, role: "farmer" as any });
     } else if (existingRole.role !== "farmer") {
-      // Update to farmer role
       await supabase.from("user_roles").update({ role: "farmer" as any }).eq("user_id", userId);
     }
 
-    // Update profile with phone & village
-    await supabase
-      .from("profiles")
-      .update({ phone: cleanPhone, city: village.trim(), is_approved: true })
-      .eq("user_id", userId);
+    await supabase.from("profiles").update({
+      phone: cleanPhone,
+      state: state,
+      city: district.trim() || null,
+      village: village.trim() || null,
+      main_crop: mainCrop || null,
+      farm_size: farmSize.trim() || null,
+      is_approved: true,
+    } as any).eq("user_id", userId);
 
     setLoading(false);
     toast.success("Account created! Welcome to Shree Balaji Agro 🌾");
@@ -154,14 +137,10 @@ const FarmerLogin = () => {
       </div>
 
       {/* Right panel */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12">
+      <div className="flex-1 flex items-center justify-center px-6 py-12 overflow-y-auto">
         <div className="w-full max-w-md">
-          <Link
-            to="/login"
-            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Other login types
+          <Link to="/login" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
+            <ArrowLeft className="h-4 w-4" /> Other login types
           </Link>
 
           <div className="flex items-center gap-3 mb-6">
@@ -182,21 +161,8 @@ const FarmerLogin = () => {
             {mode === "signup" && (
               <>
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Your Name *</label>
-                  <Input
-                    placeholder="e.g. Ramesh Kumar"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Village / City</label>
-                  <Input
-                    placeholder="e.g. Indore"
-                    value={village}
-                    onChange={(e) => setVillage(e.target.value)}
-                  />
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Full Name *</label>
+                  <Input placeholder="e.g. Ramesh Kumar" value={name} onChange={(e) => setName(e.target.value)} required />
                 </div>
               </>
             )}
@@ -204,17 +170,11 @@ const FarmerLogin = () => {
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Mobile Number *</label>
               <div className="flex gap-2">
-                <div className="flex items-center px-3 rounded-md border border-input bg-muted text-sm text-muted-foreground">
-                  +91
-                </div>
+                <div className="flex items-center px-3 rounded-md border border-input bg-muted text-sm text-muted-foreground">+91</div>
                 <Input
-                  type="tel"
-                  placeholder="9876543210"
-                  value={phone}
+                  type="tel" placeholder="9876543210" value={phone}
                   onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                  required
-                  maxLength={10}
-                  className="flex-1"
+                  required maxLength={10} className="flex-1"
                 />
               </div>
             </div>
@@ -224,19 +184,54 @@ const FarmerLogin = () => {
                 {mode === "signup" ? "Set 4-Digit PIN *" : "4-Digit PIN *"}
               </label>
               <Input
-                type="password"
-                placeholder="••••"
-                value={pin}
+                type="password" placeholder="••••" value={pin}
                 onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                required
-                maxLength={4}
-                inputMode="numeric"
+                required maxLength={4} inputMode="numeric"
                 className="text-center text-xl tracking-[0.5em] max-w-[200px]"
               />
-              {mode === "signup" && (
-                <p className="text-xs text-muted-foreground mt-1">Remember this PIN to login later</p>
-              )}
+              {mode === "signup" && <p className="text-xs text-muted-foreground mt-1">Remember this PIN to login later</p>}
             </div>
+
+            {mode === "signup" && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">State *</label>
+                  <Select value={state} onValueChange={setState}>
+                    <SelectTrigger><SelectValue placeholder="Select your state" /></SelectTrigger>
+                    <SelectContent>
+                      {INDIAN_STATES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">District</label>
+                    <Input placeholder="e.g. Indore" value={district} onChange={(e) => setDistrict(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Village</label>
+                    <Input placeholder="e.g. Mhow" value={village} onChange={(e) => setVillage(e.target.value)} />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Main Crop (Optional)</label>
+                    <Select value={mainCrop} onValueChange={setMainCrop}>
+                      <SelectTrigger><SelectValue placeholder="Select crop" /></SelectTrigger>
+                      <SelectContent>
+                        {CROPS.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Farm Size (Optional)</label>
+                    <Input placeholder="e.g. 5 acres" value={farmSize} onChange={(e) => setFarmSize(e.target.value)} />
+                  </div>
+                </div>
+              </>
+            )}
 
             <Button type="submit" className="w-full bg-green-700 hover:bg-green-800" disabled={loading}>
               {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
@@ -246,19 +241,9 @@ const FarmerLogin = () => {
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             {mode === "login" ? (
-              <>
-                New farmer?{" "}
-                <button onClick={() => setMode("signup")} className="text-green-700 font-medium hover:underline">
-                  Register here
-                </button>
-              </>
+              <>New farmer?{" "}<button onClick={() => setMode("signup")} className="text-green-700 font-medium hover:underline">Register here</button></>
             ) : (
-              <>
-                Already registered?{" "}
-                <button onClick={() => setMode("login")} className="text-green-700 font-medium hover:underline">
-                  Login
-                </button>
-              </>
+              <>Already registered?{" "}<button onClick={() => setMode("login")} className="text-green-700 font-medium hover:underline">Login</button></>
             )}
           </p>
 
