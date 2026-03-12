@@ -383,17 +383,25 @@ export type Database = {
           city: string | null
           company_name: string | null
           created_at: string
+          district: string | null
           email: string | null
+          employee_id: string | null
+          farm_size: string | null
           full_name: string | null
           gst_number: string | null
           id: string
           is_approved: boolean
+          license_number: string | null
+          main_crop: string | null
+          pan_number: string | null
           phone: string | null
           pincode: string | null
+          region: string | null
           state: string | null
           territory: string | null
           updated_at: string
           user_id: string
+          village: string | null
         }
         Insert: {
           address?: string | null
@@ -401,17 +409,25 @@ export type Database = {
           city?: string | null
           company_name?: string | null
           created_at?: string
+          district?: string | null
           email?: string | null
+          employee_id?: string | null
+          farm_size?: string | null
           full_name?: string | null
           gst_number?: string | null
           id?: string
           is_approved?: boolean
+          license_number?: string | null
+          main_crop?: string | null
+          pan_number?: string | null
           phone?: string | null
           pincode?: string | null
+          region?: string | null
           state?: string | null
           territory?: string | null
           updated_at?: string
           user_id: string
+          village?: string | null
         }
         Update: {
           address?: string | null
@@ -419,17 +435,25 @@ export type Database = {
           city?: string | null
           company_name?: string | null
           created_at?: string
+          district?: string | null
           email?: string | null
+          employee_id?: string | null
+          farm_size?: string | null
           full_name?: string | null
           gst_number?: string | null
           id?: string
           is_approved?: boolean
+          license_number?: string | null
+          main_crop?: string | null
+          pan_number?: string | null
           phone?: string | null
           pincode?: string | null
+          region?: string | null
           state?: string | null
           territory?: string | null
           updated_at?: string
           user_id?: string
+          village?: string | null
         }
         Relationships: []
       }
@@ -497,17 +521,25 @@ export type Database = {
           city: string | null
           company_name: string | null
           created_at: string
+          district: string | null
           email: string | null
+          employee_id: string | null
+          farm_size: string | null
           full_name: string | null
           gst_number: string | null
           id: string
           is_approved: boolean
+          license_number: string | null
+          main_crop: string | null
+          pan_number: string | null
           phone: string | null
           pincode: string | null
+          region: string | null
           state: string | null
           territory: string | null
           updated_at: string
           user_id: string
+          village: string | null
         }[]
         SetofOptions: {
           from: "*"
