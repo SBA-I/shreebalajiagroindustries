@@ -107,7 +107,7 @@ const FarmerLogin = () => {
     await supabase.from("profiles").update({
       phone: cleanPhone,
       state: state,
-      city: district.trim() || null,
+      district: district.trim() || null,
       village: village.trim() || null,
       main_crop: mainCrop || null,
       farm_size: farmSize.trim() || null,
