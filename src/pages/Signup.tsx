@@ -61,7 +61,7 @@ const Signup = () => {
         license_number: licenseNumber.trim() || null,
         address: address.trim() || null,
         state: state || null,
-        city: district.trim() || null,
+        district: district.trim() || null,
         pincode: pincode.trim() || null,
       } as any).eq("user_id", userId);
     }

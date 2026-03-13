@@ -91,14 +91,16 @@ const Login = () => {
     const userId = data.user?.id;
     if (userId) {
       // Update role to field_officer
-      await supabase.from("user_roles").upsert({ user_id: userId, role: "field_officer" as any }, { onConflict: "user_id,role" });
-      // Also delete the auto-assigned dealer role if it exists
-      await supabase.from("user_roles").delete().eq("user_id", userId).neq("role", "field_officer" as any);
+      // Delete the auto-assigned dealer role first
+      await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", "dealer" as any);
+      // Insert field_officer role
+      await supabase.from("user_roles").insert({ user_id: userId, role: "field_officer" as any });
 
       await supabase.from("profiles").update({
         phone: foPhone || null,
         employee_id: foEmployeeId.trim() || null,
         territory: foRegion.trim() || null,
+        region: foRegion.trim() || null,
       } as any).eq("user_id", userId);
     }
 
