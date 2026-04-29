@@ -113,6 +113,33 @@ const ProductDetail = () => {
                   <p className="text-sm font-medium text-foreground">{product.packSizes.join(", ")}</p>
                 </div>
               </div>
+
+              {Array.isArray((product as any).pricing) && (product as any).pricing.length > 0 && (
+                <div className="pt-2">
+                  <h3 className="font-heading font-semibold text-foreground mb-3">Pricing (2026–27 Scheme)</h3>
+                  <div className="overflow-x-auto rounded-lg border border-border">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted">
+                        <tr>
+                          <th className="text-left font-medium text-muted-foreground px-4 py-2">Packing</th>
+                          <th className="text-right font-medium text-muted-foreground px-4 py-2">Dealer Price</th>
+                          <th className="text-right font-medium text-muted-foreground px-4 py-2">M.R.P.</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(product as any).pricing.map((row: { size: string; dealerPrice: string; mrp: string }) => (
+                          <tr key={row.size} className="border-t border-border">
+                            <td className="px-4 py-2 font-medium text-foreground">{row.size}</td>
+                            <td className="px-4 py-2 text-right text-foreground">{row.dealerPrice}</td>
+                            <td className="px-4 py-2 text-right text-primary font-semibold">{row.mrp}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">Prices as per Kharif 2026–27 dealer scheme. Subject to change.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
