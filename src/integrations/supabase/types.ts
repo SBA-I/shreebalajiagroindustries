@@ -44,102 +44,6 @@ export type Database = {
         }
         Relationships: []
       }
-      dealer_visits: {
-        Row: {
-          created_at: string
-          dealer_location: string | null
-          dealer_name: string
-          id: string
-          latitude: number | null
-          longitude: number | null
-          notes: string | null
-          officer_id: string
-          order_amount: number | null
-          order_placed: boolean
-          purpose: string | null
-          updated_at: string
-          visit_date: string
-        }
-        Insert: {
-          created_at?: string
-          dealer_location?: string | null
-          dealer_name: string
-          id?: string
-          latitude?: number | null
-          longitude?: number | null
-          notes?: string | null
-          officer_id: string
-          order_amount?: number | null
-          order_placed?: boolean
-          purpose?: string | null
-          updated_at?: string
-          visit_date?: string
-        }
-        Update: {
-          created_at?: string
-          dealer_location?: string | null
-          dealer_name?: string
-          id?: string
-          latitude?: number | null
-          longitude?: number | null
-          notes?: string | null
-          officer_id?: string
-          order_amount?: number | null
-          order_placed?: boolean
-          purpose?: string | null
-          updated_at?: string
-          visit_date?: string
-        }
-        Relationships: []
-      }
-      farmer_meetings: {
-        Row: {
-          created_at: string
-          crop: string | null
-          farmer_name: string
-          farmer_phone: string | null
-          id: string
-          latitude: number | null
-          longitude: number | null
-          meeting_date: string
-          notes: string | null
-          officer_id: string
-          problem_reported: string | null
-          product_recommended: string | null
-          village: string | null
-        }
-        Insert: {
-          created_at?: string
-          crop?: string | null
-          farmer_name: string
-          farmer_phone?: string | null
-          id?: string
-          latitude?: number | null
-          longitude?: number | null
-          meeting_date?: string
-          notes?: string | null
-          officer_id: string
-          problem_reported?: string | null
-          product_recommended?: string | null
-          village?: string | null
-        }
-        Update: {
-          created_at?: string
-          crop?: string | null
-          farmer_name?: string
-          farmer_phone?: string | null
-          id?: string
-          latitude?: number | null
-          longitude?: number | null
-          meeting_date?: string
-          notes?: string | null
-          officer_id?: string
-          problem_reported?: string | null
-          product_recommended?: string | null
-          village?: string | null
-        }
-        Relationships: []
-      }
       inventory: {
         Row: {
           current_stock: number
@@ -247,13 +151,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "order_items_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "order_items_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
@@ -261,42 +158,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      orders: {
-        Row: {
-          created_at: string
-          delivery_date: string | null
-          id: string
-          notes: string | null
-          order_number: string
-          status: Database["public"]["Enums"]["order_status"]
-          total: number
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          delivery_date?: string | null
-          id?: string
-          notes?: string | null
-          order_number: string
-          status?: Database["public"]["Enums"]["order_status"]
-          total?: number
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          delivery_date?: string | null
-          id?: string
-          notes?: string | null
-          order_number?: string
-          status?: Database["public"]["Enums"]["order_status"]
-          total?: number
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
       }
       products: {
         Row: {
@@ -376,188 +237,14 @@ export type Database = {
         }
         Relationships: []
       }
-      profiles: {
-        Row: {
-          address: string | null
-          avatar_url: string | null
-          city: string | null
-          company_name: string | null
-          created_at: string
-          district: string | null
-          email: string | null
-          employee_id: string | null
-          farm_size: string | null
-          full_name: string | null
-          gst_number: string | null
-          id: string
-          is_approved: boolean
-          license_number: string | null
-          main_crop: string | null
-          pan_number: string | null
-          phone: string | null
-          pincode: string | null
-          region: string | null
-          state: string | null
-          territory: string | null
-          updated_at: string
-          user_id: string
-          village: string | null
-        }
-        Insert: {
-          address?: string | null
-          avatar_url?: string | null
-          city?: string | null
-          company_name?: string | null
-          created_at?: string
-          district?: string | null
-          email?: string | null
-          employee_id?: string | null
-          farm_size?: string | null
-          full_name?: string | null
-          gst_number?: string | null
-          id?: string
-          is_approved?: boolean
-          license_number?: string | null
-          main_crop?: string | null
-          pan_number?: string | null
-          phone?: string | null
-          pincode?: string | null
-          region?: string | null
-          state?: string | null
-          territory?: string | null
-          updated_at?: string
-          user_id: string
-          village?: string | null
-        }
-        Update: {
-          address?: string | null
-          avatar_url?: string | null
-          city?: string | null
-          company_name?: string | null
-          created_at?: string
-          district?: string | null
-          email?: string | null
-          employee_id?: string | null
-          farm_size?: string | null
-          full_name?: string | null
-          gst_number?: string | null
-          id?: string
-          is_approved?: boolean
-          license_number?: string | null
-          main_crop?: string | null
-          pan_number?: string | null
-          phone?: string | null
-          pincode?: string | null
-          region?: string | null
-          state?: string | null
-          territory?: string | null
-          updated_at?: string
-          user_id?: string
-          village?: string | null
-        }
-        Relationships: []
-      }
-      sales_targets: {
-        Row: {
-          achieved_amount: number
-          created_at: string
-          id: string
-          month: number
-          officer_id: string
-          target_amount: number
-          updated_at: string
-          year: number
-        }
-        Insert: {
-          achieved_amount?: number
-          created_at?: string
-          id?: string
-          month: number
-          officer_id: string
-          target_amount?: number
-          updated_at?: string
-          year: number
-        }
-        Update: {
-          achieved_amount?: number
-          created_at?: string
-          id?: string
-          month?: number
-          officer_id?: string
-          target_amount?: number
-          updated_at?: string
-          year?: number
-        }
-        Relationships: []
-      }
-      user_roles: {
-        Row: {
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Insert: {
-          id?: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Update: {
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      get_dealer_profiles: {
-        Args: never
-        Returns: {
-          address: string | null
-          avatar_url: string | null
-          city: string | null
-          company_name: string | null
-          created_at: string
-          district: string | null
-          email: string | null
-          employee_id: string | null
-          farm_size: string | null
-          full_name: string | null
-          gst_number: string | null
-          id: string
-          is_approved: boolean
-          license_number: string | null
-          main_crop: string | null
-          pan_number: string | null
-          phone: string | null
-          pincode: string | null
-          region: string | null
-          state: string | null
-          territory: string | null
-          updated_at: string
-          user_id: string
-          village: string | null
-        }[]
-        SetofOptions: {
-          from: "*"
-          to: "profiles"
-          isOneToOne: false
-          isSetofReturn: true
-        }
-      }
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
-      app_role: "admin" | "distributor" | "dealer" | "farmer" | "field_officer"
       message_type: "support" | "announcement" | "order" | "general"
       order_status:
         | "pending"
@@ -694,7 +381,6 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "distributor", "dealer", "farmer", "field_officer"],
       message_type: ["support", "announcement", "order", "general"],
       order_status: [
         "pending",
