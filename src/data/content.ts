@@ -227,7 +227,7 @@ export const newsArticles: NewsArticle[] = [
       "As the Kharif season approaches, Shree Balaji Agro Industries' technical team has prepared comprehensive pest management advisories for major crops including rice, cotton, soybean, and vegetables.",
       "**Rice** — Begin with seed treatment using systemic insecticides. Monitor for stem borers from 30 days after transplanting. Apply Sumo Fighter at first sign of BPH or leaf folder infestation.",
       "**Cotton** — Early-season jassid and aphid management is critical. Use systemic insecticides at the 2-4 leaf stage. Switch to contact insecticides for bollworm management during square formation. Implement refuge crop strategy for Bt cotton.",
-      "**Soybean** — Pre-emergence herbicide application within 3 days of sowing is essential. Monitor for defoliators from the vegetative stage. Apply Jaguar / Phantom preventively at flowering for fungal and larval management.",
+      "**Soybean** — Pre-emergence herbicide application within 3 days of sowing is essential. Monitor for defoliators from the vegetative stage. Apply Jaguar preventively at flowering for fungal and larval management.",
       "For detailed crop-specific advisories, contact your local Shree Balaji representative or visit our Knowledge Base for comprehensive guides.",
     ],
     category: "advisory",
