@@ -1,5 +1,4 @@
 import { useState, useCallback } from "react";
-import { useAuth } from "@/contexts/AuthContext";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -9,7 +8,6 @@ export function useAiChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [language, setLanguage] = useState<"en" | "hi" | "mr">("en");
-  const { userRole } = useAuth();
 
   const sendMessage = useCallback(
     async (input: string) => {
@@ -41,7 +39,7 @@ export function useAiChat() {
           },
           body: JSON.stringify({
             messages: allMessages,
-            userRole: userRole || "visitor",
+            userRole: "visitor",
             language,
           }),
         });
@@ -111,7 +109,7 @@ export function useAiChat() {
         setIsLoading(false);
       }
     },
-    [messages, userRole, language]
+    [messages, language]
   );
 
   const clearChat = useCallback(() => setMessages([]), []);
