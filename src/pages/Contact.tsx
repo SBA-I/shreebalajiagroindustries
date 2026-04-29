@@ -54,7 +54,7 @@ const Contact = () => {
                 {[
                   { icon: MapPin, label: "Registered Office", value: "2404/B1, Lane No. 6, Dhule-424001 (M.S.)" },
                   { icon: MapPin, label: "Factory", value: "Plot No. E-35, M.I.D.C., Awdhan, Dhule-424311" },
-                  { icon: Phone, label: "Mobile", value: "+91 98605 32515" },
+                  { icon: Phone, label: "Mobile", value: "+91 77449 98998" },
                   { icon: Mail, label: "Email", value: "sbaindia44@gmail.com" },
                   { icon: Clock, label: "Business Hours", value: "Mon–Sat: 9:00 AM – 6:00 PM" },
                 ].map((item) => (
