@@ -116,7 +116,7 @@ const ProductDetail = () => {
 
               {Array.isArray(product.pricing) && product.pricing.length > 0 && (
                 <div className="pt-2">
-                  <h3 className="font-heading font-semibold text-foreground mb-3">Pricing (2026–27 Scheme)</h3>
+                  <h3 className="font-heading font-semibold text-foreground mb-3">Pricing</h3>
                   <div className="overflow-x-auto rounded-lg border border-border">
                     <table className="w-full text-sm">
                       <thead className="bg-muted">
