@@ -131,14 +131,14 @@ export const products: Product[] = [
     isNew: false,
   },
   {
-    id: "sb-001-terminater",
-    name: "Terminater",
+    id: "sb-001-terminator",
+    name: "Terminator",
     category: "insecticides",
     categoryLabel: "Insecticides",
     image: productInsecticide,
     tagline: "Bio fungi, larvicide & sucking pest control with growth promotion",
     description:
-      "Terminater is a multi-action bio formulation effective against fungal infections, larvae, sucking pests, thrips and flies, while also acting as a growth promoter. Built on natural oils for safe, residue-free protection across cotton, vegetables and horticulture crops.",
+      "Terminator is a multi-action bio formulation effective against fungal infections, larvae, sucking pests, thrips and flies, while also acting as a growth promoter. Built on natural oils for safe, residue-free protection across cotton, vegetables and horticulture crops.",
     composition: "Bio fungi + Larvicide + Natural oil blend (Growth Promoter)",
     dosage: "1.5–2.0 ml per litre of water",
     targetPests: ["Fungal infections", "Larvae", "Sucking pests", "Thrips", "Whitefly"],
@@ -402,13 +402,13 @@ export const products: Product[] = [
   },
   {
     id: "sb-007",
-    name: "Liaf Stick",
+    name: "Leaf Stick",
     category: "pgr",
     categoryLabel: "Plant Growth Regulators",
     image: productPgr,
     tagline: "Silicon sticker & spreader for superior spray performance",
     description:
-      "Liaf Stick is a silicon-based sticker and spreader that ensures uniform coverage of any pesticide, fungicide or fertiliser spray. It improves leaf wetting, prevents wash-off and increases effectiveness of every drop.",
+      "Leaf Stick is a silicon-based sticker and spreader that ensures uniform coverage of any pesticide, fungicide or fertiliser spray. It improves leaf wetting, prevents wash-off and increases effectiveness of every drop.",
     composition: "Silicon based Sticker / Spreader",
     dosage: "0.3–0.5 ml per litre of spray solution",
     targetPests: [],
