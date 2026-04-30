@@ -135,7 +135,6 @@ const ProductDetail = () => {
                       </tbody>
                     </table>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">Prices as per Kharif 2026–27 dealer scheme. Subject to change.</p>
                 </div>
               )}
             </div>
