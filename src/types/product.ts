@@ -36,6 +36,7 @@ export interface Product {
   targetCrops: string[];
   formulation: string;
   packSizes: string[];
+  pricing: { size: string; dealerPrice: string; mrp: string }[];
   modeOfAction: string;
   safetyPrecautions: string[];
   features: string[];
@@ -75,6 +76,7 @@ export function mapDbProduct(p: DbProduct): Product {
     targetCrops: p.target_crops ?? [],
     formulation: p.formulation ?? "",
     packSizes: (p as any).pack_sizes ?? [],
+    pricing: (p as any).pricing ?? [],
     modeOfAction: (p as any).mode_of_action ?? "",
     safetyPrecautions: (p as any).safety_precautions ?? [],
     features: p.features ?? [],
