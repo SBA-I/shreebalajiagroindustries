@@ -114,7 +114,7 @@ const ProductDetail = () => {
                 </div>
               </div>
 
-              {Array.isArray((product as any).pricing) && (product as any).pricing.length > 0 && (
+              {Array.isArray(product.pricing) && product.pricing.length > 0 && (
                 <div className="pt-2">
                   <h3 className="font-heading font-semibold text-foreground mb-3">Pricing (2026–27 Scheme)</h3>
                   <div className="overflow-x-auto rounded-lg border border-border">
@@ -127,7 +127,7 @@ const ProductDetail = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {(product as any).pricing.map((row: { size: string; dealerPrice: string; mrp: string }) => (
+                        {product.pricing.map((row) => (
                           <tr key={row.size} className="border-t border-border">
                             <td className="px-4 py-2 font-medium text-foreground">{row.size}</td>
                             <td className="px-4 py-2 text-right text-foreground">{row.dealerPrice}</td>
