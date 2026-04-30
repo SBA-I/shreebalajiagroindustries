@@ -36,7 +36,7 @@ export interface Product {
   targetCrops: string[];
   formulation: string;
   packSizes: string[];
-  pricing: { size: string; dealerPrice: string; mrp: string }[];
+  pricing: { size: string; mrp: string }[];
   modeOfAction: string;
   safetyPrecautions: string[];
   features: string[];
