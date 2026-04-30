@@ -7,7 +7,7 @@ export type ProductCategory = "insecticides" | "fungicides" | "herbicides" | "pg
 
 export interface PackPrice {
   size: string;
-  dealerPrice: string;
+  dealerPrice?: string;
   mrp: string;
 }
 
