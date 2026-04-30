@@ -293,12 +293,7 @@ export interface TeamMember {
 }
 
 export const teamMembers: TeamMember[] = [
-  { name: "Ramesh Agarwal", role: "Founder & Managing Director", bio: "30+ years of experience in the agrochemical industry. Visionary leader committed to empowering Indian farmers.", initials: "RA" },
-  { name: "Dr. Arvind Sharma", role: "Chief Agronomist & R&D Head", bio: "PhD in Plant Pathology with 20 years of research experience. Leads product development and field trials.", initials: "AS" },
-  { name: "Priya Nair", role: "Director of Operations", bio: "Expert in manufacturing operations and supply chain management. Ensures quality and timely delivery.", initials: "PN" },
-  { name: "Vikram Desai", role: "VP Sales & Distribution", bio: "Built the nationwide distributor network. 15+ years in agricultural channel development.", initials: "VD" },
-  { name: "Dr. Meena Gupta", role: "IPM & Sustainability Head", bio: "Specialist in Integrated Pest Management. Leads our sustainability and bio-products initiative.", initials: "MG" },
-  { name: "Suresh Patil", role: "Head of Technical Services", bio: "Field application expert providing on-ground support to distributors and farmers across India.", initials: "SP" },
+  { name: "Manoj Shankar Chaudhari", role: "Managing Director", bio: "Managing Director of Shree Balaji Agro Industries, leading the company's vision to empower Indian farmers with high-quality, effective crop protection and nutrition solutions.", initials: "MC" },
 ];
 
 // FAQ
