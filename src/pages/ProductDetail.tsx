@@ -116,24 +116,42 @@ const ProductDetail = () => {
 
               {Array.isArray(product.pricing) && product.pricing.length > 0 && (
                 <div className="pt-2">
-                  <h3 className="font-heading font-semibold text-foreground mb-3">Pricing</h3>
-                  <div className="overflow-x-auto rounded-lg border border-border">
-                    <table className="w-full text-sm">
-                      <thead className="bg-muted">
-                        <tr>
-                          <th className="text-left font-medium text-muted-foreground px-4 py-2">Packing</th>
-                          <th className="text-right font-medium text-muted-foreground px-4 py-2">M.R.P.</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {product.pricing.map((row) => (
-                          <tr key={row.size} className="border-t border-border">
-                            <td className="px-4 py-2 font-medium text-foreground">{row.size}</td>
-                            <td className="px-4 py-2 text-right text-primary font-semibold">{row.mrp}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  <h3 className="font-heading font-semibold text-foreground mb-3">Available Packings</h3>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {product.pricing.map((row) => (
+                      <div
+                        key={row.size}
+                        className="rounded-xl border border-border bg-card p-4 hover:shadow-elevated hover:border-primary/40 transition-all"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <Package className="h-4 w-4 text-primary" />
+                            <span className="font-heading font-semibold text-foreground">{row.size}</span>
+                          </div>
+                          <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                            {product.categoryLabel}
+                          </span>
+                        </div>
+                        <div className="flex items-baseline gap-1 mb-3">
+                          <span className="text-xl font-bold text-primary">{row.mrp}</span>
+                          <span className="text-[11px] text-muted-foreground">M.R.P.</span>
+                        </div>
+                        <div className="space-y-1.5 text-xs text-muted-foreground border-t border-border pt-3">
+                          <div className="flex gap-1.5">
+                            <span className="font-medium text-foreground shrink-0">Composition:</span>
+                            <span className="line-clamp-1">{product.composition}</span>
+                          </div>
+                          <div className="flex gap-1.5">
+                            <span className="font-medium text-foreground shrink-0">Formulation:</span>
+                            <span>{product.formulation}</span>
+                          </div>
+                          <div className="flex gap-1.5">
+                            <span className="font-medium text-foreground shrink-0">Dosage:</span>
+                            <span className="line-clamp-1">{product.dosage}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
