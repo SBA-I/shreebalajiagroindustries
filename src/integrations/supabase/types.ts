@@ -176,6 +176,7 @@ export type Database = {
           pack_sizes: string[] | null
           popularity: number
           price: number | null
+          pricing: Json
           safety_precautions: string[] | null
           short_description: string | null
           slug: string
@@ -201,6 +202,7 @@ export type Database = {
           pack_sizes?: string[] | null
           popularity?: number
           price?: number | null
+          pricing?: Json
           safety_precautions?: string[] | null
           short_description?: string | null
           slug: string
@@ -226,6 +228,7 @@ export type Database = {
           pack_sizes?: string[] | null
           popularity?: number
           price?: number | null
+          pricing?: Json
           safety_precautions?: string[] | null
           short_description?: string | null
           slug?: string
