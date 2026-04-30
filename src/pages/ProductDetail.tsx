@@ -122,7 +122,6 @@ const ProductDetail = () => {
                       <thead className="bg-muted">
                         <tr>
                           <th className="text-left font-medium text-muted-foreground px-4 py-2">Packing</th>
-                          <th className="text-right font-medium text-muted-foreground px-4 py-2">Dealer Price</th>
                           <th className="text-right font-medium text-muted-foreground px-4 py-2">M.R.P.</th>
                         </tr>
                       </thead>
@@ -130,7 +129,6 @@ const ProductDetail = () => {
                         {product.pricing.map((row) => (
                           <tr key={row.size} className="border-t border-border">
                             <td className="px-4 py-2 font-medium text-foreground">{row.size}</td>
-                            <td className="px-4 py-2 text-right text-foreground">{row.dealerPrice}</td>
                             <td className="px-4 py-2 text-right text-primary font-semibold">{row.mrp}</td>
                           </tr>
                         ))}
