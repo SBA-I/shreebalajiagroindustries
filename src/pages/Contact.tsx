@@ -75,6 +75,7 @@ const Contact = () => {
                 <h3 className="font-heading font-semibold text-foreground mb-2">Emergency Contact</h3>
                 <p className="text-sm text-muted-foreground mb-2">For urgent product safety or chemical emergency:</p>
                 <p className="text-sm font-bold text-destructive">+91 77449 98998 (24/7 Helpline)</p>
+                <p className="text-sm font-bold text-destructive">+91 98605 32515</p>
               </div>
             </div>
 
