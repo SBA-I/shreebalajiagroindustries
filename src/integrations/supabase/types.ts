@@ -494,31 +494,91 @@ export type Database = {
       }
       profiles: {
         Row: {
+          assigned_territory: string | null
           created_at: string
+          crops: string[] | null
+          district: string | null
+          employee_id: string | null
           full_name: string | null
+          gst_document_url: string | null
+          gst_number: string | null
           id: string
+          land_size_acres: number | null
+          license_document_url: string | null
+          license_number: string | null
           phone: string | null
+          preferred_language: string | null
           requested_role: Database["public"]["Enums"]["app_role"]
+          reviewed_at: string | null
+          reviewed_by: string | null
+          shop_address: string | null
+          shop_lat: number | null
+          shop_lng: number | null
+          shop_name: string | null
+          state: string | null
+          taluka: string | null
           updated_at: string
           user_id: string
+          verification_notes: string | null
+          verification_status: string
         }
         Insert: {
+          assigned_territory?: string | null
           created_at?: string
+          crops?: string[] | null
+          district?: string | null
+          employee_id?: string | null
           full_name?: string | null
+          gst_document_url?: string | null
+          gst_number?: string | null
           id?: string
+          land_size_acres?: number | null
+          license_document_url?: string | null
+          license_number?: string | null
           phone?: string | null
+          preferred_language?: string | null
           requested_role?: Database["public"]["Enums"]["app_role"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          shop_address?: string | null
+          shop_lat?: number | null
+          shop_lng?: number | null
+          shop_name?: string | null
+          state?: string | null
+          taluka?: string | null
           updated_at?: string
           user_id: string
+          verification_notes?: string | null
+          verification_status?: string
         }
         Update: {
+          assigned_territory?: string | null
           created_at?: string
+          crops?: string[] | null
+          district?: string | null
+          employee_id?: string | null
           full_name?: string | null
+          gst_document_url?: string | null
+          gst_number?: string | null
           id?: string
+          land_size_acres?: number | null
+          license_document_url?: string | null
+          license_number?: string | null
           phone?: string | null
+          preferred_language?: string | null
           requested_role?: Database["public"]["Enums"]["app_role"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          shop_address?: string | null
+          shop_lat?: number | null
+          shop_lng?: number | null
+          shop_name?: string | null
+          state?: string | null
+          taluka?: string | null
           updated_at?: string
           user_id?: string
+          verification_notes?: string | null
+          verification_status?: string
         }
         Relationships: []
       }
