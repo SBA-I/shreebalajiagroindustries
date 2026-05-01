@@ -18,10 +18,29 @@ const navItems = [
       { label: "PGR", path: "/products?category=pgr" },
     ],
   },
+  {
+    label: "Tools",
+    path: "/tools/harvest-timer",
+    children: [
+      { label: "🌱 Ask AI", path: "/ask-ai" },
+      { label: "💰 Profit Simulator", path: "/yield-simulator" },
+      { label: "⏱ Harvest Timer (PHI)", path: "/tools/harvest-timer" },
+      { label: "🐛 Pest Calendar", path: "/tools/pest-calendar" },
+    ],
+  },
+  {
+    label: "Dealers",
+    path: "/dealers",
+    children: [
+      { label: "Find a Dealer", path: "/dealers" },
+      { label: "Track Dispatch", path: "/track" },
+      { label: "Marketing Kit", path: "/marketing-kit" },
+    ],
+  },
+  { label: "Safety", path: "/safety" },
+  { label: "Sustainability", path: "/sustainability" },
   { label: "Resources", path: "/resources" },
   { label: "News", path: "/news" },
-  { label: "🌱 Ask AI", path: "/ask-ai" },
-  { label: "💰 Profit Simulator", path: "/yield-simulator" },
   { label: "Contact", path: "/contact" },
 ];
 
