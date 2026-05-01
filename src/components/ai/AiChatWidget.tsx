@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Trash2, Sprout } from "lucide-react";
+import { MessageCircle, X, Send, Trash2, Sprout, Mail } from "lucide-react";
 import whatsappIcon from "@/assets/whatsapp-icon.svg";
 import { Button } from "@/components/ui/button";
 import { useAiChat } from "@/hooks/use-ai-chat";
@@ -26,6 +26,15 @@ const AiChatWidget = () => {
 
   return (
     <>
+      {/* Email floating button */}
+      <a
+        href="mailto:sbaindia44@gmail.com"
+        className="fixed bottom-[10.5rem] right-6 z-50 h-14 w-14 rounded-full bg-secondary text-secondary-foreground shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
+        aria-label="Email us"
+      >
+        <Mail className="h-6 w-6" />
+      </a>
+
       {/* WhatsApp floating button (above AI button) */}
       <a
         href="https://wa.me/917744998998"
