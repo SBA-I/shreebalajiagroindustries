@@ -13,6 +13,17 @@ serve(async (req) => {
   }
 
   try {
+    // Internal shared-secret authentication: this function uses the service role
+    // key which bypasses RLS, so it must only be callable by trusted server-side code.
+    const internalSecret = Deno.env.get("INTERNAL_SECRET");
+    const providedSecret = req.headers.get("x-internal-secret");
+    if (!internalSecret || providedSecret !== internalSecret) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
@@ -109,8 +120,9 @@ serve(async (req) => {
       { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
+    console.error("send-notification error:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
