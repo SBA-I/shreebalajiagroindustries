@@ -138,14 +138,6 @@ const ProductDetail = () => {
                         </div>
                         <div className="space-y-1.5 text-xs text-muted-foreground border-t border-border pt-3">
                           <div className="flex gap-1.5">
-                            <span className="font-medium text-foreground shrink-0">Composition:</span>
-                            <span className="line-clamp-1">{product.composition}</span>
-                          </div>
-                          <div className="flex gap-1.5">
-                            <span className="font-medium text-foreground shrink-0">Formulation:</span>
-                            <span>{product.formulation}</span>
-                          </div>
-                          <div className="flex gap-1.5">
                             <span className="font-medium text-foreground shrink-0">Dosage:</span>
                             <span className="line-clamp-1">{product.dosage}</span>
                           </div>
