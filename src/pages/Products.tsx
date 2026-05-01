@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import ProductCard from "@/components/products/ProductCard";
 import ComparisonBar from "@/components/products/ComparisonBar";
+import VoiceSearchButton from "@/components/products/VoiceSearchButton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useProducts } from "@/hooks/use-db-products";
@@ -148,7 +149,7 @@ const Products = () => {
                 placeholder="Search by product, crop, pest, or composition..."
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                className="pl-10"
+                className="pl-10 pr-10"
               />
               {search && (
                 <button
@@ -159,6 +160,12 @@ const Products = () => {
                 </button>
               )}
             </div>
+            <VoiceSearchButton
+              onTranscript={(text) => {
+                setSearch(text);
+                setPage(1);
+              }}
+            />
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value)}
