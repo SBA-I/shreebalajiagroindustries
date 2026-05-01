@@ -1,12 +1,13 @@
 import Layout from "@/components/layout/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShieldCheck, FileText, Megaphone, Store, Truck, Bug, Leaf } from "lucide-react";
+import { ShieldCheck, FileText, Megaphone, Store, Truck, Bug, Leaf, UserCheck } from "lucide-react";
 import AdminMsdsManager from "@/components/admin/AdminMsdsManager";
 import AdminMarketingManager from "@/components/admin/AdminMarketingManager";
 import AdminDealersManager from "@/components/admin/AdminDealersManager";
 import AdminDispatchManager from "@/components/admin/AdminDispatchManager";
 import AdminPestCalendarManager from "@/components/admin/AdminPestCalendarManager";
 import AdminArticlesManager from "@/components/admin/AdminArticlesManager";
+import AdminVerificationQueue from "@/components/admin/AdminVerificationQueue";
 
 const AdminPortal = () => (
   <Layout>
@@ -22,8 +23,9 @@ const AdminPortal = () => (
 
     <section className="py-8">
       <div className="container mx-auto px-4 lg:px-8 max-w-6xl">
-        <Tabs defaultValue="msds">
+        <Tabs defaultValue="verification">
           <TabsList className="flex-wrap h-auto mb-6">
+            <TabsTrigger value="verification" className="gap-1.5"><UserCheck className="h-4 w-4" /> Verification</TabsTrigger>
             <TabsTrigger value="msds" className="gap-1.5"><FileText className="h-4 w-4" /> MSDS</TabsTrigger>
             <TabsTrigger value="marketing" className="gap-1.5"><Megaphone className="h-4 w-4" /> Marketing</TabsTrigger>
             <TabsTrigger value="dealers" className="gap-1.5"><Store className="h-4 w-4" /> Dealers</TabsTrigger>
@@ -31,6 +33,7 @@ const AdminPortal = () => (
             <TabsTrigger value="pest" className="gap-1.5"><Bug className="h-4 w-4" /> Pest Calendar</TabsTrigger>
             <TabsTrigger value="articles" className="gap-1.5"><Leaf className="h-4 w-4" /> Articles</TabsTrigger>
           </TabsList>
+          <TabsContent value="verification"><AdminVerificationQueue /></TabsContent>
           <TabsContent value="msds"><AdminMsdsManager /></TabsContent>
           <TabsContent value="marketing"><AdminMarketingManager /></TabsContent>
           <TabsContent value="dealers"><AdminDealersManager /></TabsContent>
