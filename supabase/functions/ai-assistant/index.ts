@@ -13,7 +13,11 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, userRole, language } = await req.json();
+    const { messages, language } = await req.json();
+    // SECURITY: Never trust client-supplied role. This function is public (verify_jwt=false),
+    // so we always treat the caller as an unauthenticated visitor. Privileged role-specific
+    // contexts must be derived server-side from a verified JWT, not from request body.
+    const userRole = "visitor";
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
