@@ -15,6 +15,7 @@ import News from "./pages/News";
 import NewsDetail from "./pages/NewsDetail";
 import Contact from "./pages/Contact";
 import AskAI from "./pages/AskAI";
+import YieldSimulator from "./pages/YieldSimulator";
 import AiChatWidget from "./components/ai/AiChatWidget";
 import NotFound from "./pages/NotFound";
 
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/news/:slug" element={<NewsDetail />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/ask-ai" element={<AskAI />} />
+            <Route path="/yield-simulator" element={<YieldSimulator />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <AiChatWidget />
