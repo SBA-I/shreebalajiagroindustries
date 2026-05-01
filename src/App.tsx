@@ -18,6 +18,8 @@ import NewsDetail from "./pages/NewsDetail";
 import Contact from "./pages/Contact";
 import AskAI from "./pages/AskAI";
 import YieldSimulator from "./pages/YieldSimulator";
+import HarvestTimer from "./pages/HarvestTimer";
+import PestCalendar from "./pages/PestCalendar";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import AdminPortal from "./pages/portals/AdminPortal";
@@ -50,6 +52,8 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/ask-ai" element={<AskAI />} />
               <Route path="/yield-simulator" element={<YieldSimulator />} />
+              <Route path="/tools/harvest-timer" element={<HarvestTimer />} />
+              <Route path="/tools/pest-calendar" element={<PestCalendar />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPortal /></ProtectedRoute>} />
