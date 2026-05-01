@@ -44,6 +44,119 @@ export type Database = {
         }
         Relationships: []
       }
+      dealers: {
+        Row: {
+          address_line: string
+          city: string
+          contact_person: string | null
+          created_at: string
+          district: string | null
+          email: string | null
+          id: string
+          is_active: boolean
+          is_authorized: boolean
+          name: string
+          phone: string
+          pincode: string
+          state: string
+          updated_at: string
+        }
+        Insert: {
+          address_line: string
+          city: string
+          contact_person?: string | null
+          created_at?: string
+          district?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          is_authorized?: boolean
+          name: string
+          phone: string
+          pincode: string
+          state: string
+          updated_at?: string
+        }
+        Update: {
+          address_line?: string
+          city?: string
+          contact_person?: string | null
+          created_at?: string
+          district?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          is_authorized?: boolean
+          name?: string
+          phone?: string
+          pincode?: string
+          state?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      dispatches: {
+        Row: {
+          carrier: string | null
+          carrier_ref: string | null
+          created_at: string
+          dealer_id: string | null
+          dealer_name: string
+          delivered_at: string | null
+          destination_city: string
+          destination_state: string
+          dispatched_at: string | null
+          expected_delivery_at: string | null
+          id: string
+          notes: string | null
+          status: string
+          tracking_number: string
+          updated_at: string
+        }
+        Insert: {
+          carrier?: string | null
+          carrier_ref?: string | null
+          created_at?: string
+          dealer_id?: string | null
+          dealer_name: string
+          delivered_at?: string | null
+          destination_city: string
+          destination_state: string
+          dispatched_at?: string | null
+          expected_delivery_at?: string | null
+          id?: string
+          notes?: string | null
+          status?: string
+          tracking_number: string
+          updated_at?: string
+        }
+        Update: {
+          carrier?: string | null
+          carrier_ref?: string | null
+          created_at?: string
+          dealer_id?: string | null
+          dealer_name?: string
+          delivered_at?: string | null
+          destination_city?: string
+          destination_state?: string
+          dispatched_at?: string | null
+          expected_delivery_at?: string | null
+          id?: string
+          notes?: string | null
+          status?: string
+          tracking_number?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dispatches_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inventory: {
         Row: {
           current_stock: number
@@ -78,6 +191,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "inventory_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketing_assets: {
+        Row: {
+          asset_type: string
+          created_at: string
+          description: string | null
+          file_url: string
+          id: string
+          is_active: boolean
+          product_id: string | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          asset_type?: string
+          created_at?: string
+          description?: string | null
+          file_url: string
+          id?: string
+          is_active?: boolean
+          product_id?: string | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          asset_type?: string
+          created_at?: string
+          description?: string | null
+          file_url?: string
+          id?: string
+          is_active?: boolean
+          product_id?: string | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketing_assets_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
@@ -121,6 +281,53 @@ export type Database = {
         }
         Relationships: []
       }
+      msds_documents: {
+        Row: {
+          created_at: string
+          file_size_kb: number | null
+          file_url: string
+          id: string
+          is_active: boolean
+          language: string
+          product_id: string | null
+          product_name: string
+          updated_at: string
+          version: string | null
+        }
+        Insert: {
+          created_at?: string
+          file_size_kb?: number | null
+          file_url: string
+          id?: string
+          is_active?: boolean
+          language?: string
+          product_id?: string | null
+          product_name: string
+          updated_at?: string
+          version?: string | null
+        }
+        Update: {
+          created_at?: string
+          file_size_kb?: number | null
+          file_url?: string
+          id?: string
+          is_active?: boolean
+          language?: string
+          product_id?: string | null
+          product_name?: string
+          updated_at?: string
+          version?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "msds_documents_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           id: string
@@ -158,6 +365,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pest_calendar: {
+        Row: {
+          active_months: number[]
+          created_at: string
+          crop: string
+          id: string
+          is_active: boolean
+          pest_name: string
+          preventive_tips: string | null
+          recommended_product_ids: string[] | null
+          region: string
+          season: string
+          severity: string
+          updated_at: string
+        }
+        Insert: {
+          active_months: number[]
+          created_at?: string
+          crop: string
+          id?: string
+          is_active?: boolean
+          pest_name: string
+          preventive_tips?: string | null
+          recommended_product_ids?: string[] | null
+          region?: string
+          season: string
+          severity?: string
+          updated_at?: string
+        }
+        Update: {
+          active_months?: number[]
+          created_at?: string
+          crop?: string
+          id?: string
+          is_active?: boolean
+          pest_name?: string
+          preventive_tips?: string | null
+          recommended_product_ids?: string[] | null
+          region?: string
+          season?: string
+          severity?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       products: {
         Row: {
@@ -267,6 +519,48 @@ export type Database = {
           requested_role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      sustainability_articles: {
+        Row: {
+          body: string
+          category: string
+          created_at: string
+          excerpt: string | null
+          hero_image_url: string | null
+          id: string
+          is_published: boolean
+          published_at: string
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          category?: string
+          created_at?: string
+          excerpt?: string | null
+          hero_image_url?: string | null
+          id?: string
+          is_published?: boolean
+          published_at?: string
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          category?: string
+          created_at?: string
+          excerpt?: string | null
+          hero_image_url?: string | null
+          id?: string
+          is_published?: boolean
+          published_at?: string
+          slug?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
