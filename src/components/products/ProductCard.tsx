@@ -41,24 +41,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <div className="text-xs text-muted-foreground mb-3">
           <span className="font-medium text-foreground">Composition:</span> {product.composition}
         </div>
-        {product.pricing && product.pricing.length > 0 && (
-          <div className="mb-4">
-            <p className="text-xs font-medium text-foreground mb-2">Available Packings</p>
-            <div className="grid grid-cols-2 gap-2">
-              {product.pricing.map((row) => (
-                <div
-                  key={row.size}
-                  className="rounded-lg border border-border bg-muted/40 px-2.5 py-2 flex flex-col"
-                >
-                  <span className="text-[11px] text-muted-foreground leading-tight">{row.size}</span>
-                  <span className="text-sm font-semibold text-primary leading-tight">{row.mrp}</span>
-                  <span className="text-[10px] text-muted-foreground leading-tight">M.R.P.</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-        <div className="flex gap-2">
+        <div className="flex gap-2 mt-auto">
           <Link to={`/products/${product.id}`} className="flex-1">
             <Button variant="default" size="sm" className="w-full">View Details</Button>
           </Link>
