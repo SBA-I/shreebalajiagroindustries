@@ -320,12 +320,8 @@ export interface Milestone {
 }
 
 export const milestones: Milestone[] = [
-  { year: "2010", title: "Company Founded", description: "Shree Balaji Agro Industries established in Rajasthan with a vision to provide quality crop protection solutions." },
-  { year: "2012", title: "First Product Line", description: "Launched initial range of insecticides and fungicides. Established first 50 distributor partnerships." },
-  { year: "2014", title: "Manufacturing Expansion", description: "Expanded manufacturing facility with automated production lines. Achieved ISO 9001 certification." },
-  { year: "2016", title: "Pan-India Distribution", description: "Distribution network expanded to 15 states with 200+ distributors. Launched herbicide product range." },
-  { year: "2019", title: "R&D Center Launch", description: "Opened dedicated research and development center. Initiated bio-pesticide research program." },
-  { year: "2022", title: "500+ Distributors", description: "Crossed 500 distributor milestone. Introduced digital ordering platform for partners." },
-  { year: "2025", title: "Quality Award", description: "Received 'Best Quality Agrochemicals' at AgriExpo 2025. Launched bio-insecticide BioGuard Plus." },
-  { year: "2026", title: "20+ States Coverage", description: "Expanded to 20+ states. Launched advanced digital distributor portal and knowledge platform." },
+  { year: "2010", title: "Company Founded", description: "Shree Balaji Agro Industries established in Maharashtra with a vision to provide quality crop protection solutions." },
+  { year: "2014", title: "First Product Line & ISO Certification", description: "Launched initial range of insecticides and fungicides. Achieved ISO 9001 certification for manufacturing excellence." },
+  { year: "2022", title: "50+ Distributors", description: "Crossed the 50+ distributor milestone, strengthening our partner network across Maharashtra and beyond." },
+  { year: "2026", title: "Bio-Stimulant License", description: "Received official bio-stimulant license, expanding our portfolio into sustainable plant growth solutions." },
 ];
