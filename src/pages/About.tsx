@@ -94,7 +94,7 @@ const About = () => {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
             {[
               { icon: Building2, title: "Quality", desc: "Rigorous quality control at every stage of manufacturing. ISO 9001:2015 certified processes." },
-              { icon: Users, title: "Partnership", desc: "Building lasting relationships with 500+ distributors and thousands of farmers nationwide." },
+              { icon: Users, title: "Partnership", desc: "Building lasting relationships with 50+ distributors and thousands of farmers nationwide." },
               { icon: Award, title: "Innovation", desc: "Continuous R&D investment in advanced formulations and bio-pesticide development." },
               { icon: Target, title: "Integrity", desc: "Transparent business practices, ethical standards, and regulatory compliance at all times." },
             ].map((v) => (
@@ -115,9 +115,7 @@ const About = () => {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
             {[
               "ISO 9001:2015 Certified",
-              "CIB&RC Registered",
-              "GMP Compliant Facility",
-              "AgriExpo 2025 Quality Award",
+              "Bio-Stimulant License",
             ].map((cert) => (
               <div key={cert} className="bg-card rounded-xl border border-border p-5 shadow-card flex items-center gap-3">
                 <Award className="h-6 w-6 text-accent shrink-0" />
