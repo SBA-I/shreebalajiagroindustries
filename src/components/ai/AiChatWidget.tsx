@@ -162,19 +162,24 @@ const AiChatWidget = () => {
               className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               disabled={isLoading}
             />
-            {voiceSupported && (
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                onClick={() => (listening ? stopVoice() : startVoice())}
-                className={`h-8 w-8 ${listening ? "text-primary animate-pulse" : ""}`}
-                aria-label={listening ? "Stop voice input" : "Start voice input"}
-                title={listening ? "Stop" : "Speak your question"}
-              >
-                {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-              </Button>
-            )}
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              onClick={() => {
+                if (!voiceSupported) {
+                  alert("Voice input is not supported in this browser. Please use Chrome, Edge, or Safari.");
+                  return;
+                }
+                listening ? stopVoice() : startVoice();
+              }}
+              className={`h-8 w-8 ${listening ? "text-primary animate-pulse" : ""} ${!voiceSupported ? "opacity-50" : ""}`}
+              aria-label={listening ? "Stop voice input" : "Start voice input"}
+              title={!voiceSupported ? "Voice not supported in this browser" : listening ? "Stop" : "Speak your question"}
+              disabled={isLoading}
+            >
+              {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            </Button>
             <Button type="submit" size="icon" variant="ghost" disabled={!input.trim() || isLoading} className="h-8 w-8">
               <Send className="h-4 w-4" />
             </Button>
