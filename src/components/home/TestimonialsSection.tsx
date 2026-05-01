@@ -4,18 +4,18 @@ import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 const testimonials = [
   {
     quote: "Shree Balaji Agro Industries has been our trusted partner for over 8 years. Their product quality and consistency are unmatched in the industry.",
-    name: "Rajesh Patel",
-    role: "Distributor, Gujarat",
+    name: "Mahendra Shet Bhandari",
+    role: "Distributor, Maharashtra",
   },
   {
     quote: "The range of crop protection products and the technical support provided by the team has significantly improved our farming yields.",
-    name: "Suresh Kumar",
+    name: "Badhiram Dhudhane",
     role: "Progressive Farmer, Maharashtra",
   },
   {
     quote: "Excellent supply chain management and timely delivery. They understand the urgency of agricultural seasons and never let us down.",
-    name: "Anil Sharma",
-    role: "Dealer, Rajasthan",
+    name: "Madhav Kadam",
+    role: "Dealer, Maharashtra",
   },
 ];
 
