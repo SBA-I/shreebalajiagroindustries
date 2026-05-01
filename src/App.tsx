@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ComparisonProvider } from "@/hooks/use-product-comparison";
+import { AuthProvider } from "@/hooks/use-auth";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Products from "./pages/Products";
@@ -16,6 +18,12 @@ import NewsDetail from "./pages/NewsDetail";
 import Contact from "./pages/Contact";
 import AskAI from "./pages/AskAI";
 import YieldSimulator from "./pages/YieldSimulator";
+import Auth from "./pages/Auth";
+import Dashboard from "./pages/Dashboard";
+import AdminPortal from "./pages/portals/AdminPortal";
+import DistributorPortal from "./pages/portals/DistributorPortal";
+import FieldOfficerPortal from "./pages/portals/FieldOfficerPortal";
+import FarmerPortal from "./pages/portals/FarmerPortal";
 import AiChatWidget from "./components/ai/AiChatWidget";
 import NotFound from "./pages/NotFound";
 
@@ -24,28 +32,36 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <ComparisonProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/products/compare" element={<CompareProducts />} />
-            <Route path="/products/:productId" element={<ProductDetail />} />
-            <Route path="/resources" element={<Resources />} />
-            <Route path="/resources/:slug" element={<ArticleDetail />} />
-            <Route path="/news" element={<News />} />
-            <Route path="/news/:slug" element={<NewsDetail />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/ask-ai" element={<AskAI />} />
-            <Route path="/yield-simulator" element={<YieldSimulator />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <AiChatWidget />
-        </BrowserRouter>
-      </ComparisonProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <ComparisonProvider>
+            <Toaster />
+            <Sonner />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/products/compare" element={<CompareProducts />} />
+              <Route path="/products/:productId" element={<ProductDetail />} />
+              <Route path="/resources" element={<Resources />} />
+              <Route path="/resources/:slug" element={<ArticleDetail />} />
+              <Route path="/news" element={<News />} />
+              <Route path="/news/:slug" element={<NewsDetail />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/ask-ai" element={<AskAI />} />
+              <Route path="/yield-simulator" element={<YieldSimulator />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPortal /></ProtectedRoute>} />
+              <Route path="/distributor" element={<ProtectedRoute allowedRoles={["distributor", "admin"]}><DistributorPortal /></ProtectedRoute>} />
+              <Route path="/field-officer" element={<ProtectedRoute allowedRoles={["field_officer", "admin"]}><FieldOfficerPortal /></ProtectedRoute>} />
+              <Route path="/farmer" element={<ProtectedRoute allowedRoles={["farmer", "admin"]}><FarmerPortal /></ProtectedRoute>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <AiChatWidget />
+          </ComparisonProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );

@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, X, ChevronDown, LogIn, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo-sbai.png";
+import { useAuth } from "@/hooks/use-auth";
 
 const navItems = [
   { label: "Home", path: "/" },
@@ -28,6 +29,8 @@ const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -79,9 +82,24 @@ const Header = () => {
 
         {/* Desktop Actions */}
         <div className="hidden lg:flex items-center gap-3">
-          <Link to="/contact">
-            <Button size="sm">Contact Us</Button>
-          </Link>
+          {user ? (
+            <>
+              <Link to="/dashboard">
+                <Button size="sm" variant="outline" className="gap-1.5">
+                  <LayoutDashboard className="h-4 w-4" /> Dashboard
+                </Button>
+              </Link>
+              <Button size="sm" variant="ghost" onClick={async () => { await signOut(); navigate("/"); }}>
+                Sign Out
+              </Button>
+            </>
+          ) : (
+            <Link to="/auth">
+              <Button size="sm" className="gap-1.5">
+                <LogIn className="h-4 w-4" /> Login
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Mobile Toggle */}
@@ -124,6 +142,33 @@ const Header = () => {
                 )}
               </div>
             ))}
+            <div className="pt-3 border-t border-border space-y-1">
+              {user ? (
+                <>
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setMobileOpen(false)}
+                    className="block px-3 py-2.5 rounded-md text-sm font-medium text-primary"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={async () => { await signOut(); setMobileOpen(false); navigate("/"); }}
+                    className="block w-full text-left px-3 py-2.5 rounded-md text-sm font-medium text-foreground/80 hover:text-primary"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/auth"
+                  onClick={() => setMobileOpen(false)}
+                  className="block px-3 py-2.5 rounded-md text-sm font-medium text-primary"
+                >
+                  Login / Sign Up
+                </Link>
+              )}
+            </div>
           </nav>
         </div>
       )}
