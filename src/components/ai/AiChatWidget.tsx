@@ -1,17 +1,30 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Trash2, Sprout, Mail } from "lucide-react";
+import { MessageCircle, X, Send, Trash2, Sprout, Mail, Mic, MicOff } from "lucide-react";
 import whatsappIcon from "@/assets/whatsapp-icon.svg";
 import { Button } from "@/components/ui/button";
 import { useAiChat } from "@/hooks/use-ai-chat";
+import { useVoiceSearch, type VoiceLang } from "@/hooks/use-voice-search";
 import ReactMarkdown from "react-markdown";
 
 const langLabels = { en: "EN", hi: "हिं", mr: "मर" } as const;
+const langToVoice: Record<keyof typeof langLabels, VoiceLang> = {
+  en: "en-IN",
+  hi: "hi-IN",
+  mr: "mr-IN",
+};
 
 const AiChatWidget = () => {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const { messages, isLoading, sendMessage, clearChat, language, setLanguage } = useAiChat();
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const { listening, supported: voiceSupported, start: startVoice, stop: stopVoice } = useVoiceSearch({
+    lang: langToVoice[language as keyof typeof langLabels] ?? "en-IN",
+    onResult: (text) => {
+      if (text) setInput((prev) => (prev ? prev + " " + text : text));
+    },
+  });
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -145,10 +158,23 @@ const AiChatWidget = () => {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about crops, pests, products..."
+              placeholder={listening ? "Listening..." : "Ask about crops, pests, products..."}
               className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               disabled={isLoading}
             />
+            {voiceSupported && (
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                onClick={() => (listening ? stopVoice() : startVoice())}
+                className={`h-8 w-8 ${listening ? "text-primary animate-pulse" : ""}`}
+                aria-label={listening ? "Stop voice input" : "Start voice input"}
+                title={listening ? "Stop" : "Speak your question"}
+              >
+                {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+              </Button>
+            )}
             <Button type="submit" size="icon" variant="ghost" disabled={!input.trim() || isLoading} className="h-8 w-8">
               <Send className="h-4 w-4" />
             </Button>
