@@ -1,10 +1,10 @@
-import { Award, Users, Package, MapPin } from "lucide-react";
+import { Award, Users, Package, Sprout } from "lucide-react";
 
 const stats = [
   { icon: Award, value: "15+", label: "Years Experience", color: "text-primary" },
-  { icon: Package, value: "200+", label: "Products", color: "text-secondary" },
-  { icon: Users, value: "500+", label: "Distributors", color: "text-primary" },
-  { icon: MapPin, value: "20+", label: "States Covered", color: "text-secondary" },
+  { icon: Package, value: "10+", label: "Products", color: "text-secondary" },
+  { icon: Users, value: "50+", label: "Distributors", color: "text-primary" },
+  { icon: Sprout, value: "1000+", label: "Farmers", color: "text-secondary" },
 ];
 
 const StatsSection = () => {
