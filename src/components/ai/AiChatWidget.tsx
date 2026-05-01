@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send, Trash2, Sprout } from "lucide-react";
+import whatsappIcon from "@/assets/whatsapp-icon.svg";
 import { Button } from "@/components/ui/button";
 import { useAiChat } from "@/hooks/use-ai-chat";
 import ReactMarkdown from "react-markdown";
@@ -25,6 +26,17 @@ const AiChatWidget = () => {
 
   return (
     <>
+      {/* WhatsApp floating button (above AI button) */}
+      <a
+        href="https://wa.me/917744998998"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-24 right-6 z-50 h-14 w-14 rounded-full bg-[#25D366] shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
+        aria-label="Chat on WhatsApp"
+      >
+        <img src={whatsappIcon} alt="WhatsApp" className="h-7 w-7" />
+      </a>
+
       {/* Floating button */}
       {!open && (
         <button
