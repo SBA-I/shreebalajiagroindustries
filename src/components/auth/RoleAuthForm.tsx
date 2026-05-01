@@ -15,6 +15,8 @@ import logo from "@/assets/logo-sbai.png";
 
 export type RoleKey = "farmer" | "distributor" | "field_officer" | "admin";
 
+export type ExtraFieldsData = Record<string, unknown>;
+
 interface RoleAuthFormProps {
   role: RoleKey;
   title: string;
@@ -24,6 +26,15 @@ interface RoleAuthFormProps {
   allowSignup?: boolean;
   showGoogle?: boolean;
   extraPhone?: boolean;
+  /** Optional render prop to inject role-specific signup fields. */
+  renderExtraFields?: (props: {
+    value: ExtraFieldsData;
+    onChange: (next: ExtraFieldsData) => void;
+  }) => React.ReactNode;
+  /** Optional async validator for the extra fields. Return error string or null. */
+  validateExtras?: (value: ExtraFieldsData) => string | null;
+  /** Map extras into the metadata payload sent to Supabase. */
+  extrasToMetadata?: (value: ExtraFieldsData) => Record<string, unknown>;
 }
 
 const signupSchema = z.object({
@@ -47,6 +58,9 @@ const RoleAuthForm = ({
   allowSignup = true,
   showGoogle = true,
   extraPhone = true,
+  renderExtraFields,
+  validateExtras,
+  extrasToMetadata,
 }: RoleAuthFormProps) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -67,6 +81,7 @@ const RoleAuthForm = ({
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [extras, setExtras] = useState<ExtraFieldsData>({});
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,6 +108,10 @@ const RoleAuthForm = ({
     }
     const parsed = signupSchema.safeParse({ fullName: name, email, phone, password });
     if (!parsed.success) return toast.error(parsed.error.errors[0].message);
+    if (validateExtras) {
+      const err = validateExtras(extras);
+      if (err) return toast.error(err);
+    }
     setBusy(true);
     const { error } = await supabase.auth.signUp({
       email: parsed.data.email,
@@ -103,6 +122,7 @@ const RoleAuthForm = ({
           full_name: parsed.data.fullName,
           phone: parsed.data.phone || null,
           requested_role: role,
+          ...(extrasToMetadata ? extrasToMetadata(extras) : {}),
         },
       },
     });
@@ -214,6 +234,7 @@ const RoleAuthForm = ({
                       />
                       <p className="text-xs text-muted-foreground mt-1">At least 8 characters</p>
                     </div>
+                    {renderExtraFields?.({ value: extras, onChange: setExtras })}
                     <Button type="submit" className="w-full" disabled={busy}>
                       {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Account"}
                     </Button>
