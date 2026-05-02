@@ -12,7 +12,7 @@ const LanguageBar = () => {
   const { lang, setLang, t } = useI18n();
 
   return (
-    <div className="w-full bg-primary/95 text-primary-foreground text-xs notranslate" translate="no">
+    <div className="w-full bg-primary/95 text-primary-foreground text-xs">
       <div className="container mx-auto px-4 lg:px-8 h-8 flex items-center justify-end gap-2">
         <Globe className="h-3.5 w-3.5 opacity-80" aria-hidden />
         <span className="opacity-80 hidden sm:inline">{t("lang.label")}</span>
