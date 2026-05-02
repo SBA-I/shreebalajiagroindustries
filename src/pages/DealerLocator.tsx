@@ -256,7 +256,14 @@ const DealerLocator = () => {
   );
 };
 
-const DealerCard = ({ dealer, mapsHref, waHref }: { dealer: Dealer; mapsHref: string; waHref: string | null }) => (
+const DealerCard = ({
+  dealer, mapsHref, waBuilder, stock,
+}: {
+  dealer: Dealer;
+  mapsHref: string;
+  waBuilder: ((productName?: string) => string) | null;
+  stock: StockBadge[];
+}) => (
   <div className="rounded-lg border border-border p-4 hover:border-primary transition-colors">
     <div className="flex gap-3">
       {dealer.photo_url && (
@@ -285,15 +292,38 @@ const DealerCard = ({ dealer, mapsHref, waHref }: { dealer: Dealer; mapsHref: st
         </p>
       </div>
     </div>
+
+    {stock.length > 0 && (
+      <div className="mt-3 pt-3 border-t border-border space-y-1.5">
+        <p className="text-xs font-medium text-muted-foreground">Stock status</p>
+        <div className="flex flex-wrap gap-1.5">
+          {stock.map((s) => {
+            const label = STATUS_LABEL[s.status] ?? s.status;
+            const tone = STATUS_TONE[s.status] ?? "bg-muted text-muted-foreground";
+            const text = s.status === "arriving" && s.arriving_on
+              ? `${s.product_name}: ${label} ${new Date(s.arriving_on).toLocaleDateString(undefined, { weekday: "short" })}`
+              : `${s.product_name}: ${label}`;
+            return waBuilder ? (
+              <a key={s.product_id} href={waBuilder(s.product_name)} target="_blank" rel="noopener noreferrer" className="inline-block">
+                <Badge className={`${tone} cursor-pointer hover:opacity-80`}>{text}</Badge>
+              </a>
+            ) : (
+              <Badge key={s.product_id} className={tone}>{text}</Badge>
+            );
+          })}
+        </div>
+      </div>
+    )}
+
     <div className="mt-3 flex flex-wrap gap-2">
       <Button asChild size="sm" className="gap-1.5">
         <a href={mapsHref} target="_blank" rel="noopener noreferrer">
           <Navigation className="h-3.5 w-3.5" /> Navigate
         </a>
       </Button>
-      {waHref ? (
+      {waBuilder ? (
         <Button asChild size="sm" variant="outline" className="gap-1.5">
-          <a href={waHref} target="_blank" rel="noopener noreferrer">
+          <a href={waBuilder()} target="_blank" rel="noopener noreferrer">
             <MessageCircle className="h-3.5 w-3.5" /> Check Stock on WhatsApp
           </a>
         </Button>
