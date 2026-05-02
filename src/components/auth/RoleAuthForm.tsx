@@ -217,11 +217,16 @@ const RoleAuthForm = ({
   };
 
   const handleForgotPassword = async () => {
-    const email = loginEmail.trim();
-    if (!email || !email.includes("@")) {
+    const identifier = loginEmail.trim();
+    if (!identifier) {
       toast.error("Enter your email above first, then click Forgot password.");
       return;
     }
+    if (!identifier.includes("@")) {
+      toast.error("Password reset requires an email. If you signed up with mobile only, please contact support.");
+      return;
+    }
+    const email = identifier;
     setBusy(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/reset-password`,
