@@ -207,13 +207,7 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
     }, 900);
   }, [applyWholePageTranslation]);
 
-  const t = useCallback(
-    (key: TKey) => {
-      const dict = translations[lang] as Record<string, string>;
-      return dict[key] ?? translations.en[key] ?? key;
-    },
-    [lang]
-  );
+  const t = useCallback((key: TKey) => translations.en[key] ?? key, []);
 
   return (
     <Ctx.Provider value={{ lang, setLang, t, isTranslating }}>
