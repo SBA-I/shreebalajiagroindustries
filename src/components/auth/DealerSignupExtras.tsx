@@ -4,8 +4,11 @@ import { Label } from "@/components/ui/label";
 import { Loader2, ScanLine, CheckCircle2, AlertCircle } from "lucide-react";
 import type { ExtraFieldsData } from "./RoleAuthForm";
 
-// Indian GSTIN: 2 digit state + 10 char PAN + 1 entity + 1 'Z' + 1 checksum
-const GSTIN_REGEX = /\b\d{2}[A-Z]{5}\d{4}[A-Z]\d[A-Z]\d\b/;
+// Indian GSTIN (15 chars): 2 digit state + 10 char PAN (5 letters + 4 digits + 1 letter)
+// + 1 entity (alphanumeric) + 'Z' + 1 alphanumeric checksum.
+// Used standalone for typed input and as a pattern (without anchors) for OCR scan.
+const GSTIN_REGEX = /^\d{2}[A-Z]{5}\d{4}[A-Z][0-9A-Z]Z[0-9A-Z]$/;
+const GSTIN_SCAN_REGEX = /\d{2}[A-Z]{5}\d{4}[A-Z][0-9A-Z]Z[0-9A-Z]/;
 
 interface Props {
   value: ExtraFieldsData;
@@ -44,7 +47,7 @@ const DealerSignupExtras = ({ value, onChange }: Props) => {
       const Tesseract = (await import("tesseract.js")).default;
       const { data } = await Tesseract.recognize(file, "eng");
       const text = (data.text || "").toUpperCase();
-      const match = text.match(GSTIN_REGEX);
+      const match = text.match(GSTIN_SCAN_REGEX);
       if (match) {
         onChange({ ...value, gst_number: match[0] });
         setOcrStatus("ok");
