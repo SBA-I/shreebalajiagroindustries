@@ -24,14 +24,7 @@ const navItems: NavItem[] = [
       { key: "pgr", tKey: "cat.pgr", path: "/products?category=pgr" },
     ],
   },
-  {
-    key: "dealers",
-    tKey: "nav.dealers",
-    path: "/dealers",
-    children: [
-      { key: "find", tKey: "dealers.find", path: "/find-dealer" },
-    ],
-  },
+  { key: "find", tKey: "dealers.find", path: "/find-dealer" },
   { key: "safety", tKey: "nav.safety", path: "/safety" },
   { key: "sustainability", tKey: "nav.sustainability", path: "/sustainability" },
   { key: "resources", tKey: "nav.resources", path: "/resources" },
