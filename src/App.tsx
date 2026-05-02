@@ -33,9 +33,7 @@ import AdminPortal from "./pages/portals/AdminPortal";
 import DistributorPortal from "./pages/portals/DistributorPortal";
 import FieldOfficerPortal from "./pages/portals/FieldOfficerPortal";
 import FarmerPortal from "./pages/portals/FarmerPortal";
-import AiChatWidget from "./components/ai/AiChatWidget";
-import EmergencyFirstAidButton from "./components/safety/EmergencyFirstAidButton";
-import EmergencyContactButton from "./components/safety/EmergencyContactButton";
+import FloatingActionHub from "./components/FloatingActionHub";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -78,9 +76,7 @@ const App = () => (
               <Route path="/farmer" element={<ProtectedRoute allowedRoles={["farmer", "admin"]}><FarmerPortal /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-            <AiChatWidget />
-            <EmergencyFirstAidButton />
-            <EmergencyContactButton />
+            <FloatingActionHub />
           </ComparisonProvider>
         </AuthProvider>
         </I18nProvider>
