@@ -31,7 +31,7 @@ const AdminDealerStockManager = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [rows, setRows] = useState<Stock[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dealerFilter, setDealerFilter] = useState<string>("");
+  const [dealerFilter, setDealerFilter] = useState<string>("all");
   const [q, setQ] = useState("");
 
   const [form, setForm] = useState({ dealer_id: "", product_id: "", status: "in_stock", arriving_on: "", notes: "" });
@@ -55,7 +55,7 @@ const AdminDealerStockManager = () => {
   const productName = (id: string) => products.find((p) => p.id === id)?.name ?? id;
 
   const filtered = useMemo(() => rows.filter((r) => {
-    if (dealerFilter && r.dealer_id !== dealerFilter) return false;
+    if (dealerFilter !== "all" && r.dealer_id !== dealerFilter) return false;
     if (q) {
       const hay = `${dealerName(r.dealer_id)} ${productName(r.product_id)}`.toLowerCase();
       if (!hay.includes(q.toLowerCase())) return false;
@@ -141,7 +141,7 @@ const AdminDealerStockManager = () => {
             <Select value={dealerFilter} onValueChange={setDealerFilter}>
               <SelectTrigger className="w-60"><SelectValue placeholder="Filter by dealer" /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All dealers</SelectItem>
+                <SelectItem value="all">All dealers</SelectItem>
                 {dealers.map((d) => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
               </SelectContent>
             </Select>
