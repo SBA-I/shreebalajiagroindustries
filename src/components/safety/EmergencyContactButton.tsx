@@ -30,14 +30,16 @@ const EmergencyContactButton = () => {
         >
           {open ? <X className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
         </button>
-        <button
-          type="button"
-          onClick={dismiss}
-          aria-label="Hide emergency contact button"
-          className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-background border border-border text-muted-foreground flex items-center justify-center shadow hover:text-foreground"
-        >
-          <X className="h-2.5 w-2.5" />
-        </button>
+        {open && (
+          <button
+            type="button"
+            onClick={dismiss}
+            aria-label="Hide emergency contact button"
+            className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-background border border-border text-muted-foreground flex items-center justify-center shadow hover:text-foreground"
+          >
+            <X className="h-2.5 w-2.5" />
+          </button>
+        )}
       </div>
 
       {open && (
