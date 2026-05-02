@@ -9,6 +9,7 @@ import { Loader2, Trash2, Upload, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import EditDialog from "./EditDialog";
+import { notifySubscribers } from "@/lib/notify";
 
 interface Asset {
   id: string;
@@ -27,6 +28,7 @@ const TYPE_OPTIONS = [
   { value: "bulletin", label: "Technical Bulletin (PDF)" },
   { value: "banner", label: "Banner" },
   { value: "poster", label: "Poster" },
+  { value: "other", label: "Other" },
 ];
 const AUDIENCE_OPTIONS = [
   { value: "dealers", label: "Dealers only" },
@@ -73,6 +75,13 @@ const AdminMarketingManager = () => {
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success("Asset uploaded");
+    if (audience === "public") {
+      notifySubscribers("marketing", {
+        title: title.trim(),
+        excerpt: description.trim() || undefined,
+        hero_image_url: pub.publicUrl,
+      });
+    }
     setTitle(""); setDescription(""); setType("catalog"); setAudience("dealers"); setFile(null);
     if (fileRef.current) fileRef.current.value = "";
     refresh();

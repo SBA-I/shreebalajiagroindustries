@@ -1,6 +1,6 @@
 import Layout from "@/components/layout/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShieldCheck, FileText, Megaphone, Store, Truck, Bug, BookOpen, UserCheck, Receipt, Package, MessageSquare, Users, Boxes, UserCog, Newspaper } from "lucide-react";
+import { ShieldCheck, FileText, Megaphone, Store, Truck, Bug, BookOpen, UserCheck, Receipt, Package, MessageSquare, Users, Boxes, UserCog, Newspaper, Mail } from "lucide-react";
 import AdminMsdsManager from "@/components/admin/AdminMsdsManager";
 import AdminMarketingManager from "@/components/admin/AdminMarketingManager";
 import AdminDealersManager from "@/components/admin/AdminDealersManager";
@@ -15,6 +15,7 @@ import AdminUsersManager from "@/components/admin/AdminUsersManager";
 import AdminDealerStockManager from "@/components/admin/AdminDealerStockManager";
 import AdminFieldOfficersManager from "@/components/admin/AdminFieldOfficersManager";
 import AdminNewsManager from "@/components/admin/AdminNewsManager";
+import AdminSubscribersManager from "@/components/admin/AdminSubscribersManager";
 
 const AdminPortal = () => (
   <Layout>
@@ -45,6 +46,7 @@ const AdminPortal = () => (
             <TabsTrigger value="pest" className="gap-1.5 justify-start"><Bug className="h-4 w-4 shrink-0" /> Pest Calendar</TabsTrigger>
             <TabsTrigger value="resources" className="gap-1.5 justify-start"><BookOpen className="h-4 w-4 shrink-0" /> Resources & Sustainability</TabsTrigger>
             <TabsTrigger value="news" className="gap-1.5 justify-start"><Newspaper className="h-4 w-4 shrink-0" /> News</TabsTrigger>
+            <TabsTrigger value="subscribers" className="gap-1.5 justify-start"><Mail className="h-4 w-4 shrink-0" /> Subscribers</TabsTrigger>
             <TabsTrigger value="inquiries" className="gap-1.5 justify-start"><MessageSquare className="h-4 w-4 shrink-0" /> Inquiries</TabsTrigger>
           </TabsList>
           <TabsContent value="verification"><AdminVerificationQueue /></TabsContent>
@@ -60,6 +62,7 @@ const AdminPortal = () => (
           <TabsContent value="pest"><AdminPestCalendarManager /></TabsContent>
           <TabsContent value="resources"><AdminResourcesManager /></TabsContent>
           <TabsContent value="news"><AdminNewsManager /></TabsContent>
+          <TabsContent value="subscribers"><AdminSubscribersManager /></TabsContent>
           <TabsContent value="inquiries"><AdminContactInquiriesManager /></TabsContent>
         </Tabs>
       </div>

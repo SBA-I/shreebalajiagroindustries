@@ -10,6 +10,7 @@ import { Loader2, Trash2, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import EditDialog from "./EditDialog";
+import { notifySubscribers } from "@/lib/notify";
 
 const CATEGORIES: Array<{ value: string; label: string }> = [
   { value: "crop-protection", label: "Crop Protection" },
@@ -120,12 +121,31 @@ const AdminResourcesManager = () => {
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success("Resource added");
+    if (form.is_published) {
+      notifySubscribers("resource", {
+        title: form.title,
+        excerpt: form.excerpt || undefined,
+        slug,
+        hero_image_url: form.hero_image_url || undefined,
+      });
+    }
     setForm(blank);
     refresh();
   };
 
   const togglePublish = async (id: string, current: boolean) => {
     await supabase.from("sustainability_articles").update({ is_published: !current }).eq("id", id);
+    if (!current) {
+      const row = rows.find((r) => r.id === id);
+      if (row) {
+        notifySubscribers("resource", {
+          title: row.title,
+          excerpt: row.excerpt ?? undefined,
+          slug: row.slug,
+          hero_image_url: row.hero_image_url ?? undefined,
+        });
+      }
+    }
     refresh();
   };
   const toggleFeatured = async (id: string, current: boolean) => {
