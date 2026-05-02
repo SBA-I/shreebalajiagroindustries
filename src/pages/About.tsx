@@ -35,12 +35,12 @@ const stats = [
 const StatItem = ({ icon: Icon, value, suffix, label }: typeof stats[number]) => {
   const [ref, current] = useCountUp(value);
   return (
-    <div ref={ref as React.RefObject<HTMLDivElement>} className="text-center">
+    <div ref={ref} className="text-center">
       <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-primary/10 flex items-center justify-center">
         <Icon className="h-6 w-6 text-primary" />
       </div>
       <p className="font-heading text-3xl md:text-4xl font-bold text-foreground tabular-nums">
-        {current.toLocaleString()}
+        <span className="notranslate" translate="no">{current.toLocaleString()}</span>
         {suffix}
       </p>
       <p className="text-sm text-muted-foreground mt-1">{label}</p>

@@ -94,6 +94,19 @@ const setGoogTransCookie = (lang: Lang) => {
   document.cookie = `googtrans=${value}; path=/; domain=.${host}`;
 };
 
+const GOOGLE_TARGET_LANG: Record<Lang, string> = {
+  en: "",
+  hi: "hi",
+  mr: "mr",
+};
+
+const normalizeTranslateLayout = () => {
+  if (typeof document === "undefined") return;
+  document.documentElement.classList.toggle("translation-active", document.documentElement.lang !== BCP47.en);
+  document.body.style.top = "0px";
+  document.body.style.position = "static";
+};
+
 // Try to drive the in-page combo; if not ready yet, poll briefly
 const triggerCombo = (lang: Lang): Promise<boolean> => {
   return new Promise((resolve) => {
@@ -101,8 +114,10 @@ const triggerCombo = (lang: Lang): Promise<boolean> => {
     const tryNow = () => {
       const combo = document.querySelector<HTMLSelectElement>(".goog-te-combo");
       if (combo) {
-        combo.value = lang;
-        combo.dispatchEvent(new Event("change"));
+        combo.value = GOOGLE_TARGET_LANG[lang];
+        combo.dispatchEvent(new Event("change", { bubbles: true }));
+        window.setTimeout(normalizeTranslateLayout, 150);
+        window.setTimeout(normalizeTranslateLayout, 600);
         resolve(true);
         return;
       }
@@ -122,11 +137,13 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
   const [isTranslating, setIsTranslating] = useState(false);
   const translatingTimer = useRef<number | null>(null);
   const mutationPasses = useRef(0);
+  const lastMutationTranslateAt = useRef(0);
 
   const applyWholePageTranslation = useCallback(async (l: Lang) => {
     setGoogTransCookie(l);
-    if (l === "en") return true;
-    return triggerCombo(l);
+    const ok = await triggerCombo(l);
+    normalizeTranslateLayout();
+    return ok;
   }, []);
 
   useEffect(() => {
@@ -159,13 +176,15 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
     if (lang === "en") return;
     let queued = false;
     const observer = new MutationObserver(() => {
-      if (queued || mutationPasses.current >= 3) return;
+      normalizeTranslateLayout();
+      if (queued || Date.now() - lastMutationTranslateAt.current < 1200) return;
       queued = true;
       window.setTimeout(() => {
         queued = false;
+        lastMutationTranslateAt.current = Date.now();
         mutationPasses.current += 1;
         void applyWholePageTranslation(lang);
-      }, 500);
+      }, 650);
     });
     observer.observe(document.body, { childList: true, subtree: true });
     return () => observer.disconnect();
@@ -179,7 +198,7 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
     window.dispatchEvent(new CustomEvent("sbai-lang-change", { detail: l }));
 
     const ok = await applyWholePageTranslation(l);
-    if (!ok) {
+    if (!ok && l !== "en") {
       setTimeout(() => window.location.reload(), 80);
       return;
     }
@@ -190,13 +209,7 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
     }, 900);
   }, [applyWholePageTranslation]);
 
-  const t = useCallback(
-    (key: TKey) => {
-      const dict = translations[lang] as Record<string, string>;
-      return dict[key] ?? translations.en[key] ?? key;
-    },
-    [lang]
-  );
+  const t = useCallback((key: TKey) => translations.en[key] ?? key, []);
 
   return (
     <Ctx.Provider value={{ lang, setLang, t, isTranslating }}>
