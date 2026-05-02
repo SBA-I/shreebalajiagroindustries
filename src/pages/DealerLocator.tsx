@@ -28,6 +28,26 @@ interface Dealer {
 
 interface TalukaRow { taluka: string; district: string; state: string; dealer_count: number }
 
+interface StockBadge {
+  product_id: string;
+  product_name: string;
+  status: string;
+  arriving_on: string | null;
+}
+
+const STATUS_TONE: Record<string, string> = {
+  in_stock: "bg-emerald-100 text-emerald-800",
+  low_stock: "bg-amber-100 text-amber-800",
+  out_of_stock: "bg-rose-100 text-rose-800",
+  arriving: "bg-blue-100 text-blue-800",
+};
+const STATUS_LABEL: Record<string, string> = {
+  in_stock: "In Stock",
+  low_stock: "Low",
+  out_of_stock: "Out",
+  arriving: "Arriving",
+};
+
 const DealerLocator = () => {
   const [pincode, setPincode] = useState("");
   const [results, setResults] = useState<Dealer[]>([]);
@@ -36,6 +56,27 @@ const DealerLocator = () => {
   const [talukas, setTalukas] = useState<TalukaRow[]>([]);
   const [selectedTaluka, setSelectedTaluka] = useState<string>("");
   const [geoBusy, setGeoBusy] = useState(false);
+  const [stockByDealer, setStockByDealer] = useState<Record<string, StockBadge[]>>({});
+
+  const loadStock = async (dealerIds: string[]) => {
+    if (dealerIds.length === 0) { setStockByDealer({}); return; }
+    const [{ data: stock }, { data: prods }] = await Promise.all([
+      supabase.from("dealer_stock").select("dealer_id, product_id, status, arriving_on").in("dealer_id", dealerIds),
+      supabase.from("products").select("id, name").eq("is_active", true),
+    ]);
+    const nameMap: Record<string, string> = {};
+    (prods ?? []).forEach((p: any) => { nameMap[p.id] = p.name; });
+    const grouped: Record<string, StockBadge[]> = {};
+    (stock ?? []).forEach((s: any) => {
+      const list = grouped[s.dealer_id] ?? (grouped[s.dealer_id] = []);
+      list.push({ product_id: s.product_id, product_name: nameMap[s.product_id] ?? "Product", status: s.status, arriving_on: s.arriving_on });
+    });
+    setStockByDealer(grouped);
+  };
+
+  useEffect(() => {
+    loadStock(results.map((r) => r.id));
+  }, [results]);
 
   useEffect(() => {
     supabase.rpc("list_dealer_talukas_public").then(({ data }) => {
@@ -110,8 +151,12 @@ const DealerLocator = () => {
     const num = (d.whatsapp ?? "").replace(/\D/g, "");
     if (!num) return null;
     const full = num.length === 10 ? `91${num}` : num;
-    const msg = encodeURIComponent(`Namaste, I would like to check stock availability of Shree Balaji Agro products at ${d.name}.`);
-    return `https://wa.me/${full}?text=${msg}`;
+    return (productName?: string) => {
+      const text = productName
+        ? `Hello ${d.name}, I saw on the Shree Balaji Agro website that you have ${productName} in stock. Can you set aside 2 litres for me?`
+        : `Namaste, I would like to check stock availability of Shree Balaji Agro products at ${d.name}.`;
+      return `https://wa.me/${full}?text=${encodeURIComponent(text)}`;
+    };
   };
 
   return (
@@ -191,7 +236,13 @@ const DealerLocator = () => {
                         {results.length} dealer{results.length === 1 ? "" : "s"} found
                       </p>
                       {results.map((d) => (
-                        <DealerCard key={d.id} dealer={d} mapsHref={mapsHref(d)} waHref={waHref(d)} />
+                        <DealerCard
+                          key={d.id}
+                          dealer={d}
+                          mapsHref={mapsHref(d)}
+                          waBuilder={waHref(d) as any}
+                          stock={stockByDealer[d.id] ?? []}
+                        />
                       ))}
                     </div>
                   )}
@@ -205,7 +256,14 @@ const DealerLocator = () => {
   );
 };
 
-const DealerCard = ({ dealer, mapsHref, waHref }: { dealer: Dealer; mapsHref: string; waHref: string | null }) => (
+const DealerCard = ({
+  dealer, mapsHref, waBuilder, stock,
+}: {
+  dealer: Dealer;
+  mapsHref: string;
+  waBuilder: ((productName?: string) => string) | null;
+  stock: StockBadge[];
+}) => (
   <div className="rounded-lg border border-border p-4 hover:border-primary transition-colors">
     <div className="flex gap-3">
       {dealer.photo_url && (
@@ -234,15 +292,38 @@ const DealerCard = ({ dealer, mapsHref, waHref }: { dealer: Dealer; mapsHref: st
         </p>
       </div>
     </div>
+
+    {stock.length > 0 && (
+      <div className="mt-3 pt-3 border-t border-border space-y-1.5">
+        <p className="text-xs font-medium text-muted-foreground">Stock status</p>
+        <div className="flex flex-wrap gap-1.5">
+          {stock.map((s) => {
+            const label = STATUS_LABEL[s.status] ?? s.status;
+            const tone = STATUS_TONE[s.status] ?? "bg-muted text-muted-foreground";
+            const text = s.status === "arriving" && s.arriving_on
+              ? `${s.product_name}: ${label} ${new Date(s.arriving_on).toLocaleDateString(undefined, { weekday: "short" })}`
+              : `${s.product_name}: ${label}`;
+            return waBuilder ? (
+              <a key={s.product_id} href={waBuilder(s.product_name)} target="_blank" rel="noopener noreferrer" className="inline-block">
+                <Badge className={`${tone} cursor-pointer hover:opacity-80`}>{text}</Badge>
+              </a>
+            ) : (
+              <Badge key={s.product_id} className={tone}>{text}</Badge>
+            );
+          })}
+        </div>
+      </div>
+    )}
+
     <div className="mt-3 flex flex-wrap gap-2">
       <Button asChild size="sm" className="gap-1.5">
         <a href={mapsHref} target="_blank" rel="noopener noreferrer">
           <Navigation className="h-3.5 w-3.5" /> Navigate
         </a>
       </Button>
-      {waHref ? (
+      {waBuilder ? (
         <Button asChild size="sm" variant="outline" className="gap-1.5">
-          <a href={waHref} target="_blank" rel="noopener noreferrer">
+          <a href={waBuilder()} target="_blank" rel="noopener noreferrer">
             <MessageCircle className="h-3.5 w-3.5" /> Check Stock on WhatsApp
           </a>
         </Button>
