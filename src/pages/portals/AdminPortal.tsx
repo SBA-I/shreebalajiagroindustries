@@ -43,7 +43,7 @@ const AdminPortal = () => (
             <TabsTrigger value="msds" className="gap-1.5 justify-start"><FileText className="h-4 w-4 shrink-0" /> MSDS</TabsTrigger>
             <TabsTrigger value="marketing" className="gap-1.5 justify-start"><Megaphone className="h-4 w-4 shrink-0" /> Marketing</TabsTrigger>
             <TabsTrigger value="pest" className="gap-1.5 justify-start"><Bug className="h-4 w-4 shrink-0" /> Pest Calendar</TabsTrigger>
-            <TabsTrigger value="resources" className="gap-1.5 justify-start"><BookOpen className="h-4 w-4 shrink-0" /> Knowledge Library</TabsTrigger>
+            <TabsTrigger value="resources" className="gap-1.5 justify-start"><BookOpen className="h-4 w-4 shrink-0" /> Resources & Sustainability</TabsTrigger>
             <TabsTrigger value="news" className="gap-1.5 justify-start"><Newspaper className="h-4 w-4 shrink-0" /> News</TabsTrigger>
             <TabsTrigger value="inquiries" className="gap-1.5 justify-start"><MessageSquare className="h-4 w-4 shrink-0" /> Inquiries</TabsTrigger>
           </TabsList>
