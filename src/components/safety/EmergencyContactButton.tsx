@@ -77,7 +77,7 @@ const EmergencyContactButton = () => {
               </span>
             </a>
             <a
-              href="tel:+912562223456"
+              href="tel:+917744998998"
               className="flex items-center justify-between p-2 rounded-md bg-muted hover:bg-muted/70 transition-colors"
             >
               <div>
@@ -85,7 +85,7 @@ const EmergencyContactButton = () => {
                 <p className="text-[11px] text-muted-foreground">Mon–Sat 9–6</p>
               </div>
               <span className="flex items-center gap-1 text-xs font-medium">
-                <Phone className="h-3 w-3" /> Call
+                <Phone className="h-3 w-3" /> 77449 98998
               </span>
             </a>
           </div>
