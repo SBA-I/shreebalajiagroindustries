@@ -97,6 +97,54 @@ export type Database = {
           },
         ]
       }
+      dealer_stock: {
+        Row: {
+          arriving_on: string | null
+          created_at: string
+          dealer_id: string
+          id: string
+          notes: string | null
+          product_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          arriving_on?: string | null
+          created_at?: string
+          dealer_id: string
+          id?: string
+          notes?: string | null
+          product_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          arriving_on?: string | null
+          created_at?: string
+          dealer_id?: string
+          id?: string
+          notes?: string | null
+          product_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dealer_stock_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dealer_stock_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dealers: {
         Row: {
           address_line: string
@@ -203,6 +251,7 @@ export type Database = {
         Row: {
           carrier: string | null
           carrier_ref: string | null
+          challan_url: string | null
           created_at: string
           dealer_id: string | null
           dealer_name: string
@@ -210,16 +259,24 @@ export type Database = {
           destination_city: string
           destination_state: string
           dispatched_at: string | null
+          driver_name: string | null
+          driver_phone: string | null
           expected_delivery_at: string | null
           id: string
+          lr_number: string | null
           notes: string | null
+          product_summary: string | null
+          quantity_summary: string | null
+          stage: string
           status: string
           tracking_number: string
+          transport_company: string | null
           updated_at: string
         }
         Insert: {
           carrier?: string | null
           carrier_ref?: string | null
+          challan_url?: string | null
           created_at?: string
           dealer_id?: string | null
           dealer_name: string
@@ -227,16 +284,24 @@ export type Database = {
           destination_city: string
           destination_state: string
           dispatched_at?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
           expected_delivery_at?: string | null
           id?: string
+          lr_number?: string | null
           notes?: string | null
+          product_summary?: string | null
+          quantity_summary?: string | null
+          stage?: string
           status?: string
           tracking_number: string
+          transport_company?: string | null
           updated_at?: string
         }
         Update: {
           carrier?: string | null
           carrier_ref?: string | null
+          challan_url?: string | null
           created_at?: string
           dealer_id?: string | null
           dealer_name?: string
@@ -244,11 +309,18 @@ export type Database = {
           destination_city?: string
           destination_state?: string
           dispatched_at?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
           expected_delivery_at?: string | null
           id?: string
+          lr_number?: string | null
           notes?: string | null
+          product_summary?: string | null
+          quantity_summary?: string | null
+          stage?: string
           status?: string
           tracking_number?: string
+          transport_company?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -335,6 +407,7 @@ export type Database = {
       marketing_assets: {
         Row: {
           asset_type: string
+          audience: string
           created_at: string
           description: string | null
           file_url: string
@@ -347,6 +420,7 @@ export type Database = {
         }
         Insert: {
           asset_type?: string
+          audience?: string
           created_at?: string
           description?: string | null
           file_url: string
@@ -359,6 +433,7 @@ export type Database = {
         }
         Update: {
           asset_type?: string
+          audience?: string
           created_at?: string
           description?: string | null
           file_url?: string
