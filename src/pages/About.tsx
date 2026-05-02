@@ -154,7 +154,6 @@ const AnimatedTimeline = () => {
 
 const certifications = [
   { name: "ISO 9001:2015", issuer: "Quality Management", year: "2014" },
-  { name: "CIB&RC Registered", issuer: "Central Insecticides Board", year: "2010" },
   { name: "Bio-Stimulant License", issuer: "Govt. of India", year: "2026" },
   { name: "GST Compliant", issuer: "Tax Authority", year: "Active" },
 ];
