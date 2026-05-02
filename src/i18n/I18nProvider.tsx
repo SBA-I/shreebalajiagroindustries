@@ -94,6 +94,19 @@ const setGoogTransCookie = (lang: Lang) => {
   document.cookie = `googtrans=${value}; path=/; domain=.${host}`;
 };
 
+const GOOGLE_TARGET_LANG: Record<Lang, string> = {
+  en: "",
+  hi: "hi",
+  mr: "mr",
+};
+
+const normalizeTranslateLayout = () => {
+  if (typeof document === "undefined") return;
+  document.documentElement.classList.toggle("translation-active", document.documentElement.lang !== BCP47.en);
+  document.body.style.top = "0px";
+  document.body.style.position = "static";
+};
+
 // Try to drive the in-page combo; if not ready yet, poll briefly
 const triggerCombo = (lang: Lang): Promise<boolean> => {
   return new Promise((resolve) => {
@@ -101,8 +114,10 @@ const triggerCombo = (lang: Lang): Promise<boolean> => {
     const tryNow = () => {
       const combo = document.querySelector<HTMLSelectElement>(".goog-te-combo");
       if (combo) {
-        combo.value = lang;
-        combo.dispatchEvent(new Event("change"));
+        combo.value = GOOGLE_TARGET_LANG[lang];
+        combo.dispatchEvent(new Event("change", { bubbles: true }));
+        window.setTimeout(normalizeTranslateLayout, 150);
+        window.setTimeout(normalizeTranslateLayout, 600);
         resolve(true);
         return;
       }
@@ -125,8 +140,9 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
 
   const applyWholePageTranslation = useCallback(async (l: Lang) => {
     setGoogTransCookie(l);
-    if (l === "en") return true;
-    return triggerCombo(l);
+    const ok = await triggerCombo(l);
+    normalizeTranslateLayout();
+    return ok;
   }, []);
 
   useEffect(() => {
