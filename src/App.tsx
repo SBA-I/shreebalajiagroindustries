@@ -23,6 +23,7 @@ import HarvestTimer from "./pages/HarvestTimer";
 import PestCalendar from "./pages/PestCalendar";
 import SafetyHub from "./pages/SafetyHub";
 import Sustainability from "./pages/Sustainability";
+import DealerLocator from "./pages/DealerLocator";
 import Auth from "./pages/Auth";
 import FarmerAuth from "./pages/auth/FarmerAuth";
 import DistributorAuth from "./pages/auth/DistributorAuth";
@@ -64,6 +65,7 @@ const App = () => (
               <Route path="/tools/pest-calendar" element={<PestCalendar />} />
               <Route path="/safety" element={<SafetyHub />} />
               <Route path="/sustainability" element={<Sustainability />} />
+              <Route path="/find-dealer" element={<DealerLocator />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/auth/farmer" element={<FarmerAuth />} />
               <Route path="/auth/distributor" element={<DistributorAuth />} />
