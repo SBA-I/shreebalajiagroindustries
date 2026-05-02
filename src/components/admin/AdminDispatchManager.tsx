@@ -227,7 +227,7 @@ const ChallanButton = ({ row, onSaved }: { row: Row; onSaved: () => void }) => {
   };
   return (
     <>
-      <input ref={ref} type="file" accept="application/pdf,image/*" className="hidden"
+      <input ref={ref} type="file" accept="application/pdf,image/*,.pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.doc,.docx" className="hidden"
         onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); if (ref.current) ref.current.value = ""; }} />
       <Button size="icon" variant="ghost" disabled={busy} onClick={() => ref.current?.click()} title="Upload challan/LR PDF">
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}

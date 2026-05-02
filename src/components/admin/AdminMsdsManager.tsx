@@ -99,7 +99,7 @@ const AdminMsdsManager = () => {
             </div>
             <div className="md:col-span-3">
               <Label>PDF File</Label>
-              <Input ref={fileRef} type="file" accept="application/pdf" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+              <Input ref={fileRef} type="file" accept="application/pdf,image/*,.pdf,.jpg,.jpeg,.png,.webp,.doc,.docx" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
             </div>
             <div className="md:col-span-1 flex items-end">
               <Button type="submit" disabled={busy} className="w-full gap-1.5">
