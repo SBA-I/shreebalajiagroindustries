@@ -161,9 +161,18 @@ const RoleAuthForm = ({
       }
       return;
     }
-    toast.success("Account created! Check your email to verify, then log in.");
+    // Force the user back to the sign-in screen after signup, regardless of
+    // whether Supabase auto-confirmed the email. This guarantees a clean
+    // login step for new accounts.
+    await supabase.auth.signOut();
+    toast.success("Account created! Please sign in to continue.");
     setTab("login");
     setLoginEmail(parsed.data.email);
+    setName("");
+    setEmail("");
+    setPhone("");
+    setPassword("");
+    setExtras({});
   };
 
   const handleGoogle = async () => {
