@@ -2,16 +2,17 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Plus, X, AlertOctagon, AlertTriangle, Mail,
-  Calculator, Camera, TrendingUp, Timer, Bug, MapPin,
+  Calculator, Camera, TrendingUp, Timer, Bug, MapPin, Sparkles,
 } from "lucide-react";
 import whatsappIcon from "@/assets/whatsapp-icon.svg";
+import AiChatWidget from "@/components/ai/AiChatWidget";
 import SprayCalculator from "@/components/ai/SprayCalculator";
 import CropImageDetector from "@/components/ai/CropImageDetector";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import EmergencyFirstAidButton from "@/components/safety/EmergencyFirstAidButton";
 import EmergencyContactButton from "@/components/safety/EmergencyContactButton";
 
-type PanelKey = "spray" | "disease" | "firstaid" | "contact" | null;
+type PanelKey = "ai" | "spray" | "disease" | "firstaid" | "contact" | null;
 
 interface ActionItem {
   key: string;
@@ -36,6 +37,7 @@ const FloatingActionHub = () => {
   const close = () => setExpanded(false);
 
   const actions: ActionItem[] = [
+    { key: "ai", label: "Balaji AI", icon: <Sparkles className="h-5 w-5" />, bg: "bg-primary text-primary-foreground", onClick: () => openPanel("ai") },
     { key: "spray", label: "Spray Calc.", icon: <Calculator className="h-5 w-5" />, bg: "bg-primary text-primary-foreground", onClick: () => openPanel("spray") },
     { key: "disease", label: "Disease Scan", icon: <Camera className="h-5 w-5" />, bg: "bg-accent text-accent-foreground", onClick: () => openPanel("disease") },
     { key: "firstaid", label: "First-Aid", icon: <AlertOctagon className="h-5 w-5" />, bg: "bg-destructive text-destructive-foreground", onClick: () => openPanel("firstaid") },
@@ -90,6 +92,7 @@ const FloatingActionHub = () => {
   return (
     <>
       {/* Controlled panels */}
+      <AiChatWidget hideTrigger open={panel === "ai"} onOpenChange={(o) => setPanel(o ? "ai" : null)} />
       <Dialog open={panel === "spray"} onOpenChange={(o) => setPanel(o ? "spray" : null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
