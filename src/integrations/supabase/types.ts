@@ -657,6 +657,19 @@ export type Database = {
         }
         Returns: boolean
       }
+      search_dealers_public: {
+        Args: { _pincode: string }
+        Returns: {
+          address_line: string
+          city: string
+          district: string
+          id: string
+          is_authorized: boolean
+          name: string
+          pincode: string
+          state: string
+        }[]
+      }
     }
     Enums: {
       app_role:
