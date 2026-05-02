@@ -174,10 +174,35 @@ const RoleAuthForm = ({
     });
     setBusy(false);
     if (error) {
-      toast.error(error.message.toLowerCase().includes("invalid") ? "Invalid email or password" : error.message);
+      const msg = error.message.toLowerCase();
+      if (msg.includes("invalid")) {
+        // The password may simply be wrong, OR this account was created via
+        // Google and never had a password. Tell the user both options.
+        toast.error(
+          "Invalid email or password. If you originally signed in with Google, please use \"Continue with Google\" or reset your password below.",
+          { duration: 6000 },
+        );
+      } else {
+        toast.error(error.message);
+      }
       return;
     }
     toast.success("Welcome back!");
+  };
+
+  const handleForgotPassword = async () => {
+    const email = loginEmail.trim();
+    if (!email || !email.includes("@")) {
+      toast.error("Enter your email above first, then click Forgot password.");
+      return;
+    }
+    setBusy(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/reset-password`,
+    });
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success("Password reset link sent. Check your email.");
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -293,6 +318,7 @@ const RoleAuthForm = ({
                     busy={busy}
                     showGoogle={showGoogle}
                     onGoogle={handleGoogle}
+                    onForgotPassword={handleForgotPassword}
                   />
                 </TabsContent>
 
@@ -342,6 +368,7 @@ const RoleAuthForm = ({
                 busy={busy}
                 showGoogle={showGoogle && role !== "admin"}
                 onGoogle={handleGoogle}
+                onForgotPassword={handleForgotPassword}
               />
             )}
 
@@ -375,14 +402,27 @@ const LoginFormFields = ({
   busy,
   showGoogle,
   onGoogle,
-}: LoginFieldsProps & { showGoogle?: boolean; onGoogle?: () => void }) => (
+  onForgotPassword,
+}: LoginFieldsProps & { showGoogle?: boolean; onGoogle?: () => void; onForgotPassword?: () => void }) => (
   <form onSubmit={onSubmit} className="space-y-4">
     <div>
       <Label htmlFor="login-email">Email</Label>
       <Input id="login-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
     </div>
     <div>
-      <Label htmlFor="login-password">Password</Label>
+      <div className="flex items-center justify-between">
+        <Label htmlFor="login-password">Password</Label>
+        {onForgotPassword && (
+          <button
+            type="button"
+            onClick={onForgotPassword}
+            disabled={busy}
+            className="text-xs text-primary hover:underline disabled:opacity-50"
+          >
+            Forgot password?
+          </button>
+        )}
+      </div>
       <Input id="login-password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
     </div>
     <Button type="submit" className="w-full" disabled={busy}>
