@@ -111,6 +111,7 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
     return isLang(saved) ? saved : "en";
   });
   const [isTranslating, setIsTranslating] = useState(false);
+  const [targetLang, setTargetLang] = useState<Lang>(lang);
   const translatingTimer = useRef<number | null>(null);
 
   const applyGoogleFallback = useCallback(async (l: Lang) => {
@@ -139,6 +140,7 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
 
   const setLang = useCallback(async (l: Lang) => {
     if (l === lang) return;
+    setTargetLang(l);
     setIsTranslating(true);
     localStorage.setItem("sbai-lang", l);
     updateSeoLanguageTags(l);
@@ -179,7 +181,7 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
           <div className="flex flex-col items-center gap-3 px-6 py-5 rounded-2xl bg-card border border-border shadow-elevated">
             <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
             <p className="text-sm font-medium text-foreground">
-              Loading {LANG_NAMES[lang]}…
+              Loading {LANG_NAMES[targetLang]}…
             </p>
           </div>
         </div>
