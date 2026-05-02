@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Plus, Trash2, Upload, X } from "lucide-react";
+import { Loader2, Plus, Trash2, Upload, X, FileDown, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import EditDialog from "./EditDialog";
@@ -416,6 +416,12 @@ const ProductRow = ({
             <div><Label>Popularity</Label><Input type="number" value={draft.popularity} onChange={(e) => setDraft({ ...draft, popularity: e.target.value })} /></div>
             <div className="flex items-center gap-2 mt-6"><Switch checked={draft.is_new} onCheckedChange={(v) => setDraft({ ...draft, is_new: v })} /><Label>NEW</Label></div>
             <div className="flex items-center gap-2 mt-6"><Switch checked={draft.is_active} onCheckedChange={(v) => setDraft({ ...draft, is_active: v })} /><Label>Active</Label></div>
+
+            <div className="md:col-span-2 border-t border-border pt-3 mt-2">
+              <Label className="flex items-center gap-1.5 mb-2"><FileText className="h-4 w-4" /> MSDS / Safety Data Sheets</Label>
+              <ProductMsdsSection productId={product.id} productName={product.name} />
+              <p className="text-xs text-muted-foreground mt-1">Uploaded sheets appear automatically in the public Safety &amp; Compliance tab.</p>
+            </div>
           </div>
         </EditDialog>
         <Button size="icon" variant="ghost" onClick={() => onDelete(product.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
@@ -425,3 +431,111 @@ const ProductRow = ({
 };
 
 export default AdminProductsManager;
+
+// ---------- Per-product MSDS uploader ----------
+interface MsdsRow { id: string; language: string; version: string | null; file_url: string; file_size_kb: number | null; }
+
+const ProductMsdsSection = ({ productId, productName }: { productId: string; productName: string }) => {
+  const [docs, setDocs] = useState<MsdsRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [language, setLanguage] = useState("en");
+  const [version, setVersion] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [busy, setBusy] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const refresh = async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("msds_documents")
+      .select("id, language, version, file_url, file_size_kb")
+      .or(`product_id.eq.${productId},product_name.eq.${productName}`)
+      .order("created_at", { ascending: false });
+    setDocs((data ?? []) as MsdsRow[]);
+    setLoading(false);
+  };
+  useEffect(() => { refresh(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [productId, productName]);
+
+  const upload = async () => {
+    if (!file) return toast.error("Choose a PDF first");
+    setBusy(true);
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const path = `${productId}/${Date.now()}-${safeName}`;
+    const { error: upErr } = await supabase.storage.from("msds").upload(path, file, { upsert: false });
+    if (upErr) { setBusy(false); return toast.error(upErr.message); }
+    const { data: pub } = supabase.storage.from("msds").getPublicUrl(path);
+    const { error: insErr } = await supabase.from("msds_documents").insert({
+      product_id: productId,
+      product_name: productName,
+      language,
+      version: version.trim() || null,
+      file_url: pub.publicUrl,
+      file_size_kb: Math.round(file.size / 1024),
+    });
+    setBusy(false);
+    if (insErr) return toast.error(insErr.message);
+    toast.success("MSDS uploaded");
+    setVersion(""); setFile(null);
+    if (fileRef.current) fileRef.current.value = "";
+    refresh();
+  };
+
+  const remove = async (id: string) => {
+    if (!confirm("Delete this MSDS?")) return;
+    const { error } = await supabase.from("msds_documents").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Deleted");
+    refresh();
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="grid gap-2 md:grid-cols-12 items-end">
+        <div className="md:col-span-3">
+          <Label className="text-xs">Language</Label>
+          <Select value={language} onValueChange={setLanguage}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="en">English</SelectItem>
+              <SelectItem value="hi">Hindi</SelectItem>
+              <SelectItem value="mr">Marathi</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="md:col-span-3">
+          <Label className="text-xs">Version</Label>
+          <Input value={version} onChange={(e) => setVersion(e.target.value)} placeholder="2026.1" />
+        </div>
+        <div className="md:col-span-4">
+          <Label className="text-xs">PDF file</Label>
+          <Input ref={fileRef} type="file" accept="application/pdf" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+        </div>
+        <div className="md:col-span-2">
+          <Button type="button" size="sm" onClick={upload} disabled={busy} className="w-full gap-1.5">
+            {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />} Upload
+          </Button>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-3"><Loader2 className="h-4 w-4 animate-spin text-primary" /></div>
+      ) : docs.length === 0 ? (
+        <p className="text-xs text-muted-foreground py-2">No MSDS uploaded for this product yet.</p>
+      ) : (
+        <div className="divide-y divide-border border border-border rounded-md">
+          {docs.map((d) => (
+            <div key={d.id} className="flex items-center justify-between px-2 py-1.5 gap-2">
+              <p className="text-xs truncate">
+                {d.language.toUpperCase()}{d.version && ` · v${d.version}`}{d.file_size_kb && ` · ${d.file_size_kb} KB`}
+              </p>
+              <div className="flex gap-1">
+                <Button asChild size="icon" variant="ghost" className="h-7 w-7"><a href={d.file_url} target="_blank" rel="noopener"><FileDown className="h-3.5 w-3.5" /></a></Button>
+                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => remove(d.id)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
