@@ -25,17 +25,6 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    key: "tools",
-    tKey: "nav.tools",
-    path: "/tools/harvest-timer",
-    children: [
-      { key: "askai", tKey: "tools.askAi", path: "/ask-ai" },
-      { key: "profit", tKey: "tools.profit", path: "/yield-simulator" },
-      { key: "harvest", tKey: "tools.harvest", path: "/tools/harvest-timer" },
-      { key: "pest", tKey: "tools.pest", path: "/tools/pest-calendar" },
-    ],
-  },
-  {
     key: "dealers",
     tKey: "nav.dealers",
     path: "/dealers",
