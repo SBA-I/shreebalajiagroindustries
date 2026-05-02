@@ -20,6 +20,8 @@ import AskAI from "./pages/AskAI";
 import YieldSimulator from "./pages/YieldSimulator";
 import HarvestTimer from "./pages/HarvestTimer";
 import PestCalendar from "./pages/PestCalendar";
+import SafetyHub from "./pages/SafetyHub";
+import Sustainability from "./pages/Sustainability";
 import Auth from "./pages/Auth";
 import FarmerAuth from "./pages/auth/FarmerAuth";
 import DistributorAuth from "./pages/auth/DistributorAuth";
@@ -31,6 +33,7 @@ import DistributorPortal from "./pages/portals/DistributorPortal";
 import FieldOfficerPortal from "./pages/portals/FieldOfficerPortal";
 import FarmerPortal from "./pages/portals/FarmerPortal";
 import AiChatWidget from "./components/ai/AiChatWidget";
+import EmergencyFirstAidButton from "./components/safety/EmergencyFirstAidButton";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -58,6 +61,8 @@ const App = () => (
               <Route path="/yield-simulator" element={<YieldSimulator />} />
               <Route path="/tools/harvest-timer" element={<HarvestTimer />} />
               <Route path="/tools/pest-calendar" element={<PestCalendar />} />
+              <Route path="/safety" element={<SafetyHub />} />
+              <Route path="/sustainability" element={<Sustainability />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/auth/farmer" element={<FarmerAuth />} />
               <Route path="/auth/distributor" element={<DistributorAuth />} />
@@ -71,6 +76,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
             <AiChatWidget />
+            <EmergencyFirstAidButton />
           </ComparisonProvider>
         </AuthProvider>
       </BrowserRouter>

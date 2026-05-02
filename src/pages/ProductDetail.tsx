@@ -8,6 +8,8 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import PesticideLoadIndicator from "@/components/safety/PesticideLoadIndicator";
+import type { ChemCategory } from "@/data/firstAid";
 
 const ProductDetail = () => {
   const { productId } = useParams();
@@ -207,7 +209,7 @@ const ProductDetail = () => {
           )}
 
           {activeTab === "safety" && (
-            <div className="max-w-2xl">
+            <div className="grid gap-6 lg:grid-cols-2 max-w-5xl">
               <div className="bg-card rounded-xl border border-border p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <AlertTriangle className="h-5 w-5 text-accent" />
@@ -222,6 +224,7 @@ const ProductDetail = () => {
                   ))}
                 </ul>
               </div>
+              <PesticideLoadIndicator category={product.category as ChemCategory} />
             </div>
           )}
 
