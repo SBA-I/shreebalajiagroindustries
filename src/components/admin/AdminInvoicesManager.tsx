@@ -110,7 +110,7 @@ const AdminInvoicesManager = () => {
             </div>
             <div className="md:col-span-3">
               <Label>PDF File *</Label>
-              <Input type="file" accept="application/pdf" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+              <Input type="file" accept="application/pdf,image/*,.pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.doc,.docx" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
             </div>
             <div className="md:col-span-3 flex justify-end">
               <Button type="submit" disabled={busy} className="gap-1.5">

@@ -127,7 +127,7 @@ const ImageUploadField = ({ value, onChange }: { value: string; onChange: (url: 
           <input
             ref={inputRef}
             type="file"
-            accept="image/*"
+            accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif,.bmp,.svg"
             className="hidden"
             onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ""; }}
           />
@@ -508,7 +508,7 @@ const ProductMsdsSection = ({ productId, productName }: { productId: string; pro
         </div>
         <div className="md:col-span-4">
           <Label className="text-xs">PDF file</Label>
-          <Input ref={fileRef} type="file" accept="application/pdf" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+          <Input ref={fileRef} type="file" accept="application/pdf,image/*,.pdf,.jpg,.jpeg,.png,.webp,.doc,.docx" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
         </div>
         <div className="md:col-span-2">
           <Button type="button" size="sm" onClick={upload} disabled={busy} className="w-full gap-1.5">

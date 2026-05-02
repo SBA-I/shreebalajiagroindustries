@@ -100,7 +100,7 @@ const DealerSignupExtras = ({ value, onChange }: Props) => {
         <Input
           id="d-gst-file"
           type="file"
-          accept="image/*"
+          accept="image/*,application/pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.pdf"
           onChange={(e) => e.target.files?.[0] && handleGstFile(e.target.files[0])}
           disabled={ocrBusy}
         />

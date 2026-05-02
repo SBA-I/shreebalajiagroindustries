@@ -124,7 +124,7 @@ const AdminMarketingManager = () => {
             </div>
             <div className="md:col-span-2">
               <Label>File</Label>
-              <Input ref={fileRef} type="file" accept="image/*,video/*,application/pdf" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+              <Input ref={fileRef} type="file" accept="image/*,video/*,application/pdf,.pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif,.svg,.mp4,.mov,.webm,.mkv,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
             </div>
             <div className="md:col-span-3">
               <Label>Description</Label>

@@ -121,8 +121,7 @@ const CropImageDetector = () => {
             <input
               ref={fileRef}
               type="file"
-              accept="image/*"
-              capture="environment"
+              accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif,.bmp"
               className="hidden"
               onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
             />
