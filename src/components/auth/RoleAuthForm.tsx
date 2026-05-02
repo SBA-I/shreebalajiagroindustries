@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
-import { useAuth, roleHomePath } from "@/hooks/use-auth";
+import { useAuth, roleHomePath, type AppRole } from "@/hooks/use-auth";
 import logo from "@/assets/logo-sbai.png";
 
 export type RoleKey = "farmer" | "distributor" | "field_officer" | "admin";
