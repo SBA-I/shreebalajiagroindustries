@@ -29,7 +29,7 @@ const navItems: NavItem[] = [
     tKey: "nav.dealers",
     path: "/dealers",
     children: [
-      { key: "find", tKey: "dealers.find", path: "/dealers" },
+      { key: "find", tKey: "dealers.find", path: "/find-dealer" },
       { key: "track", tKey: "dealers.track", path: "/track" },
       { key: "kit", tKey: "dealers.kit", path: "/marketing-kit" },
     ],

@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Search, Loader2, Store } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MapPin, Search, Loader2, Store, Navigation, MessageCircle, LocateFixed } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -14,16 +15,33 @@ interface Dealer {
   address_line: string;
   city: string;
   district: string | null;
+  taluka: string | null;
   state: string;
   pincode: string;
   is_authorized: boolean;
+  lat: number | null;
+  lng: number | null;
+  photo_url: string | null;
+  whatsapp: string | null;
+  distance_km?: number | null;
 }
+
+interface TalukaRow { taluka: string; district: string; state: string; dealer_count: number }
 
 const DealerLocator = () => {
   const [pincode, setPincode] = useState("");
   const [results, setResults] = useState<Dealer[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [talukas, setTalukas] = useState<TalukaRow[]>([]);
+  const [selectedTaluka, setSelectedTaluka] = useState<string>("");
+  const [geoBusy, setGeoBusy] = useState(false);
+
+  useEffect(() => {
+    supabase.rpc("list_dealer_talukas_public").then(({ data }) => {
+      setTalukas((data ?? []) as TalukaRow[]);
+    });
+  }, []);
 
   const search = async () => {
     const trimmed = pincode.trim();
@@ -45,6 +63,57 @@ const DealerLocator = () => {
     setLoading(false);
   };
 
+  const useMyLocation = () => {
+    if (!navigator.geolocation) return toast.error("Geolocation not supported on this device");
+    setGeoBusy(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const { data, error } = await supabase.rpc("nearest_dealers_public", {
+          _lat: latitude, _lng: longitude, _limit: 5,
+        });
+        setGeoBusy(false);
+        setSearched(true);
+        if (error) { toast.error("Could not load nearby dealers"); setResults([]); return; }
+        setResults((data ?? []) as Dealer[]);
+      },
+      (err) => {
+        setGeoBusy(false);
+        toast.error(err.code === err.PERMISSION_DENIED ? "Please allow location access" : "Could not detect location");
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  const filterByTaluka = async (taluka: string) => {
+    setSelectedTaluka(taluka);
+    if (!taluka) return;
+    setLoading(true);
+    setSearched(true);
+    const { data, error } = await supabase
+      .from("dealers")
+      .select("id,name,address_line,city,district,taluka,state,pincode,is_authorized,lat,lng,photo_url,whatsapp")
+      .eq("is_active", true)
+      .eq("taluka", taluka)
+      .order("city");
+    setLoading(false);
+    if (error) { toast.error("Could not load dealers"); setResults([]); return; }
+    setResults((data ?? []) as Dealer[]);
+  };
+
+  const mapsHref = (d: Dealer) =>
+    d.lat != null && d.lng != null
+      ? `https://www.google.com/maps/dir/?api=1&destination=${d.lat},${d.lng}`
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${d.name}, ${d.address_line}, ${d.city}, ${d.state} ${d.pincode}`)}`;
+
+  const waHref = (d: Dealer) => {
+    const num = (d.whatsapp ?? "").replace(/\D/g, "");
+    if (!num) return null;
+    const full = num.length === 10 ? `91${num}` : num;
+    const msg = encodeURIComponent(`Namaste, I would like to check stock availability of Shree Balaji Agro products at ${d.name}.`);
+    return `https://wa.me/${full}?text=${msg}`;
+  };
+
   return (
     <Layout>
       <section className="bg-gradient-to-br from-primary to-primary/80 py-12">
@@ -54,7 +123,7 @@ const DealerLocator = () => {
             <div>
               <h1 className="font-heading text-3xl md:text-4xl font-bold">Find an Authorized Dealer</h1>
               <p className="text-primary-foreground/80 text-sm md:text-base mt-1">
-                Enter your pincode to find the nearest Balaji-authorised krishi kendra.
+                Auto-detect your location, search by pincode, or filter by taluka to find the nearest Balaji krishi kendra.
               </p>
             </div>
           </div>
@@ -62,7 +131,28 @@ const DealerLocator = () => {
       </section>
 
       <section className="py-10">
-        <div className="container mx-auto px-4 lg:px-8 max-w-3xl">
+        <div className="container mx-auto px-4 lg:px-8 max-w-3xl space-y-4">
+          <Card className="shadow-card">
+            <CardContent className="p-4 grid gap-3 md:grid-cols-2">
+              <Button onClick={useMyLocation} disabled={geoBusy} className="gap-1.5">
+                {geoBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <LocateFixed className="h-4 w-4" />}
+                Use my current location
+              </Button>
+              <Select value={selectedTaluka} onValueChange={filterByTaluka}>
+                <SelectTrigger><SelectValue placeholder="Filter by taluka" /></SelectTrigger>
+                <SelectContent>
+                  {talukas.length === 0 ? (
+                    <SelectItem value="__none" disabled>No talukas yet</SelectItem>
+                  ) : talukas.map((t) => (
+                    <SelectItem key={`${t.taluka}-${t.district}`} value={t.taluka}>
+                      {t.taluka} {t.district ? `· ${t.district}` : ""} ({t.dealer_count})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </CardContent>
+          </Card>
+
           <Card className="shadow-card">
             <CardHeader>
               <CardTitle className="font-heading text-lg flex items-center gap-2">
@@ -71,7 +161,7 @@ const DealerLocator = () => {
             </CardHeader>
             <CardContent>
               <form
-                onSubmit={(e) => { e.preventDefault(); search(); }}
+                onSubmit={(e) => { e.preventDefault(); setSelectedTaluka(""); search(); }}
                 className="flex flex-col sm:flex-row gap-2"
               >
                 <Input
@@ -93,7 +183,7 @@ const DealerLocator = () => {
                   {results.length === 0 ? (
                     <div className="text-center py-8 text-sm text-muted-foreground">
                       <MapPin className="h-6 w-6 mx-auto mb-2 text-muted-foreground/60" />
-                      No authorised dealers found near {pincode}. Please contact our helpdesk for assistance.
+                      No authorised dealers found. Please contact our helpdesk for assistance.
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -101,24 +191,7 @@ const DealerLocator = () => {
                         {results.length} dealer{results.length === 1 ? "" : "s"} found
                       </p>
                       {results.map((d) => (
-                        <div key={d.id} className="rounded-lg border border-border p-4 hover:border-primary transition-colors">
-                          <div className="flex items-start justify-between gap-2 mb-2">
-                            <h3 className="font-heading font-semibold">{d.name}</h3>
-                            {d.is_authorized && (
-                              <Badge className="bg-primary/10 text-primary hover:bg-primary/20">Authorised</Badge>
-                            )}
-                          </div>
-                          <p className="text-sm text-muted-foreground flex items-start gap-1.5">
-                            <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-                            <span>
-                              {d.address_line}, {d.city}
-                              {d.district && `, ${d.district}`}, {d.state} – {d.pincode}
-                            </span>
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-3">
-                            Sign in to view contact details for this dealer.
-                          </p>
-                        </div>
+                        <DealerCard key={d.id} dealer={d} mapsHref={mapsHref(d)} waHref={waHref(d)} />
                       ))}
                     </div>
                   )}
@@ -131,5 +204,55 @@ const DealerLocator = () => {
     </Layout>
   );
 };
+
+const DealerCard = ({ dealer, mapsHref, waHref }: { dealer: Dealer; mapsHref: string; waHref: string | null }) => (
+  <div className="rounded-lg border border-border p-4 hover:border-primary transition-colors">
+    <div className="flex gap-3">
+      {dealer.photo_url && (
+        <img src={dealer.photo_url} alt={`${dealer.name} shop`} loading="lazy"
+             className="h-20 w-20 rounded-md object-cover border border-border shrink-0" />
+      )}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-start justify-between gap-2 mb-1">
+          <h3 className="font-heading font-semibold">{dealer.name}</h3>
+          <div className="flex items-center gap-1.5">
+            {dealer.distance_km != null && (
+              <Badge variant="outline" className="text-xs">{dealer.distance_km} km</Badge>
+            )}
+            {dealer.is_authorized && (
+              <Badge className="bg-primary/10 text-primary hover:bg-primary/20">Authorised</Badge>
+            )}
+          </div>
+        </div>
+        <p className="text-sm text-muted-foreground flex items-start gap-1.5">
+          <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+          <span>
+            {dealer.address_line}, {dealer.city}
+            {dealer.taluka && `, ${dealer.taluka}`}
+            {dealer.district && `, ${dealer.district}`}, {dealer.state} – {dealer.pincode}
+          </span>
+        </p>
+      </div>
+    </div>
+    <div className="mt-3 flex flex-wrap gap-2">
+      <Button asChild size="sm" className="gap-1.5">
+        <a href={mapsHref} target="_blank" rel="noopener noreferrer">
+          <Navigation className="h-3.5 w-3.5" /> Navigate
+        </a>
+      </Button>
+      {waHref ? (
+        <Button asChild size="sm" variant="outline" className="gap-1.5">
+          <a href={waHref} target="_blank" rel="noopener noreferrer">
+            <MessageCircle className="h-3.5 w-3.5" /> Check Stock on WhatsApp
+          </a>
+        </Button>
+      ) : (
+        <Button size="sm" variant="outline" disabled className="gap-1.5">
+          <MessageCircle className="h-3.5 w-3.5" /> WhatsApp unavailable
+        </Button>
+      )}
+    </div>
+  </div>
+);
 
 export default DealerLocator;
