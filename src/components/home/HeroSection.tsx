@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Leaf } from "lucide-react";
+import { ArrowRight, Leaf, Camera, UserCircle2 } from "lucide-react";
 import heroImage from "@/assets/hero-farm.jpg";
 
 const HeroSection = () => {
@@ -10,6 +10,8 @@ const HeroSection = () => {
       <div className="absolute inset-0">
         <img src={heroImage} alt="Lush agricultural farmland" className="w-full h-full object-cover" />
         <div className="absolute inset-0" style={{ background: "var(--gradient-hero)" }} />
+        {/* Extra 20% dark overlay for headline contrast */}
+        <div className="absolute inset-0 bg-foreground/20" />
       </div>
 
       {/* Content */}
@@ -20,26 +22,39 @@ const HeroSection = () => {
             <span className="text-sm font-medium text-primary-foreground">Trusted Crop Protection Solutions</span>
           </div>
 
-          <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground leading-tight">
+          <h1
+            className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground leading-tight"
+            style={{ textShadow: "0 2px 12px hsl(120 30% 8% / 0.55)" }}
+          >
             Empowering Agriculture,{" "}
             <span className="text-gradient-gold">Enriching Lives</span>
           </h1>
 
-          <p className="text-lg text-primary-foreground/85 leading-relaxed max-w-xl">
+          <p
+            className="text-lg text-primary-foreground/90 leading-relaxed max-w-xl"
+            style={{ textShadow: "0 1px 6px hsl(120 30% 8% / 0.5)" }}
+          >
             Premium quality pesticides and insecticides engineered for modern farming. 
             Protecting your crops, maximizing your harvest.
           </p>
 
-          <div className="flex flex-wrap gap-4 pt-2">
+          <div className="flex flex-wrap gap-3 pt-2">
             <Link to="/products">
               <Button variant="hero" size="lg" className="gap-2 text-base">
                 Explore Products
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
-            <Link to="/contact">
-              <Button variant="hero-outline" size="lg" className="text-base">
-                Contact Us
+            <Link to="/ask-ai">
+              <Button variant="hero-outline" size="lg" className="gap-2 text-base">
+                <Camera className="h-5 w-5" />
+                Scan Crop
+              </Button>
+            </Link>
+            <Link to="/auth/farmer">
+              <Button variant="hero-outline" size="lg" className="gap-2 text-base">
+                <UserCircle2 className="h-5 w-5" />
+                Farmer Portal
               </Button>
             </Link>
           </div>
