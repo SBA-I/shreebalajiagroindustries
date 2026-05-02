@@ -234,7 +234,6 @@ const About = () => {
                   <span className="font-heading text-4xl font-bold">{member.initials}</span>
                 </div>
                 <BadgeCheck className="h-5 w-5 text-accent absolute top-4 right-4" />
-                <p className="text-xs uppercase tracking-wider opacity-90">Verified Leadership</p>
               </div>
               {/* Content */}
               <div className="p-8">
@@ -244,12 +243,6 @@ const About = () => {
                 <blockquote className="border-l-4 border-primary/40 pl-4 mt-5 italic text-foreground/80 text-sm">
                   “{MD_MESSAGE.slice(0, 160)}…”
                 </blockquote>
-                <div className="mt-5">
-                  <MdVoicePlayer />
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Plays a 30-second voice message in your browser. No data sent to servers.
-                  </p>
-                </div>
               </div>
             </div>
           ))}
