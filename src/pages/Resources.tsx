@@ -2,14 +2,27 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Input } from "@/components/ui/input";
-import { articles, articleCategoryLabels, type ArticleCategory } from "@/data/content";
-import { Search, BookOpen, Video, FileText, Clock, User, Bookmark, BookmarkCheck } from "lucide-react";
+import { Search, BookOpen, Video, FileText, Clock, User, Bookmark, BookmarkCheck, Loader2 } from "lucide-react";
+import { useResources } from "@/hooks/use-resources";
 
-const typeIcons = { article: BookOpen, video: Video, guide: FileText };
+const categoryLabels: Record<string, string> = {
+  "crop-protection": "Crop Protection",
+  "application": "Application Techniques",
+  "safety": "Safety & Compliance",
+  "ipm": "IPM",
+  "seasonal": "Seasonal Care",
+  "soil-health": "Soil Health",
+  "sustainability": "Sustainability",
+  "rnd": "R&D",
+};
+const labelFor = (c: string) => categoryLabels[c] ?? c;
+
+const typeIcons: Record<string, typeof BookOpen> = { article: BookOpen, video: Video, guide: FileText };
 
 const Resources = () => {
+  const { data: articles = [], isLoading } = useResources();
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState<ArticleCategory | "all">("all");
+  const [category, setCategory] = useState<string>("all");
   const [bookmarks, setBookmarks] = useState<string[]>([]);
 
   const toggleBookmark = (id: string) => {
@@ -27,9 +40,10 @@ const Resources = () => {
       );
     }
     return result;
-  }, [search, category]);
+  }, [search, category, articles]);
 
   const featured = articles.filter((a) => a.featured);
+  const categories = useMemo(() => Array.from(new Set(articles.map((a) => a.category))), [articles]);
 
   return (
     <Layout>
@@ -58,7 +72,7 @@ const Resources = () => {
             <h2 className="font-heading text-xl font-bold text-foreground mb-6">Featured Articles</h2>
             <div className="grid md:grid-cols-3 gap-6">
               {featured.map((article) => {
-                const Icon = typeIcons[article.type];
+                const Icon = typeIcons[article.type] ?? BookOpen;
                 return (
                   <Link
                     key={article.id}
@@ -69,7 +83,7 @@ const Resources = () => {
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                         <Icon className="h-4 w-4 text-primary" />
                       </div>
-                      <span className="text-xs font-medium text-primary">{articleCategoryLabels[article.category]}</span>
+                      <span className="text-xs font-medium text-primary">{labelFor(article.category)}</span>
                     </div>
                     <h3 className="font-heading font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
                       {article.title}
@@ -100,7 +114,7 @@ const Resources = () => {
             >
               All Topics
             </button>
-            {(Object.keys(articleCategoryLabels) as ArticleCategory[]).map((cat) => (
+            {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setCategory(cat)}
@@ -108,12 +122,14 @@ const Resources = () => {
                   category === cat ? "bg-primary text-primary-foreground" : "bg-card border border-border text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {articleCategoryLabels[cat]}
+                {labelFor(cat)}
               </button>
             ))}
           </div>
 
-          {filtered.length === 0 ? (
+          {isLoading ? (
+            <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+          ) : filtered.length === 0 ? (
             <div className="text-center py-16">
               <BookOpen className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
               <p className="text-muted-foreground">No articles found matching your search.</p>
@@ -121,7 +137,7 @@ const Resources = () => {
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filtered.map((article) => {
-                const Icon = typeIcons[article.type];
+                const Icon = typeIcons[article.type] ?? BookOpen;
                 const isBookmarked = bookmarks.includes(article.id);
                 return (
                   <div key={article.id} className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-elevated transition-all group">
@@ -132,7 +148,7 @@ const Resources = () => {
                             <Icon className="h-4 w-4 text-primary" />
                           </div>
                           <span className="text-xs font-medium text-secondary bg-secondary/10 px-2 py-0.5 rounded-full">
-                            {articleCategoryLabels[article.category]}
+                            {labelFor(article.category)}
                           </span>
                         </div>
                         <button
