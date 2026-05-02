@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import EditDialog from "./EditDialog";
 
-const CATEGORIES = ["insecticides", "fungicides", "herbicides", "pgr"] as const;
+const CATEGORIES = ["Insecticides", "Fungicides", "Herbicides", "PGR"] as const;
 type Category = typeof CATEGORIES[number];
 
 interface Product {
@@ -39,7 +39,7 @@ const slugify = (s: string) => s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-"
 const splitList = (s: string | null) => (s ?? "").split(",").map((x) => x.trim()).filter(Boolean);
 
 const blank = {
-  name: "", slug: "", category: "insecticides" as Category, short_description: "", description: "",
+  name: "", slug: "", category: "Insecticides" as Category, short_description: "", description: "",
   technical_name: "", formulation: "", dosage: "",
   target_crops: "", target_pests: "", features: "",
   price: "", unit: "L", image_url: "", is_new: false, is_active: true, popularity: "50",
