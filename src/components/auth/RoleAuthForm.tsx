@@ -67,6 +67,7 @@ const RoleAuthForm = ({
   const { user, roles, loading } = useAuth();
   const [tab, setTab] = useState<"login" | "signup">("login");
   const [busy, setBusy] = useState(false);
+  const [linking, setLinking] = useState(false);
 
   useEffect(() => {
     if (!loading && user) {
@@ -85,6 +86,46 @@ const RoleAuthForm = ({
       // Wait for roles to load (roles array is empty until DB lookup completes).
       // We only act once we either have roles or have confirmed the user has none.
       if (!hasRequired && roles.length > 0) {
+        // Try to link an existing approved account (same email, signed up via
+        // email/password or created by admin) to this OAuth identity.
+        if ((role === "distributor" || role === "field_officer") && !linking) {
+          setLinking(true);
+          (async () => {
+            try {
+              const { data, error } = await supabase.functions.invoke("link-oauth-role", {
+                body: { requested_role: role },
+              });
+              if (!error && (data as any)?.linked) {
+                toast.success("Account linked. Welcome back!");
+                // Refresh the session so the new role is picked up.
+                await supabase.auth.refreshSession();
+                window.location.reload();
+                return;
+              }
+              toast.error(
+                `This Google account is not registered as a ${role.replace("_", " ")}. Please use the correct portal or sign up first.`,
+              );
+            } catch {
+              toast.error("Sign-in failed. Please try again.");
+            } finally {
+              try {
+                await supabase.auth.signOut({ scope: "global" } as any);
+              } catch {
+                await supabase.auth.signOut();
+              }
+              try {
+                Object.keys(localStorage)
+                  .filter((k) => k.startsWith("sb-") && k.endsWith("-auth-token"))
+                  .forEach((k) => localStorage.removeItem(k));
+              } catch {
+                /* ignore */
+              }
+              setLinking(false);
+            }
+          })();
+          return;
+        }
+
         // Wrong portal for this account — sign out and stay on sign-in page.
         toast.error(
           `This account is not registered as a ${role.replace("_", " ")}. Please use the correct portal or sign up first.`,
