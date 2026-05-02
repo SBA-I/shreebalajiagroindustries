@@ -1,4 +1,5 @@
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { translations, type Lang, type TKey } from "./translations";
 
 interface I18nCtx {
@@ -76,7 +77,6 @@ const updateSeoLanguageTags = (lang: Lang) => {
 // Drive the Google Translate widget. Returns true when a reload is needed.
 const setGoogTransCookie = (lang: Lang) => {
   if (typeof document === "undefined") return;
-  const value = `/en/${lang}`;
   const host = window.location.hostname;
   const expire = "Thu, 01 Jan 1970 00:00:00 GMT";
   // Clear any existing cookie on all path/domain combos
@@ -86,6 +86,8 @@ const setGoogTransCookie = (lang: Lang) => {
     document.cookie = `googtrans=; expires=${expire}; path=${path}; domain=${host}`;
     document.cookie = `googtrans=; expires=${expire}; path=${path}; domain=.${host}`;
   });
+  if (lang === "en") return;
+  const value = `/en/${lang}`;
   // Set new cookie
   document.cookie = `googtrans=${value}; path=/`;
   document.cookie = `googtrans=${value}; path=/; domain=${host}`;
@@ -115,14 +117,23 @@ const triggerCombo = (lang: Lang): Promise<boolean> => {
 };
 
 export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
+  const location = useLocation();
   const [lang, setLangState] = useState<Lang>("en");
   const [isTranslating, setIsTranslating] = useState(false);
+  const translatingTimer = useRef<number | null>(null);
+
+  const applyWholePageTranslation = useCallback(async (l: Lang) => {
+    setGoogTransCookie(l);
+    if (l === "en") return true;
+    return triggerCombo(l);
+  }, []);
 
   useEffect(() => {
     const saved = localStorage.getItem("sbai-lang");
     if (isLang(saved)) {
       setLangState(saved);
       updateSeoLanguageTags(saved);
+      void applyWholePageTranslation(saved);
     } else {
       updateSeoLanguageTags("en");
     }
@@ -132,7 +143,30 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
     };
     window.addEventListener("sbai-lang-change", handler);
     return () => window.removeEventListener("sbai-lang-change", handler);
-  }, []);
+  }, [applyWholePageTranslation]);
+
+  useEffect(() => {
+    if (lang === "en") return;
+    const rerun = window.setTimeout(() => {
+      void applyWholePageTranslation(lang);
+    }, 250);
+    return () => window.clearTimeout(rerun);
+  }, [lang, location.pathname, location.search, applyWholePageTranslation]);
+
+  useEffect(() => {
+    if (lang === "en") return;
+    let queued = false;
+    const observer = new MutationObserver(() => {
+      if (queued) return;
+      queued = true;
+      window.setTimeout(() => {
+        queued = false;
+        void applyWholePageTranslation(lang);
+      }, 500);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [lang, applyWholePageTranslation]);
 
   const setLang = useCallback(async (l: Lang) => {
     setIsTranslating(true);
@@ -141,23 +175,17 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
     updateSeoLanguageTags(l);
     window.dispatchEvent(new CustomEvent("sbai-lang-change", { detail: l }));
 
-    // Always set cookie first so a reload (or future visits) translates everything
-    setGoogTransCookie(l);
-
-    // Try in-place translation via the combo. If it can't be found, reload —
-    // the cookie will make Google Translate apply on next page load.
-    const ok = await triggerCombo(l);
+    const ok = await applyWholePageTranslation(l);
     if (!ok) {
       setTimeout(() => window.location.reload(), 80);
       return;
     }
-    // Force a reload anyway when switching to/from English to ensure full
-    // re-translation of every node (Google sometimes misses new DOM).
-    window.setTimeout(() => {
+    if (translatingTimer.current) window.clearTimeout(translatingTimer.current);
+    translatingTimer.current = window.setTimeout(() => {
       setIsTranslating(false);
-      window.location.reload();
-    }, 600);
-  }, []);
+      translatingTimer.current = null;
+    }, 900);
+  }, [applyWholePageTranslation]);
 
   const t = useCallback(
     (key: TKey) => {
