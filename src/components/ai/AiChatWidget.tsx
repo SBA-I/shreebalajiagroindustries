@@ -13,8 +13,19 @@ const langToVoice: Record<keyof typeof langLabels, VoiceLang> = {
   mr: "mr-IN",
 };
 
-const AiChatWidget = () => {
-  const [open, setOpen] = useState(false);
+interface AiChatWidgetProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  hideTrigger?: boolean;
+}
+
+const AiChatWidget = ({ open: openProp, onOpenChange, hideTrigger }: AiChatWidgetProps = {}) => {
+  const [openState, setOpenState] = useState(false);
+  const open = openProp ?? openState;
+  const setOpen = (v: boolean) => {
+    if (onOpenChange) onOpenChange(v);
+    else setOpenState(v);
+  };
   const [input, setInput] = useState("");
   const { messages, isLoading, sendMessage, clearChat, language, setLanguage } = useAiChat();
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -39,28 +50,8 @@ const AiChatWidget = () => {
 
   return (
     <>
-      {/* Email floating button */}
-      <a
-        href="mailto:sbaindia44@gmail.com"
-        className="fixed bottom-[7.5rem] right-3 z-50 h-11 w-11 rounded-full bg-secondary text-secondary-foreground shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
-        aria-label="Email us"
-      >
-        <Mail className="h-5 w-5" />
-      </a>
-
-      {/* WhatsApp floating button (above AI button) */}
-      <a
-        href="https://wa.me/917744998998"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-[4.25rem] right-3 z-50 h-11 w-11 rounded-full bg-[#25D366] shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
-        aria-label="Chat on WhatsApp"
-      >
-        <img src={whatsappIcon} alt="WhatsApp" className="h-6 w-6" />
-      </a>
-
       {/* Floating button */}
-      {!open && (
+      {!hideTrigger && !open && (
         <button
           onClick={() => setOpen(true)}
           className="fixed bottom-4 right-3 z-50 h-11 w-11 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
