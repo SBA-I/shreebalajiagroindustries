@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Search, Phone, Mail, Loader2, Store } from "lucide-react";
+import { MapPin, Search, Loader2, Store } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -108,9 +108,6 @@ const DealerLocator = () => {
                               <Badge className="bg-primary/10 text-primary hover:bg-primary/20">Authorised</Badge>
                             )}
                           </div>
-                          {d.contact_person && (
-                            <p className="text-xs text-muted-foreground mb-1">Contact: {d.contact_person}</p>
-                          )}
                           <p className="text-sm text-muted-foreground flex items-start gap-1.5">
                             <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0" />
                             <span>
@@ -118,16 +115,9 @@ const DealerLocator = () => {
                               {d.district && `, ${d.district}`}, {d.state} – {d.pincode}
                             </span>
                           </p>
-                          <div className="flex flex-wrap gap-3 mt-3">
-                            <a href={`tel:${d.phone}`} className="text-xs text-primary inline-flex items-center gap-1 hover:underline">
-                              <Phone className="h-3 w-3" /> {d.phone}
-                            </a>
-                            {d.email && (
-                              <a href={`mailto:${d.email}`} className="text-xs text-primary inline-flex items-center gap-1 hover:underline">
-                                <Mail className="h-3 w-3" /> {d.email}
-                              </a>
-                            )}
-                          </div>
+                          <p className="text-xs text-muted-foreground mt-3">
+                            Sign in to view contact details for this dealer.
+                          </p>
                         </div>
                       ))}
                     </div>
