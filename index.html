@@ -35,13 +35,23 @@
     </script>
     <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     <style>
-      /* Hide Google's default translate UI/banner */
+      /* Hide every Google Translate UI surface */
+      .goog-te-banner-frame,
       .goog-te-banner-frame.skiptranslate,
+      iframe.goog-te-banner-frame,
+      .skiptranslate > iframe,
       .goog-te-gadget,
+      .goog-te-gadget-simple,
+      .goog-te-gadget-icon,
       .goog-logo-link,
       .goog-te-balloon-frame,
-      #goog-gt-tt { display: none !important; }
-      body { top: 0 !important; }
+      .goog-tooltip,
+      .goog-tooltip:hover,
+      .goog-text-highlight,
+      #goog-gt-tt,
+      #google_translate_element { display: none !important; visibility: hidden !important; }
+      body { top: 0 !important; position: static !important; }
+      html { margin-top: 0 !important; }
     </style>
     <script type="module" src="/src/main.tsx"></script>
   </body>
