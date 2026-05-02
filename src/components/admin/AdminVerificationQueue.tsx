@@ -262,6 +262,24 @@ const AdminVerificationQueue = () => {
                     Note: {d.verification_notes}
                   </p>
                 )}
+
+                {tab === "rejected" && (
+                  <div className="flex gap-2">
+                    <Button size="sm" onClick={() => decide(d.id, "approved")} disabled={busyId === d.id}>
+                      {busyId === d.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                      Re-approve
+                    </Button>
+                  </div>
+                )}
+
+                {tab === "approved" && (
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="destructive" onClick={() => decide(d.id, "rejected")} disabled={busyId === d.id}>
+                      {busyId === d.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4" />}
+                      Revoke / Reject
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}
