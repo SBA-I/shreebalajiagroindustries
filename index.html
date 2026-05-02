@@ -73,6 +73,12 @@
       #google_translate_element { display: none !important; visibility: hidden !important; }
       body { top: 0 !important; position: static !important; }
       html { margin-top: 0 !important; }
+      html.translated-ltr body,
+      html.translated-rtl body,
+      html.translation-active body { top: 0 !important; position: static !important; min-height: 100vh; }
+      html.translated-ltr .fixed,
+      html.translated-rtl .fixed,
+      html.translation-active .fixed { transform: translateZ(0); }
     </style>
     <script type="module" src="/src/main.tsx"></script>
   </body>
