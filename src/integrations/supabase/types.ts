@@ -153,15 +153,18 @@ export type Database = {
           created_at: string
           district: string | null
           email: string | null
+          gst_number: string | null
           id: string
           is_active: boolean
           is_authorized: boolean
           lat: number | null
+          license_number: string | null
           lng: number | null
           name: string
           phone: string
           photo_url: string | null
           pincode: string
+          shop_url: string | null
           state: string
           taluka: string | null
           updated_at: string
@@ -175,15 +178,18 @@ export type Database = {
           created_at?: string
           district?: string | null
           email?: string | null
+          gst_number?: string | null
           id?: string
           is_active?: boolean
           is_authorized?: boolean
           lat?: number | null
+          license_number?: string | null
           lng?: number | null
           name: string
           phone: string
           photo_url?: string | null
           pincode: string
+          shop_url?: string | null
           state: string
           taluka?: string | null
           updated_at?: string
@@ -197,15 +203,18 @@ export type Database = {
           created_at?: string
           district?: string | null
           email?: string | null
+          gst_number?: string | null
           id?: string
           is_active?: boolean
           is_authorized?: boolean
           lat?: number | null
+          license_number?: string | null
           lng?: number | null
           name?: string
           phone?: string
           photo_url?: string | null
           pincode?: string
+          shop_url?: string | null
           state?: string
           taluka?: string | null
           updated_at?: string
