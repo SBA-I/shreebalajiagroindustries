@@ -1,24 +1,47 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Phone, X, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 const EmergencyContactButton = () => {
   const [open, setOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
+
+  useEffect(() => {
+    if (sessionStorage.getItem("sbai-hide-emg-contact") === "1") setHidden(true);
+  }, []);
+
+  const dismiss = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    sessionStorage.setItem("sbai-hide-emg-contact", "1");
+    setHidden(true);
+  };
+
+  if (hidden) return null;
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-label="Emergency contact"
-        className="fixed bottom-[14rem] right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-elevated hover:scale-105 transition-transform"
-      >
-        {open ? <X className="h-6 w-6" /> : <AlertTriangle className="h-6 w-6" />}
-      </button>
+      <div className="fixed bottom-[10.75rem] right-3 z-40">
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-label="Emergency contact"
+          className="flex h-11 w-11 items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-elevated hover:scale-105 transition-transform"
+        >
+          {open ? <X className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
+        </button>
+        <button
+          type="button"
+          onClick={dismiss}
+          aria-label="Hide emergency contact button"
+          className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-background border border-border text-muted-foreground flex items-center justify-center shadow hover:text-foreground"
+        >
+          <X className="h-2.5 w-2.5" />
+        </button>
+      </div>
 
       {open && (
-        <Card className="fixed bottom-[18rem] right-4 z-40 w-72 p-4 shadow-elevated animate-fade-in border-destructive/30">
+        <Card className="fixed bottom-[14rem] right-3 z-40 w-72 p-4 shadow-elevated animate-fade-in border-destructive/30">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="h-5 w-5 text-destructive" />
             <h3 className="font-heading font-semibold text-sm">Emergency Contacts</h3>
