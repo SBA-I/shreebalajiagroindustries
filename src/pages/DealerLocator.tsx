@@ -11,9 +11,6 @@ import { toast } from "sonner";
 interface Dealer {
   id: string;
   name: string;
-  contact_person: string | null;
-  phone: string;
-  email: string | null;
   address_line: string;
   city: string;
   district: string | null;
@@ -36,23 +33,14 @@ const DealerLocator = () => {
     }
     setLoading(true);
     setSearched(true);
-    const prefix = trimmed.slice(0, 3);
-    // Exact match first; if none, fall back to nearby (same prefix)
-    const { data: exact } = await supabase
-      .from("dealers")
-      .select("*")
-      .eq("is_active", true)
-      .eq("pincode", trimmed);
-    if (exact && exact.length > 0) {
-      setResults(exact as Dealer[]);
+    const { data, error } = await supabase.rpc("search_dealers_public", {
+      _pincode: trimmed,
+    });
+    if (error) {
+      toast.error("Could not search dealers. Please try again.");
+      setResults([]);
     } else {
-      const { data: nearby } = await supabase
-        .from("dealers")
-        .select("*")
-        .eq("is_active", true)
-        .like("pincode", `${prefix}%`)
-        .limit(10);
-      setResults((nearby ?? []) as Dealer[]);
+      setResults((data ?? []) as Dealer[]);
     }
     setLoading(false);
   };
