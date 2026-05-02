@@ -114,6 +114,7 @@ const Contact = () => {
                     <option value="distribution">{t("contact.type.distribution")}</option>
                     <option value="support">{t("contact.type.support")}</option>
                     <option value="complaint">{t("contact.type.complaint")}</option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
                 <div>

@@ -27,6 +27,7 @@ const TYPE_OPTIONS = [
   { value: "bulletin", label: "Technical Bulletin (PDF)" },
   { value: "banner", label: "Banner" },
   { value: "poster", label: "Poster" },
+  { value: "other", label: "Other" },
 ];
 const AUDIENCE_OPTIONS = [
   { value: "dealers", label: "Dealers only" },
