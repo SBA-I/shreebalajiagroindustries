@@ -74,24 +74,44 @@ const updateSeoLanguageTags = (lang: Lang) => {
 };
 
 // Drive the Google Translate widget. Returns true when a reload is needed.
-const applyGoogleTranslate = (lang: Lang): boolean => {
-  if (typeof document === "undefined") return false;
-  const value = lang === "en" ? "/en/en" : `/en/${lang}`;
+const setGoogTransCookie = (lang: Lang) => {
+  if (typeof document === "undefined") return;
+  const value = `/en/${lang}`;
   const host = window.location.hostname;
   const expire = "Thu, 01 Jan 1970 00:00:00 GMT";
-  document.cookie = `googtrans=; expires=${expire}; path=/`;
-  document.cookie = `googtrans=; expires=${expire}; path=/; domain=${host}`;
-  document.cookie = `googtrans=; expires=${expire}; path=/; domain=.${host}`;
+  // Clear any existing cookie on all path/domain combos
+  ["/", ""].forEach((p) => {
+    const path = p || "/";
+    document.cookie = `googtrans=; expires=${expire}; path=${path}`;
+    document.cookie = `googtrans=; expires=${expire}; path=${path}; domain=${host}`;
+    document.cookie = `googtrans=; expires=${expire}; path=${path}; domain=.${host}`;
+  });
+  // Set new cookie
   document.cookie = `googtrans=${value}; path=/`;
   document.cookie = `googtrans=${value}; path=/; domain=${host}`;
   document.cookie = `googtrans=${value}; path=/; domain=.${host}`;
-  const combo = document.querySelector<HTMLSelectElement>(".goog-te-combo");
-  if (combo) {
-    combo.value = lang;
-    combo.dispatchEvent(new Event("change"));
-    return false;
-  }
-  return true;
+};
+
+// Try to drive the in-page combo; if not ready yet, poll briefly
+const triggerCombo = (lang: Lang): Promise<boolean> => {
+  return new Promise((resolve) => {
+    let attempts = 0;
+    const tryNow = () => {
+      const combo = document.querySelector<HTMLSelectElement>(".goog-te-combo");
+      if (combo) {
+        combo.value = lang;
+        combo.dispatchEvent(new Event("change"));
+        resolve(true);
+        return;
+      }
+      if (++attempts > 20) {
+        resolve(false);
+        return;
+      }
+      setTimeout(tryNow, 150);
+    };
+    tryNow();
+  });
 };
 
 export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
@@ -114,19 +134,29 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
     return () => window.removeEventListener("sbai-lang-change", handler);
   }, []);
 
-  const setLang = useCallback((l: Lang) => {
+  const setLang = useCallback(async (l: Lang) => {
     setIsTranslating(true);
     setLangState(l);
     localStorage.setItem("sbai-lang", l);
     updateSeoLanguageTags(l);
     window.dispatchEvent(new CustomEvent("sbai-lang-change", { detail: l }));
-    const needsReload = applyGoogleTranslate(l);
-    if (needsReload) {
-      // Keep overlay visible until the reload swaps the page
+
+    // Always set cookie first so a reload (or future visits) translates everything
+    setGoogTransCookie(l);
+
+    // Try in-place translation via the combo. If it can't be found, reload —
+    // the cookie will make Google Translate apply on next page load.
+    const ok = await triggerCombo(l);
+    if (!ok) {
       setTimeout(() => window.location.reload(), 80);
       return;
     }
-    window.setTimeout(() => setIsTranslating(false), 900);
+    // Force a reload anyway when switching to/from English to ensure full
+    // re-translation of every node (Google sometimes misses new DOM).
+    window.setTimeout(() => {
+      setIsTranslating(false);
+      window.location.reload();
+    }, 600);
   }, []);
 
   const t = useCallback(
