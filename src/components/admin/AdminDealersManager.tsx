@@ -155,6 +155,9 @@ const EditDealerButton = ({ dealer, onSaved }: { dealer: Dealer; onSaved: () => 
     lat: dealer.lat?.toString() ?? "",
     lng: dealer.lng?.toString() ?? "",
     photo_url: dealer.photo_url ?? "",
+    gst_number: dealer.gst_number ?? "",
+    license_number: dealer.license_number ?? "",
+    shop_url: dealer.shop_url ?? "",
   });
   const save = async () => {
     if (!/^\d{6}$/.test(draft.pincode)) { toast.error("Invalid pincode"); return false; }
@@ -173,6 +176,9 @@ const EditDealerButton = ({ dealer, onSaved }: { dealer: Dealer; onSaved: () => 
       lat: draft.lat ? Number(draft.lat) : null,
       lng: draft.lng ? Number(draft.lng) : null,
       photo_url: draft.photo_url || null,
+      gst_number: draft.gst_number || null,
+      license_number: draft.license_number || null,
+      shop_url: draft.shop_url || null,
     }).eq("id", dealer.id);
     if (error) { toast.error(error.message); return false; }
     toast.success("Updated");
@@ -181,19 +187,28 @@ const EditDealerButton = ({ dealer, onSaved }: { dealer: Dealer; onSaved: () => 
   return (
     <EditDialog title={`Edit ${dealer.name}`} onSave={save}>
       <div className="grid gap-3 md:grid-cols-2">
-        <div><Label>Name</Label><Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} /></div>
-        <div><Label>Contact person</Label><Input value={draft.contact_person} onChange={(e) => setDraft({ ...draft, contact_person: e.target.value })} /></div>
+        <div className="md:col-span-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+          Business details (same as dealer signup)
+        </div>
+        <div><Label>Shop / Firm name</Label><Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} /></div>
+        <div><Label>Owner / Contact person</Label><Input value={draft.contact_person} onChange={(e) => setDraft({ ...draft, contact_person: e.target.value })} /></div>
         <div><Label>Phone</Label><Input value={draft.phone} onChange={(e) => setDraft({ ...draft, phone: e.target.value })} /></div>
         <div><Label>WhatsApp</Label><Input value={draft.whatsapp} onChange={(e) => setDraft({ ...draft, whatsapp: e.target.value })} /></div>
         <div className="md:col-span-2"><Label>Email</Label><Input type="email" value={draft.email} onChange={(e) => setDraft({ ...draft, email: e.target.value })} /></div>
-        <div className="md:col-span-2"><Label>Address</Label><Input value={draft.address_line} onChange={(e) => setDraft({ ...draft, address_line: e.target.value })} /></div>
+        <div><Label>GST number</Label><Input value={draft.gst_number} maxLength={15} onChange={(e) => setDraft({ ...draft, gst_number: e.target.value.toUpperCase() })} /></div>
+        <div><Label>License number</Label><Input value={draft.license_number} onChange={(e) => setDraft({ ...draft, license_number: e.target.value })} /></div>
+        <div className="md:col-span-2"><Label>Shop address</Label><Input value={draft.address_line} onChange={(e) => setDraft({ ...draft, address_line: e.target.value })} /></div>
         <div><Label>City</Label><Input value={draft.city} onChange={(e) => setDraft({ ...draft, city: e.target.value })} /></div>
         <div><Label>Taluka</Label><Input value={draft.taluka} onChange={(e) => setDraft({ ...draft, taluka: e.target.value })} /></div>
         <div><Label>District</Label><Input value={draft.district} onChange={(e) => setDraft({ ...draft, district: e.target.value })} /></div>
         <div><Label>State</Label><Input value={draft.state} onChange={(e) => setDraft({ ...draft, state: e.target.value })} /></div>
         <div><Label>Pincode</Label><Input value={draft.pincode} maxLength={6} onChange={(e) => setDraft({ ...draft, pincode: e.target.value.replace(/\D/g, "") })} /></div>
+        <div className="md:col-span-2 mt-2 text-xs font-semibold text-amber-700 uppercase tracking-wide border-t border-border pt-3">
+          Admin-only metadata
+        </div>
         <div><Label>Latitude</Label><Input value={draft.lat} onChange={(e) => setDraft({ ...draft, lat: e.target.value })} /></div>
         <div><Label>Longitude</Label><Input value={draft.lng} onChange={(e) => setDraft({ ...draft, lng: e.target.value })} /></div>
+        <div className="md:col-span-2"><Label>Shop URL</Label><Input value={draft.shop_url} onChange={(e) => setDraft({ ...draft, shop_url: e.target.value })} placeholder="https://maps.google.com/..." /></div>
         <div className="md:col-span-2"><Label>Shop photo URL</Label><Input value={draft.photo_url} onChange={(e) => setDraft({ ...draft, photo_url: e.target.value })} /></div>
       </div>
     </EditDialog>
