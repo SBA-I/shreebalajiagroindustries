@@ -1,6 +1,6 @@
 import Layout from "@/components/layout/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShieldCheck, FileText, Megaphone, Store, Truck, Bug, Leaf, UserCheck, Receipt, Package, MessageSquare, Users, Boxes } from "lucide-react";
+import { ShieldCheck, FileText, Megaphone, Store, Truck, Bug, Leaf, UserCheck, Receipt, Package, MessageSquare, Users, Boxes, UserCog } from "lucide-react";
 import AdminMsdsManager from "@/components/admin/AdminMsdsManager";
 import AdminMarketingManager from "@/components/admin/AdminMarketingManager";
 import AdminDealersManager from "@/components/admin/AdminDealersManager";
@@ -13,6 +13,7 @@ import AdminProductsManager from "@/components/admin/AdminProductsManager";
 import AdminContactInquiriesManager from "@/components/admin/AdminContactInquiriesManager";
 import AdminUsersManager from "@/components/admin/AdminUsersManager";
 import AdminDealerStockManager from "@/components/admin/AdminDealerStockManager";
+import AdminFieldOfficersManager from "@/components/admin/AdminFieldOfficersManager";
 
 const AdminPortal = () => (
   <Layout>
@@ -34,6 +35,7 @@ const AdminPortal = () => (
             <TabsTrigger value="users" className="gap-1.5 justify-start"><Users className="h-4 w-4 shrink-0" /> Users</TabsTrigger>
             <TabsTrigger value="products" className="gap-1.5 justify-start"><Package className="h-4 w-4 shrink-0" /> Products</TabsTrigger>
             <TabsTrigger value="dealers" className="gap-1.5 justify-start"><Store className="h-4 w-4 shrink-0" /> Dealers</TabsTrigger>
+            <TabsTrigger value="field-officers" className="gap-1.5 justify-start"><UserCog className="h-4 w-4 shrink-0" /> Field Officers</TabsTrigger>
             <TabsTrigger value="stock" className="gap-1.5 justify-start"><Boxes className="h-4 w-4 shrink-0" /> Dealer Stock</TabsTrigger>
             <TabsTrigger value="invoices" className="gap-1.5 justify-start"><Receipt className="h-4 w-4 shrink-0" /> Invoices</TabsTrigger>
             <TabsTrigger value="dispatch" className="gap-1.5 justify-start"><Truck className="h-4 w-4 shrink-0" /> Dispatch</TabsTrigger>
@@ -47,6 +49,7 @@ const AdminPortal = () => (
           <TabsContent value="users"><AdminUsersManager /></TabsContent>
           <TabsContent value="products"><AdminProductsManager /></TabsContent>
           <TabsContent value="dealers"><AdminDealersManager /></TabsContent>
+          <TabsContent value="field-officers"><AdminFieldOfficersManager /></TabsContent>
           <TabsContent value="stock"><AdminDealerStockManager /></TabsContent>
           <TabsContent value="invoices"><AdminInvoicesManager /></TabsContent>
           <TabsContent value="dispatch"><AdminDispatchManager /></TabsContent>
