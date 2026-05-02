@@ -2,8 +2,10 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Leaf, Camera, UserCircle2 } from "lucide-react";
 import heroImage from "@/assets/hero-farm.jpg";
+import { useI18n } from "@/i18n/I18nProvider";
 
 const HeroSection = () => {
+  const { t } = useI18n();
   return (
     <section className="relative min-h-[85vh] flex items-center overflow-hidden">
       {/* Background Image */}
@@ -19,42 +21,41 @@ const HeroSection = () => {
         <div className="max-w-2xl space-y-6 animate-fade-in">
           <div className="inline-flex items-center gap-2 bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20 rounded-full px-4 py-1.5">
             <Leaf className="h-4 w-4 text-accent" />
-            <span className="text-sm font-medium text-primary-foreground">Trusted Crop Protection Solutions</span>
+            <span className="text-sm font-medium text-primary-foreground">{t("hero.badge")}</span>
           </div>
 
           <h1
             className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground leading-tight"
             style={{ textShadow: "0 2px 12px hsl(120 30% 8% / 0.55)" }}
           >
-            Empowering Agriculture,{" "}
-            <span className="text-gradient-gold">Enriching Lives</span>
+            {t("hero.title1")}{" "}
+            <span className="text-gradient-gold">{t("hero.title2")}</span>
           </h1>
 
           <p
             className="text-lg text-primary-foreground/90 leading-relaxed max-w-xl"
             style={{ textShadow: "0 1px 6px hsl(120 30% 8% / 0.5)" }}
           >
-            Premium quality pesticides and insecticides engineered for modern farming. 
-            Protecting your crops, maximizing your harvest.
+            {t("hero.subtitle")}
           </p>
 
           <div className="flex flex-wrap gap-3 pt-2">
             <Link to="/products">
               <Button variant="hero" size="lg" className="gap-2 text-base">
-                Explore Products
+                {t("hero.cta.products")}
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
             <Link to="/ask-ai">
               <Button variant="hero-outline" size="lg" className="gap-2 text-base">
                 <Camera className="h-5 w-5" />
-                Scan Crop
+                {t("hero.cta.scan")}
               </Button>
             </Link>
             <Link to="/auth/farmer">
               <Button variant="hero-outline" size="lg" className="gap-2 text-base">
                 <UserCircle2 className="h-5 w-5" />
-                Farmer Portal
+                {t("hero.cta.farmer")}
               </Button>
             </Link>
           </div>

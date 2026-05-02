@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ComparisonProvider } from "@/hooks/use-product-comparison";
 import { AuthProvider } from "@/hooks/use-auth";
+import { I18nProvider } from "@/i18n/I18nProvider";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import About from "./pages/About";
@@ -42,6 +43,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <BrowserRouter>
+        <I18nProvider>
         <AuthProvider>
           <ComparisonProvider>
             <Toaster />
@@ -79,6 +81,7 @@ const App = () => (
             <EmergencyFirstAidButton />
           </ComparisonProvider>
         </AuthProvider>
+        </I18nProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

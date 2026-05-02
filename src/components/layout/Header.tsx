@@ -4,44 +4,52 @@ import { Menu, X, ChevronDown, LogIn, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo-sbai.png";
 import { useAuth } from "@/hooks/use-auth";
+import { useI18n } from "@/i18n/I18nProvider";
+import type { TKey } from "@/i18n/translations";
 
-const navItems = [
-  { label: "Home", path: "/" },
-  { label: "About Us", path: "/about" },
+type NavChild = { key: string; tKey: TKey; path: string };
+type NavItem = { key: string; tKey: TKey; path: string; children?: NavChild[] };
+
+const navItems: NavItem[] = [
+  { key: "home", tKey: "nav.home", path: "/" },
+  { key: "about", tKey: "nav.about", path: "/about" },
   {
-    label: "Products",
+    key: "products",
+    tKey: "nav.products",
     path: "/products",
     children: [
-      { label: "Insecticides", path: "/products?category=insecticides" },
-      { label: "Fungicides", path: "/products?category=fungicides" },
-      { label: "Herbicides", path: "/products?category=herbicides" },
-      { label: "PGR", path: "/products?category=pgr" },
+      { key: "insecticides", tKey: "cat.insecticides", path: "/products?category=insecticides" },
+      { key: "fungicides", tKey: "cat.fungicides", path: "/products?category=fungicides" },
+      { key: "herbicides", tKey: "cat.herbicides", path: "/products?category=herbicides" },
+      { key: "pgr", tKey: "cat.pgr", path: "/products?category=pgr" },
     ],
   },
   {
-    label: "Tools",
+    key: "tools",
+    tKey: "nav.tools",
     path: "/tools/harvest-timer",
     children: [
-      { label: "🌱 Ask AI", path: "/ask-ai" },
-      { label: "💰 Profit Simulator", path: "/yield-simulator" },
-      { label: "⏱ Harvest Timer (PHI)", path: "/tools/harvest-timer" },
-      { label: "🐛 Pest Calendar", path: "/tools/pest-calendar" },
+      { key: "askai", tKey: "tools.askAi", path: "/ask-ai" },
+      { key: "profit", tKey: "tools.profit", path: "/yield-simulator" },
+      { key: "harvest", tKey: "tools.harvest", path: "/tools/harvest-timer" },
+      { key: "pest", tKey: "tools.pest", path: "/tools/pest-calendar" },
     ],
   },
   {
-    label: "Dealers",
+    key: "dealers",
+    tKey: "nav.dealers",
     path: "/dealers",
     children: [
-      { label: "Find a Dealer", path: "/dealers" },
-      { label: "Track Dispatch", path: "/track" },
-      { label: "Marketing Kit", path: "/marketing-kit" },
+      { key: "find", tKey: "dealers.find", path: "/dealers" },
+      { key: "track", tKey: "dealers.track", path: "/track" },
+      { key: "kit", tKey: "dealers.kit", path: "/marketing-kit" },
     ],
   },
-  { label: "Safety", path: "/safety" },
-  { label: "Sustainability", path: "/sustainability" },
-  { label: "Resources", path: "/resources" },
-  { label: "News", path: "/news" },
-  { label: "Contact", path: "/contact" },
+  { key: "safety", tKey: "nav.safety", path: "/safety" },
+  { key: "sustainability", tKey: "nav.sustainability", path: "/sustainability" },
+  { key: "resources", tKey: "nav.resources", path: "/resources" },
+  { key: "news", tKey: "nav.news", path: "/news" },
+  { key: "contact", tKey: "nav.contact", path: "/contact" },
 ];
 
 const Header = () => {
@@ -50,6 +58,7 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { t } = useI18n();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -69,9 +78,9 @@ const Header = () => {
         <nav className="hidden lg:flex items-center gap-1">
           {navItems.map((item) => (
             <div
-              key={item.label}
+              key={item.key}
               className="relative"
-              onMouseEnter={() => item.children && setDropdownOpen(item.label)}
+              onMouseEnter={() => item.children && setDropdownOpen(item.key)}
               onMouseLeave={() => setDropdownOpen(null)}
             >
               <Link
@@ -79,18 +88,18 @@ const Header = () => {
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1
                   ${isActive(item.path) ? "text-primary bg-primary/5" : "text-foreground/80 hover:text-primary hover:bg-primary/5"}`}
               >
-                {item.label}
+                {t(item.tKey)}
                 {item.children && <ChevronDown className="h-3 w-3" />}
               </Link>
-              {item.children && dropdownOpen === item.label && (
+              {item.children && dropdownOpen === item.key && (
                 <div className="absolute top-full left-0 mt-1 bg-card border border-border rounded-lg shadow-elevated py-2 min-w-[180px] animate-fade-in">
                   {item.children.map((child) => (
                     <Link
-                      key={child.label}
+                      key={child.key}
                       to={child.path}
                       className="block px-4 py-2 text-sm text-foreground/80 hover:text-primary hover:bg-primary/5 transition-colors"
                     >
-                      {child.label}
+                      {t(child.tKey)}
                     </Link>
                   ))}
                 </div>
@@ -105,17 +114,17 @@ const Header = () => {
             <>
               <Link to="/dashboard">
                 <Button size="sm" variant="outline" className="gap-1.5">
-                  <LayoutDashboard className="h-4 w-4" /> Dashboard
+                  <LayoutDashboard className="h-4 w-4" /> {t("nav.dashboard")}
                 </Button>
               </Link>
               <Button size="sm" variant="ghost" onClick={async () => { await signOut(); navigate("/"); }}>
-                Sign Out
+                {t("nav.signOut")}
               </Button>
             </>
           ) : (
             <Link to="/auth">
               <Button size="sm" className="gap-1.5">
-                <LogIn className="h-4 w-4" /> Login
+                <LogIn className="h-4 w-4" /> {t("nav.login")}
               </Button>
             </Link>
           )}
@@ -136,25 +145,25 @@ const Header = () => {
         <div className="lg:hidden bg-card border-t border-border animate-fade-in">
           <nav className="container mx-auto px-4 py-4 space-y-1">
             {navItems.map((item) => (
-              <div key={item.label}>
+              <div key={item.key}>
                 <Link
                   to={item.path}
                   onClick={() => setMobileOpen(false)}
                   className={`block px-3 py-2.5 rounded-md text-sm font-medium transition-colors
                     ${isActive(item.path) ? "text-primary bg-primary/5" : "text-foreground/80 hover:text-primary"}`}
                 >
-                  {item.label}
+                  {t(item.tKey)}
                 </Link>
                 {item.children && (
                   <div className="ml-4 space-y-1">
                     {item.children.map((child) => (
                       <Link
-                        key={child.label}
+                        key={child.key}
                         to={child.path}
                         onClick={() => setMobileOpen(false)}
                         className="block px-3 py-2 text-sm text-muted-foreground hover:text-primary transition-colors"
                       >
-                        {child.label}
+                        {t(child.tKey)}
                       </Link>
                     ))}
                   </div>
@@ -169,13 +178,13 @@ const Header = () => {
                     onClick={() => setMobileOpen(false)}
                     className="block px-3 py-2.5 rounded-md text-sm font-medium text-primary"
                   >
-                    Dashboard
+                    {t("nav.dashboard")}
                   </Link>
                   <button
                     onClick={async () => { await signOut(); setMobileOpen(false); navigate("/"); }}
                     className="block w-full text-left px-3 py-2.5 rounded-md text-sm font-medium text-foreground/80 hover:text-primary"
                   >
-                    Sign Out
+                    {t("nav.signOut")}
                   </button>
                 </>
               ) : (
@@ -184,7 +193,7 @@ const Header = () => {
                   onClick={() => setMobileOpen(false)}
                   className="block px-3 py-2.5 rounded-md text-sm font-medium text-primary"
                 >
-                  Login / Sign Up
+                  {t("nav.loginSignup")}
                 </Link>
               )}
             </div>
