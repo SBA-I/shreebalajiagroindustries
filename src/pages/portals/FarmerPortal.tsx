@@ -61,9 +61,6 @@ const FarmerPortal = () => {
 
       <section className="py-6 md:py-10">
         <div className="container mx-auto px-4 lg:px-8 max-w-6xl space-y-4 md:space-y-6">
-          {/* Profile (signup details, editable) */}
-          <ProfileCard />
-
           {/* Top: Weather */}
           <div className="grid gap-4 md:grid-cols-2">
             <WeatherWidget />
@@ -78,6 +75,9 @@ const FarmerPortal = () => {
             <SprayLog />
             <DiseaseGallery />
           </div>
+
+          {/* Account Details (signup info, editable) */}
+          <ProfileCard />
         </div>
       </section>
     </Layout>
