@@ -35,7 +35,7 @@ const stats = [
 const StatItem = ({ icon: Icon, value, suffix, label }: typeof stats[number]) => {
   const [ref, current] = useCountUp(value);
   return (
-    <div ref={ref as React.RefObject<HTMLDivElement>} className="text-center">
+    <div ref={ref} className="text-center">
       <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-primary/10 flex items-center justify-center">
         <Icon className="h-6 w-6 text-primary" />
       </div>
