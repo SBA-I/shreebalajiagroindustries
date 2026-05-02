@@ -25,11 +25,24 @@ type SR = any;
 
 const EmergencyFirstAidButton = () => {
   const [open, setOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [category, setCategory] = useState<ChemCategory | null>(null);
   const [exposure, setExposure] = useState<ExposureType | null>(null);
   const [listening, setListening] = useState(false);
   const [transcript, setTranscript] = useState<string>("");
   const recRef = useRef<SR | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && sessionStorage.getItem("sbai-hide-firstaid") === "1") {
+      setHidden(true);
+    }
+  }, []);
+
+  const dismiss = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    sessionStorage.setItem("sbai-hide-firstaid", "1");
+    setHidden(true);
+  };
 
   const hasSpeech =
     typeof window !== "undefined" &&
@@ -104,19 +117,31 @@ const EmergencyFirstAidButton = () => {
     if (typeof window !== "undefined") window.speechSynthesis?.cancel();
   };
 
+  if (hidden) return null;
+
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-label="Emergency First Aid"
-        className="fixed bottom-[17.5rem] right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-elevated hover:scale-105 transition-transform animate-pulse"
-      >
-        {open ? <X className="h-6 w-6" /> : <AlertOctagon className="h-6 w-6" />}
-      </button>
+      <div className="fixed bottom-[14rem] right-3 z-40">
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-label="Emergency First Aid"
+          className="flex h-11 w-11 items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-elevated hover:scale-105 transition-transform animate-pulse"
+        >
+          {open ? <X className="h-5 w-5" /> : <AlertOctagon className="h-5 w-5" />}
+        </button>
+        <button
+          type="button"
+          onClick={dismiss}
+          aria-label="Hide first aid button"
+          className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-background border border-border text-muted-foreground flex items-center justify-center shadow hover:text-foreground"
+        >
+          <X className="h-2.5 w-2.5" />
+        </button>
+      </div>
 
       {open && (
-        <div className="fixed inset-0 sm:inset-auto sm:bottom-[21rem] sm:right-4 z-40 sm:w-[380px] flex items-stretch sm:items-end justify-center sm:justify-end p-2 sm:p-0">
+        <div className="fixed inset-0 sm:inset-auto sm:bottom-[17.25rem] sm:right-3 z-40 sm:w-[380px] flex items-stretch sm:items-end justify-center sm:justify-end p-2 sm:p-0">
           <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto p-4 shadow-elevated border-destructive/30 animate-fade-in">
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
