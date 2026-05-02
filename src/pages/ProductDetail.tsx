@@ -272,6 +272,18 @@ const ProductDetail = () => {
                 <div><label className="text-sm font-medium text-foreground mb-1.5 block">Email</label>
                   <Input type="email" value={inquiryForm.email} onChange={(e) => setInquiryForm({ ...inquiryForm, email: e.target.value })} required /></div>
               </div>
+              <div>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Mobile number</label>
+                <Input
+                  type="tel"
+                  inputMode="tel"
+                  pattern="[0-9+\-\s]{7,20}"
+                  placeholder="+91 ..."
+                  value={inquiryForm.phone}
+                  onChange={(e) => setInquiryForm({ ...inquiryForm, phone: e.target.value })}
+                  required
+                />
+              </div>
               <div><label className="text-sm font-medium text-foreground mb-1.5 block">Message</label>
                 <Textarea rows={4} value={inquiryForm.message} onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })} required /></div>
               <Button type="submit" className="gap-2" disabled={submittingInquiry}>
