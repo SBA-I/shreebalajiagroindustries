@@ -14,7 +14,7 @@ import EditDialog from "./EditDialog";
 const CATEGORIES = ["Insecticides", "Fungicides", "Herbicides", "PGR"] as const;
 type Category = typeof CATEGORIES[number];
 
-interface PackPrice { size: string; price: number | null }
+interface PackPrice { size: string; price: number | null; dosage?: string | null }
 
 interface Product {
   id: string;
@@ -64,15 +64,35 @@ const PackEditor = ({ value, onChange }: { value: PackPrice[]; onChange: (v: Pac
     onChange(next);
   };
   const remove = (i: number) => onChange(value.filter((_, idx) => idx !== i));
-  const add = () => onChange([...value, { size: "", price: null }]);
+  const add = () => onChange([...value, { size: "", price: null, dosage: "" }]);
 
   return (
     <div className="space-y-2">
       {value.map((p, i) => (
-        <div key={i} className="flex items-center gap-2">
-          <Input placeholder="Pack size (e.g. 250 ml)" value={p.size} onChange={(e) => update(i, { size: e.target.value })} className="flex-1" />
-          <Input placeholder="Price ₹" type="number" step="0.01" value={p.price ?? ""} onChange={(e) => update(i, { price: e.target.value ? Number(e.target.value) : null })} className="w-32" />
-          <Button type="button" size="icon" variant="ghost" onClick={() => remove(i)}><X className="h-4 w-4 text-destructive" /></Button>
+        <div key={i} className="grid grid-cols-12 gap-2 items-center">
+          <Input
+            placeholder="Pack size (e.g. 250 ml)"
+            value={p.size}
+            onChange={(e) => update(i, { size: e.target.value })}
+            className="col-span-4"
+          />
+          <Input
+            placeholder="Dosage (e.g. 200 ml/acre)"
+            value={p.dosage ?? ""}
+            onChange={(e) => update(i, { dosage: e.target.value })}
+            className="col-span-5"
+          />
+          <Input
+            placeholder="Price ₹"
+            type="number"
+            step="0.01"
+            value={p.price ?? ""}
+            onChange={(e) => update(i, { price: e.target.value ? Number(e.target.value) : null })}
+            className="col-span-2"
+          />
+          <Button type="button" size="icon" variant="ghost" onClick={() => remove(i)} className="col-span-1">
+            <X className="h-4 w-4 text-destructive" />
+          </Button>
         </div>
       ))}
       <Button type="button" size="sm" variant="outline" onClick={add} className="gap-1.5"><Plus className="h-3.5 w-3.5" /> Add pack</Button>
@@ -167,7 +187,7 @@ const AdminProductsManager = () => {
       features: splitList(form.features),
       safety_precautions: splitList(form.safety_precautions),
       pack_sizes: cleanPacks.map((p) => p.size),
-      pricing: cleanPacks,
+      pricing: cleanPacks as any,
       price: form.price ? Number(form.price) : null,
       unit: form.unit || "L",
       image_url: form.image_url || null,
