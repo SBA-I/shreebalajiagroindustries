@@ -14,6 +14,7 @@ interface Dealer {
   state: string; pincode: string; taluka: string | null;
   lat: number | null; lng: number | null; whatsapp: string | null; photo_url: string | null;
   gst_number: string | null; license_number: string | null; shop_url: string | null;
+  user_id: string | null;
 }
 
 const blank = {
@@ -65,8 +66,42 @@ const AdminDealersManager = () => {
   };
 
   const remove = async (id: string) => {
-    if (!confirm("Delete this dealer?")) return;
-    await supabase.from("dealers").delete().eq("id", id);
+    if (!confirm("Delete this dealer? Their application will also be moved to Rejected in the Verification queue.")) return;
+    const dealer = dealers.find((x) => x.id === id);
+
+    // 1. Move the linked profile to "rejected" so it appears in the Verification → Rejected tab
+    if (dealer?.user_id) {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error: profErr } = await supabase
+        .from("profiles")
+        .update({
+          verification_status: "rejected",
+          verification_notes: "Removed by admin from Dealers tab",
+          reviewed_by: user?.id ?? null,
+          reviewed_at: new Date().toISOString(),
+        })
+        .eq("user_id", dealer.user_id)
+        .eq("requested_role", "distributor");
+      if (profErr) {
+        toast.error(`Could not update verification status: ${profErr.message}`);
+        return;
+      }
+
+      // 2. Revoke the distributor role so the user loses portal access
+      await supabase
+        .from("user_roles")
+        .delete()
+        .eq("user_id", dealer.user_id)
+        .eq("role", "distributor");
+    }
+
+    // 3. Delete the dealer record itself
+    const { error } = await supabase.from("dealers").delete().eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(dealer?.user_id ? "Dealer deleted and moved to Rejected" : "Dealer deleted");
     refresh();
   };
 
