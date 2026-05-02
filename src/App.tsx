@@ -35,6 +35,7 @@ import FieldOfficerPortal from "./pages/portals/FieldOfficerPortal";
 import FarmerPortal from "./pages/portals/FarmerPortal";
 import AiChatWidget from "./components/ai/AiChatWidget";
 import EmergencyFirstAidButton from "./components/safety/EmergencyFirstAidButton";
+import EmergencyContactButton from "./components/safety/EmergencyContactButton";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -79,6 +80,7 @@ const App = () => (
             </Routes>
             <AiChatWidget />
             <EmergencyFirstAidButton />
+            <EmergencyContactButton />
           </ComparisonProvider>
         </AuthProvider>
         </I18nProvider>
