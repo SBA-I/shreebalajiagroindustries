@@ -124,7 +124,7 @@ ${productCatalog}
   } catch (e) {
     console.error("ai-assistant error:", e);
     return new Response(
-      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
+      JSON.stringify({ error: "AI service temporarily unavailable." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
