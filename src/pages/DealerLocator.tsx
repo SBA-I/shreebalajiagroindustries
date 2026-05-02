@@ -33,6 +33,9 @@ interface StockBadge {
   product_name: string;
   status: string;
   arriving_on: string | null;
+  pack_size: string | null;
+  quantity_available: number | null;
+  price: number | null;
 }
 
 const STATUS_TONE: Record<string, string> = {
@@ -61,7 +64,7 @@ const DealerLocator = () => {
   const loadStock = async (dealerIds: string[]) => {
     if (dealerIds.length === 0) { setStockByDealer({}); return; }
     const [{ data: stock }, { data: prods }] = await Promise.all([
-      supabase.from("dealer_stock").select("dealer_id, product_id, status, arriving_on").in("dealer_id", dealerIds),
+      supabase.from("dealer_stock").select("dealer_id, product_id, status, arriving_on, pack_size, quantity_available, price").in("dealer_id", dealerIds),
       supabase.from("products").select("id, name").eq("is_active", true),
     ]);
     const nameMap: Record<string, string> = {};
@@ -69,7 +72,15 @@ const DealerLocator = () => {
     const grouped: Record<string, StockBadge[]> = {};
     (stock ?? []).forEach((s: any) => {
       const list = grouped[s.dealer_id] ?? (grouped[s.dealer_id] = []);
-      list.push({ product_id: s.product_id, product_name: nameMap[s.product_id] ?? "Product", status: s.status, arriving_on: s.arriving_on });
+      list.push({
+        product_id: s.product_id,
+        product_name: nameMap[s.product_id] ?? "Product",
+        status: s.status,
+        arriving_on: s.arriving_on,
+        pack_size: s.pack_size ?? null,
+        quantity_available: s.quantity_available ?? null,
+        price: s.price ?? null,
+      });
     });
     setStockByDealer(grouped);
   };
@@ -295,20 +306,35 @@ const DealerCard = ({
 
     {stock.length > 0 && (
       <div className="mt-3 pt-3 border-t border-border space-y-1.5">
-        <p className="text-xs font-medium text-muted-foreground">Stock status</p>
-        <div className="flex flex-wrap gap-1.5">
+        <p className="text-xs font-medium text-muted-foreground">Available stock</p>
+        <div className="space-y-1.5">
           {stock.map((s) => {
             const label = STATUS_LABEL[s.status] ?? s.status;
             const tone = STATUS_TONE[s.status] ?? "bg-muted text-muted-foreground";
-            const text = s.status === "arriving" && s.arriving_on
-              ? `${s.product_name}: ${label} ${new Date(s.arriving_on).toLocaleDateString(undefined, { weekday: "short" })}`
-              : `${s.product_name}: ${label}`;
+            const meta: string[] = [];
+            if (s.pack_size) meta.push(s.pack_size);
+            if (s.quantity_available != null) meta.push(`${s.quantity_available} packs left`);
+            if (s.price != null) meta.push(`₹${s.price}`);
+            if (s.status === "arriving" && s.arriving_on) {
+              meta.push(`Arrives ${new Date(s.arriving_on).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}`);
+            }
+            const inner = (
+              <div className="flex items-center justify-between gap-2 rounded-md border border-border/60 bg-muted/30 px-2.5 py-1.5">
+                <div className="min-w-0">
+                  <p className="text-xs font-medium truncate">{s.product_name}</p>
+                  {meta.length > 0 && (
+                    <p className="text-[11px] text-muted-foreground truncate">{meta.join(" · ")}</p>
+                  )}
+                </div>
+                <Badge className={`${tone} text-[10px] shrink-0`}>{label}</Badge>
+              </div>
+            );
             return waBuilder ? (
-              <a key={s.product_id} href={waBuilder(s.product_name)} target="_blank" rel="noopener noreferrer" className="inline-block">
-                <Badge className={`${tone} cursor-pointer hover:opacity-80`}>{text}</Badge>
+              <a key={s.product_id} href={waBuilder(s.product_name)} target="_blank" rel="noopener noreferrer" className="block hover:opacity-90">
+                {inner}
               </a>
             ) : (
-              <Badge key={s.product_id} className={tone}>{text}</Badge>
+              <div key={s.product_id}>{inner}</div>
             );
           })}
         </div>
