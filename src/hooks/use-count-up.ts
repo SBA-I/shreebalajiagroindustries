@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Animates a number from 0 to `end` once the element scrolls into view.
@@ -6,12 +6,13 @@ import { useEffect, useRef, useState } from "react";
  */
 export function useCountUp(end: number, durationMs = 1500) {
   const [value, setValue] = useState(0);
-  const ref = useRef<HTMLElement | null>(null);
+  const [element, setElement] = useState<HTMLElement | null>(null);
   const started = useRef(false);
   const frame = useRef<number | null>(null);
+  const ref = useCallback((node: HTMLElement | null) => setElement(node), []);
 
   useEffect(() => {
-    const el = ref.current;
+    const el = element;
     if (!el) return;
     const io = new IntersectionObserver(
       (entries) => {
@@ -36,7 +37,7 @@ export function useCountUp(end: number, durationMs = 1500) {
       io.disconnect();
       if (frame.current !== null) cancelAnimationFrame(frame.current);
     };
-  }, [end, durationMs]);
+  }, [element, end, durationMs]);
 
   return [ref, value] as const;
 }
