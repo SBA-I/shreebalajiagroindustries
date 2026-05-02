@@ -64,7 +64,7 @@ const ProductDetail = () => {
     try {
       const { error } = await supabase.from("contact_inquiries").insert({
         name: inquiryForm.name,
-        email: inquiryForm.email,
+        email: inquiryForm.email || null,
         phone: inquiryForm.phone || null,
         inquiry_type: "product",
         message: `[Product: ${product.name}]\n\n${inquiryForm.message}`,
@@ -304,8 +304,8 @@ const ProductDetail = () => {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div><label className="text-sm font-medium text-foreground mb-1.5 block">Name</label>
                   <Input value={inquiryForm.name} onChange={(e) => setInquiryForm({ ...inquiryForm, name: e.target.value })} required /></div>
-                <div><label className="text-sm font-medium text-foreground mb-1.5 block">Email</label>
-                  <Input type="email" value={inquiryForm.email} onChange={(e) => setInquiryForm({ ...inquiryForm, email: e.target.value })} required /></div>
+                <div><label className="text-sm font-medium text-foreground mb-1.5 block">Email <span className="text-muted-foreground text-xs">(optional)</span></label>
+                  <Input type="email" value={inquiryForm.email} onChange={(e) => setInquiryForm({ ...inquiryForm, email: e.target.value })} /></div>
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Mobile number</label>
