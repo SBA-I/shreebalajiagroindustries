@@ -355,6 +355,8 @@ const hi: Dict = {
   "fab.title": "त्वरित कार्य",
   "fab.sprayDialog": "स्प्रे कैलकुलेटर",
   "fab.diseaseDialog": "रोग पहचानकर्ता",
+  "fab.language": "भाषा",
+  "fab.languageDialog": "भाषा चुनें",
 };
 
 const mr: Dict = {
@@ -525,6 +527,8 @@ const mr: Dict = {
   "fab.title": "त्वरित क्रिया",
   "fab.sprayDialog": "स्प्रे कॅल्क्युलेटर",
   "fab.diseaseDialog": "रोग शोधक",
+  "fab.language": "भाषा",
+  "fab.languageDialog": "भाषा निवडा",
 };
 
 export const translations = { en, hi, mr } as const;
