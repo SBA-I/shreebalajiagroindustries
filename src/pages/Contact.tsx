@@ -21,7 +21,7 @@ const Contact = () => {
     try {
       const { error } = await supabase.from("contact_inquiries").insert({
         name: form.name,
-        email: form.email,
+        email: form.email || null,
         phone: form.phone || null,
         inquiry_type: form.type,
         message: form.message,
@@ -86,8 +86,8 @@ const Contact = () => {
                     <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-1.5 block">{t("contact.email")}</label>
-                    <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">{t("contact.email")} <span className="text-muted-foreground text-xs">(optional)</span></label>
+                    <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
                   </div>
                 </div>
                 <div>
