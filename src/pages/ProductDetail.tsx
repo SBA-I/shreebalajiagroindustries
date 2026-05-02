@@ -273,7 +273,9 @@ const ProductDetail = () => {
               </div>
               <div><label className="text-sm font-medium text-foreground mb-1.5 block">Message</label>
                 <Textarea rows={4} value={inquiryForm.message} onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })} required /></div>
-              <Button type="submit" className="gap-2">Send Inquiry <Send className="h-4 w-4" /></Button>
+              <Button type="submit" className="gap-2" disabled={submittingInquiry}>
+                {submittingInquiry ? "Sending..." : "Send Inquiry"} <Send className="h-4 w-4" />
+              </Button>
             </form>
           </div>
         </div>
