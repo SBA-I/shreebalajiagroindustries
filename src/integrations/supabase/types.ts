@@ -104,7 +104,10 @@ export type Database = {
           dealer_id: string
           id: string
           notes: string | null
+          pack_size: string | null
+          price: number | null
           product_id: string
+          quantity_available: number | null
           status: string
           updated_at: string
         }
@@ -114,7 +117,10 @@ export type Database = {
           dealer_id: string
           id?: string
           notes?: string | null
+          pack_size?: string | null
+          price?: number | null
           product_id: string
+          quantity_available?: number | null
           status?: string
           updated_at?: string
         }
@@ -124,7 +130,10 @@ export type Database = {
           dealer_id?: string
           id?: string
           notes?: string | null
+          pack_size?: string | null
+          price?: number | null
           product_id?: string
+          quantity_available?: number | null
           status?: string
           updated_at?: string
         }

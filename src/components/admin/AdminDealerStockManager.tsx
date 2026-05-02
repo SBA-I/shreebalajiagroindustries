@@ -14,6 +14,7 @@ interface Product { id: string; name: string; }
 interface Stock {
   id: string; dealer_id: string; product_id: string;
   status: string; arriving_on: string | null; notes: string | null;
+  pack_size: string | null; quantity_available: number | null; price: number | null;
 }
 
 const STATUSES = [
@@ -34,7 +35,7 @@ const AdminDealerStockManager = () => {
   const [dealerFilter, setDealerFilter] = useState<string>("all");
   const [q, setQ] = useState("");
 
-  const [form, setForm] = useState({ dealer_id: "", product_id: "", status: "in_stock", arriving_on: "", notes: "" });
+  const [form, setForm] = useState({ dealer_id: "", product_id: "", status: "in_stock", arriving_on: "", notes: "", pack_size: "", quantity_available: "", price: "" });
   const [busy, setBusy] = useState(false);
 
   const refresh = async () => {
@@ -73,11 +74,14 @@ const AdminDealerStockManager = () => {
       status: form.status,
       arriving_on: form.arriving_on || null,
       notes: form.notes || null,
+      pack_size: form.pack_size || null,
+      quantity_available: form.quantity_available === "" ? null : Number(form.quantity_available),
+      price: form.price === "" ? null : Number(form.price),
     } as any, { onConflict: "dealer_id,product_id" });
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success("Stock saved");
-    setForm({ dealer_id: form.dealer_id, product_id: "", status: "in_stock", arriving_on: "", notes: "" });
+    setForm({ dealer_id: form.dealer_id, product_id: "", status: "in_stock", arriving_on: "", notes: "", pack_size: "", quantity_available: "", price: "" });
     refresh();
   };
 
@@ -120,7 +124,10 @@ const AdminDealerStockManager = () => {
               </Select>
             </div>
             <div><Label>Arriving on</Label><Input type="date" value={form.arriving_on} onChange={(e) => setForm({ ...form, arriving_on: e.target.value })} /></div>
-            <div className="md:col-span-3"><Label>Notes</Label><Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="e.g. 5 L cans available" /></div>
+            <div><Label>Pack size</Label><Input value={form.pack_size} onChange={(e) => setForm({ ...form, pack_size: e.target.value })} placeholder="e.g. 1 L, 500 ml, 5 kg" /></div>
+            <div><Label>Qty available</Label><Input type="number" min="0" value={form.quantity_available} onChange={(e) => setForm({ ...form, quantity_available: e.target.value })} placeholder="e.g. 12" /></div>
+            <div><Label>Price (₹)</Label><Input type="number" min="0" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="optional" /></div>
+            <div className="md:col-span-4"><Label>Notes</Label><Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="e.g. fresh batch" /></div>
             <div className="md:col-span-1 flex items-end">
               <Button type="submit" disabled={busy} className="w-full gap-1.5">
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Save
@@ -158,7 +165,14 @@ const AdminDealerStockManager = () => {
                 <div key={r.id} className="flex items-center justify-between py-2 gap-2 flex-wrap">
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium">{productName(r.product_id)}</p>
-                    <p className="text-xs text-muted-foreground">{dealerName(r.dealer_id)}{r.arriving_on ? ` · ETA ${r.arriving_on}` : ""}{r.notes ? ` · ${r.notes}` : ""}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {dealerName(r.dealer_id)}
+                      {r.pack_size ? ` · ${r.pack_size}` : ""}
+                      {r.quantity_available != null ? ` · ${r.quantity_available} packs` : ""}
+                      {r.price != null ? ` · ₹${r.price}` : ""}
+                      {r.arriving_on ? ` · ETA ${r.arriving_on}` : ""}
+                      {r.notes ? ` · ${r.notes}` : ""}
+                    </p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <Badge className={tone(r.status)}>{label(r.status)}</Badge>
