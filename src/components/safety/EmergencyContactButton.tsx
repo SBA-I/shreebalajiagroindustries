@@ -41,7 +41,7 @@ const EmergencyContactButton = () => {
       </div>
 
       {open && (
-        <Card className="fixed bottom-[14rem] right-3 z-40 w-72 p-4 shadow-elevated animate-fade-in border-destructive/30">
+        <Card className="fixed bottom-[15.25rem] right-3 z-40 w-72 p-4 shadow-elevated animate-fade-in border-destructive/30">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="h-5 w-5 text-destructive" />
             <h3 className="font-heading font-semibold text-sm">Emergency Contacts</h3>
