@@ -1,13 +1,35 @@
 import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import { getArticleBySlug, articles, articleCategoryLabels } from "@/data/content";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Clock, User, Tag, BookOpen, Share2 } from "lucide-react";
+import { ArrowLeft, Clock, User, Tag, BookOpen, Share2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useResources, useResourceBySlug } from "@/hooks/use-resources";
+
+const categoryLabels: Record<string, string> = {
+  "crop-protection": "Crop Protection",
+  "application": "Application Techniques",
+  "safety": "Safety & Compliance",
+  "ipm": "IPM",
+  "seasonal": "Seasonal Care",
+  "soil-health": "Soil Health",
+  "sustainability": "Sustainability",
+  "rnd": "R&D",
+};
 
 const ArticleDetail = () => {
   const { slug } = useParams();
-  const article = getArticleBySlug(slug || "");
+  const { data: article, isLoading } = useResourceBySlug(slug || "");
+  const { data: allArticles = [] } = useResources();
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </Layout>
+    );
+  }
 
   if (!article) {
     return (
@@ -20,7 +42,7 @@ const ArticleDetail = () => {
     );
   }
 
-  const related = articles.filter((a) => a.id !== article.id && a.category === article.category).slice(0, 3);
+  const related = allArticles.filter((a) => a.id !== article.id && a.category === article.category).slice(0, 3);
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -51,12 +73,12 @@ const ArticleDetail = () => {
           {/* Header */}
           <div className="mb-8">
             <span className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">
-              {articleCategoryLabels[article.category]}
+              {categoryLabels[article.category] ?? article.category}
             </span>
             <h1 className="font-heading text-3xl md:text-4xl font-bold text-foreground mt-4 mb-4">{article.title}</h1>
             <p className="text-lg text-muted-foreground mb-4">{article.excerpt}</p>
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1.5"><User className="h-4 w-4" />{article.author}, {article.authorRole}</span>
+              <span className="flex items-center gap-1.5"><User className="h-4 w-4" />{article.author}{article.authorRole ? `, ${article.authorRole}` : ""}</span>
               <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" />{article.readTime}</span>
               <span>{article.date}</span>
               <button onClick={handleShare} className="flex items-center gap-1.5 hover:text-primary transition-colors ml-auto">
