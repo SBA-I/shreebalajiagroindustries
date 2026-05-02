@@ -121,6 +121,7 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
   const [lang, setLangState] = useState<Lang>("en");
   const [isTranslating, setIsTranslating] = useState(false);
   const translatingTimer = useRef<number | null>(null);
+  const mutationPasses = useRef(0);
 
   const applyWholePageTranslation = useCallback(async (l: Lang) => {
     setGoogTransCookie(l);
@@ -147,6 +148,7 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (lang === "en") return;
+    mutationPasses.current = 0;
     const rerun = window.setTimeout(() => {
       void applyWholePageTranslation(lang);
     }, 250);
@@ -157,10 +159,11 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
     if (lang === "en") return;
     let queued = false;
     const observer = new MutationObserver(() => {
-      if (queued) return;
+      if (queued || mutationPasses.current >= 3) return;
       queued = true;
       window.setTimeout(() => {
         queued = false;
+        mutationPasses.current += 1;
         void applyWholePageTranslation(lang);
       }, 500);
     });
