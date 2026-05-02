@@ -1,13 +1,33 @@
 import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import { getNewsBySlug, newsArticles, newsCategoryLabels } from "@/data/content";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar, User, Share2 } from "lucide-react";
+import { ArrowLeft, Calendar, User, Share2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useNews, useNewsBySlug } from "@/hooks/use-news";
+
+const newsCategoryLabels: Record<string, string> = {
+  company: "Company News",
+  product: "Product Launch",
+  industry: "Industry Update",
+  advisory: "Advisory",
+  achievement: "Achievement",
+};
+const labelFor = (c: string) => newsCategoryLabels[c] ?? c;
 
 const NewsDetail = () => {
   const { slug } = useParams();
-  const article = getNewsBySlug(slug || "");
+  const { data: article, isLoading } = useNewsBySlug(slug || "");
+  const { data: newsArticles = [] } = useNews();
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </Layout>
+    );
+  }
 
   if (!article) {
     return (
@@ -44,7 +64,7 @@ const NewsDetail = () => {
 
           <div className="mb-8">
             <span className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">
-              {newsCategoryLabels[article.category]}
+              {labelFor(article.category)}
             </span>
             <h1 className="font-heading text-3xl md:text-4xl font-bold text-foreground mt-4 mb-4">{article.title}</h1>
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
@@ -89,7 +109,7 @@ const NewsDetail = () => {
                   className="block bg-card rounded-xl border border-border p-5 hover:shadow-card transition-all group"
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs font-medium text-primary">{newsCategoryLabels[r.category]}</span>
+                    <span className="text-xs font-medium text-primary">{labelFor(r.category)}</span>
                     <span className="text-xs text-muted-foreground">{r.date}</span>
                   </div>
                   <h3 className="font-heading font-semibold text-foreground group-hover:text-primary transition-colors">{r.title}</h3>

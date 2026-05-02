@@ -2,14 +2,24 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Input } from "@/components/ui/input";
-import { newsArticles, newsCategoryLabels, type NewsCategory } from "@/data/content";
-import { Calendar, Search, ArrowRight } from "lucide-react";
+import { Calendar, Search, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useNews } from "@/hooks/use-news";
+
+const newsCategoryLabels: Record<string, string> = {
+  company: "Company News",
+  product: "Product Launch",
+  industry: "Industry Update",
+  advisory: "Advisory",
+  achievement: "Achievement",
+};
+const labelFor = (c: string) => newsCategoryLabels[c] ?? c;
 
 const News = () => {
+  const { data: newsArticles = [], isLoading } = useNews();
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState<NewsCategory | "all">("all");
+  const [category, setCategory] = useState<string>("all");
   const [email, setEmail] = useState("");
 
   const filtered = useMemo(() => {
@@ -20,7 +30,9 @@ const News = () => {
       result = result.filter((a) => a.title.toLowerCase().includes(q) || a.excerpt.toLowerCase().includes(q));
     }
     return result;
-  }, [search, category]);
+  }, [search, category, newsArticles]);
+
+  const categories = useMemo(() => Array.from(new Set(newsArticles.map((a) => a.category))), [newsArticles]);
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,8 +62,8 @@ const News = () => {
               className="group block bg-card rounded-2xl border border-border p-8 hover:shadow-elevated transition-all max-w-4xl mx-auto"
             >
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-xs font-medium text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
-                  {newsCategoryLabels[latestArticle.category]}
+              <span className="text-xs font-medium text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
+                  {labelFor(latestArticle.category)}
                 </span>
                 <span className="text-xs text-muted-foreground flex items-center gap-1">
                   <Calendar className="h-3 w-3" /> {latestArticle.date}
@@ -89,7 +101,7 @@ const News = () => {
             >
               All News
             </button>
-            {(Object.keys(newsCategoryLabels) as NewsCategory[]).map((cat) => (
+            {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setCategory(cat)}
@@ -97,7 +109,7 @@ const News = () => {
                   category === cat ? "bg-primary text-primary-foreground" : "bg-card border border-border text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {newsCategoryLabels[cat]}
+                {labelFor(cat)}
               </button>
             ))}
           </div>
@@ -105,7 +117,9 @@ const News = () => {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Articles */}
             <div className="lg:col-span-2 space-y-6">
-              {filtered.length === 0 ? (
+              {isLoading ? (
+                <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+              ) : filtered.length === 0 ? (
                 <p className="text-center text-muted-foreground py-12">No news articles found.</p>
               ) : (
                 filtered.map((article) => (
@@ -116,7 +130,7 @@ const News = () => {
                   >
                     <div className="flex items-center gap-3 mb-3">
                       <span className="text-xs font-medium text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
-                        {newsCategoryLabels[article.category]}
+                        {labelFor(article.category)}
                       </span>
                       <span className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Calendar className="h-3 w-3" /> {article.date}
@@ -157,12 +171,12 @@ const News = () => {
               <div className="bg-card rounded-xl border border-border p-6">
                 <h3 className="font-heading font-semibold text-foreground mb-4">Categories</h3>
                 <ul className="space-y-2">
-                  {(Object.keys(newsCategoryLabels) as NewsCategory[]).map((cat) => {
+                  {categories.map((cat) => {
                     const count = newsArticles.filter((a) => a.category === cat).length;
                     return (
                       <li key={cat} className="flex items-center justify-between">
                         <button onClick={() => setCategory(cat)} className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                          {newsCategoryLabels[cat]}
+                          {labelFor(cat)}
                         </button>
                         <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{count}</span>
                       </li>
