@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import PesticideLoadIndicator from "@/components/safety/PesticideLoadIndicator";
 import type { ChemCategory } from "@/data/firstAid";
+import { supabase } from "@/integrations/supabase/client";
 
 const ProductDetail = () => {
   const { productId } = useParams();
@@ -17,6 +18,7 @@ const ProductDetail = () => {
   const { data: allProducts = [] } = useProducts();
   const [activeTab, setActiveTab] = useState<"details" | "safety" | "documents">("details");
   const [inquiryForm, setInquiryForm] = useState({ name: "", email: "", message: "" });
+  const [submittingInquiry, setSubmittingInquiry] = useState(false);
 
   if (isLoading) {
     return (
@@ -41,10 +43,25 @@ const ProductDetail = () => {
 
   const related = getRelatedProducts(product, allProducts);
 
-  const handleInquiry = (e: React.FormEvent) => {
+  const handleInquiry = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Inquiry submitted! We'll get back to you soon.");
-    setInquiryForm({ name: "", email: "", message: "" });
+    if (!product) return;
+    setSubmittingInquiry(true);
+    try {
+      const { error } = await supabase.from("contact_inquiries").insert({
+        name: inquiryForm.name,
+        email: inquiryForm.email,
+        inquiry_type: "product",
+        message: `[Product: ${product.name}]\n\n${inquiryForm.message}`,
+      });
+      if (error) throw error;
+      toast.success("Inquiry submitted! We'll get back to you soon.");
+      setInquiryForm({ name: "", email: "", message: "" });
+    } catch {
+      toast.error("Failed to send inquiry. Please try again.");
+    } finally {
+      setSubmittingInquiry(false);
+    }
   };
 
   const tabs = [
@@ -256,7 +273,9 @@ const ProductDetail = () => {
               </div>
               <div><label className="text-sm font-medium text-foreground mb-1.5 block">Message</label>
                 <Textarea rows={4} value={inquiryForm.message} onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })} required /></div>
-              <Button type="submit" className="gap-2">Send Inquiry <Send className="h-4 w-4" /></Button>
+              <Button type="submit" className="gap-2" disabled={submittingInquiry}>
+                {submittingInquiry ? "Sending..." : "Send Inquiry"} <Send className="h-4 w-4" />
+              </Button>
             </form>
           </div>
         </div>
