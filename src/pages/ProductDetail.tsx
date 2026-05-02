@@ -17,7 +17,7 @@ const ProductDetail = () => {
   const { data: product, isLoading } = useProductById(productId || "");
   const { data: allProducts = [] } = useProducts();
   const [activeTab, setActiveTab] = useState<"details" | "safety" | "documents">("details");
-  const [inquiryForm, setInquiryForm] = useState({ name: "", email: "", message: "" });
+  const [inquiryForm, setInquiryForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [submittingInquiry, setSubmittingInquiry] = useState(false);
 
   if (isLoading) {
@@ -51,12 +51,13 @@ const ProductDetail = () => {
       const { error } = await supabase.from("contact_inquiries").insert({
         name: inquiryForm.name,
         email: inquiryForm.email,
+        phone: inquiryForm.phone || null,
         inquiry_type: "product",
         message: `[Product: ${product.name}]\n\n${inquiryForm.message}`,
       });
       if (error) throw error;
       toast.success("Inquiry submitted! We'll get back to you soon.");
-      setInquiryForm({ name: "", email: "", message: "" });
+      setInquiryForm({ name: "", email: "", phone: "", message: "" });
     } catch {
       toast.error("Failed to send inquiry. Please try again.");
     } finally {
