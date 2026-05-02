@@ -13,12 +13,14 @@ interface Dealer {
   email: string | null; address_line: string; city: string; district: string | null;
   state: string; pincode: string; taluka: string | null;
   lat: number | null; lng: number | null; whatsapp: string | null; photo_url: string | null;
+  gst_number: string | null; license_number: string | null; shop_url: string | null;
 }
 
 const blank = {
   name: "", contact_person: "", phone: "", whatsapp: "", email: "",
   address_line: "", city: "", taluka: "", district: "", state: "Maharashtra",
   pincode: "", lat: "", lng: "", photo_url: "",
+  gst_number: "", license_number: "", shop_url: "",
 };
 
 const AdminDealersManager = () => {
@@ -49,6 +51,9 @@ const AdminDealersManager = () => {
       taluka: form.taluka || null,
       whatsapp: form.whatsapp || null,
       photo_url: form.photo_url || null,
+      gst_number: form.gst_number || null,
+      license_number: form.license_number || null,
+      shop_url: form.shop_url || null,
       lat: form.lat ? Number(form.lat) : null,
       lng: form.lng ? Number(form.lng) : null,
     });
@@ -71,19 +76,31 @@ const AdminDealersManager = () => {
         <CardHeader><CardTitle className="text-base">Add dealer</CardTitle></CardHeader>
         <CardContent>
           <form onSubmit={add} className="grid gap-3 md:grid-cols-3">
-            <div><Label>Name *</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
-            <div><Label>Contact person</Label><Input value={form.contact_person} onChange={(e) => setForm({ ...form, contact_person: e.target.value })} /></div>
+            {/* Same fields as dealer signup */}
+            <div className="md:col-span-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              Business details (same as dealer signup)
+            </div>
+            <div><Label>Shop / Firm name *</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
+            <div><Label>Owner / Contact person</Label><Input value={form.contact_person} onChange={(e) => setForm({ ...form, contact_person: e.target.value })} /></div>
             <div><Label>Phone *</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
             <div><Label>WhatsApp</Label><Input value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} placeholder="10-digit number" /></div>
             <div><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
-            <div className="md:col-span-2"><Label>Address *</Label><Input value={form.address_line} onChange={(e) => setForm({ ...form, address_line: e.target.value })} /></div>
+            <div><Label>GST number</Label><Input value={form.gst_number} onChange={(e) => setForm({ ...form, gst_number: e.target.value.toUpperCase() })} maxLength={15} placeholder="27AAACB1234C1Z5" /></div>
+            <div><Label>License number</Label><Input value={form.license_number} onChange={(e) => setForm({ ...form, license_number: e.target.value })} placeholder="Pesticide / Seed license" /></div>
+            <div className="md:col-span-3"><Label>Shop address *</Label><Input value={form.address_line} onChange={(e) => setForm({ ...form, address_line: e.target.value })} /></div>
             <div><Label>City *</Label><Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></div>
             <div><Label>Taluka</Label><Input value={form.taluka} onChange={(e) => setForm({ ...form, taluka: e.target.value })} placeholder="e.g. Sakri" /></div>
             <div><Label>District</Label><Input value={form.district} onChange={(e) => setForm({ ...form, district: e.target.value })} /></div>
             <div><Label>State *</Label><Input value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} /></div>
             <div><Label>Pincode *</Label><Input value={form.pincode} maxLength={6} onChange={(e) => setForm({ ...form, pincode: e.target.value.replace(/\D/g, "") })} /></div>
+
+            {/* Admin-only fields */}
+            <div className="md:col-span-3 mt-2 text-xs font-semibold text-amber-700 uppercase tracking-wide border-t border-border pt-3">
+              Admin-only metadata (not asked at signup)
+            </div>
             <div><Label>Latitude</Label><Input value={form.lat} onChange={(e) => setForm({ ...form, lat: e.target.value })} placeholder="e.g. 20.9042" /></div>
             <div><Label>Longitude</Label><Input value={form.lng} onChange={(e) => setForm({ ...form, lng: e.target.value })} placeholder="e.g. 74.7749" /></div>
+            <div><Label>Shop URL</Label><Input value={form.shop_url} onChange={(e) => setForm({ ...form, shop_url: e.target.value })} placeholder="https://maps.google.com/..." /></div>
             <div className="md:col-span-3"><Label>Shop photo URL</Label><Input value={form.photo_url} onChange={(e) => setForm({ ...form, photo_url: e.target.value })} placeholder="https://..." /></div>
             <div className="md:col-span-3 flex justify-end">
               <Button type="submit" disabled={busy} className="gap-1.5">
