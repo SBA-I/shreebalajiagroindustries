@@ -89,7 +89,22 @@ const RoleAuthForm = ({
         toast.error(
           `This account is not registered as a ${role.replace("_", " ")}. Please use the correct portal or sign up first.`,
         );
-        supabase.auth.signOut();
+        // Hard sign-out + clear any cached Supabase auth tokens so a fresh
+        // Google sign-in attempt isn't silently re-using a stale session.
+        (async () => {
+          try {
+            await supabase.auth.signOut({ scope: "global" } as any);
+          } catch {
+            await supabase.auth.signOut();
+          }
+          try {
+            Object.keys(localStorage)
+              .filter((k) => k.startsWith("sb-") && k.endsWith("-auth-token"))
+              .forEach((k) => localStorage.removeItem(k));
+          } catch {
+            /* ignore */
+          }
+        })();
         return;
       }
       if (hasRequired) {
