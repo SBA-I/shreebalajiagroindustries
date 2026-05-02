@@ -235,7 +235,7 @@ const RoleAuthForm = ({
                     setPassword={setLoginPassword}
                     onSubmit={handleLogin}
                     busy={busy}
-                    showGoogle={showGoogle && role !== "admin"}
+                    showGoogle={showGoogle}
                     onGoogle={handleGoogle}
                   />
                 </TabsContent>
