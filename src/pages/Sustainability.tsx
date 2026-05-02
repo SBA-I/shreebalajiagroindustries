@@ -1,10 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Leaf, Loader2, ArrowRight, Sprout, FlaskConical, Mountain, Bug, Bird, Sun, Recycle, Target, CheckCircle2 } from "lucide-react";
+import { Leaf, Loader2, ArrowRight, Sprout, FlaskConical, Mountain, Bug, Bird, Sun, Recycle, Target, CheckCircle2, Calculator, AlertTriangle, ChevronDown } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Article {
@@ -25,10 +28,30 @@ const CATS = [
   { value: "sustainability", label: "Sustainability", icon: Leaf },
 ];
 
+// Numeric pest action thresholds (per plant / per metre / per trap-night)
+const THRESHOLDS = [
+  { crop: "Cotton", pest: "Pink Bollworm", value: 8, unit: "moths/trap/night", treatment: "Terminator (cypermethrin) — spray at dusk to protect bees." },
+  { crop: "Soybean", pest: "Girdle Beetle", value: 1, unit: "beetle/metre row", treatment: "Phantom — apply before pod formation." },
+  { crop: "Onion", pest: "Thrips", value: 30, unit: "thrips/plant", treatment: "Jaguar — rotate modes of action to prevent resistance." },
+  { crop: "Tomato", pest: "Fruit Borer", value: 1, unit: "egg/plant or 5% damage", treatment: "Terminator + pheromone traps." },
+];
+
 const Sustainability = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [cat, setCat] = useState("all");
+
+  // Threshold calculator state
+  const [tcCrop, setTcCrop] = useState(THRESHOLDS[0].crop);
+  const [tcCount, setTcCount] = useState<string>("");
+
+  // Carbon savings calculator + scroll-triggered bar animation
+  const [acres, setAcres] = useState<string>("5");
+  const [barsVisible, setBarsVisible] = useState(false);
+  const carbonRef = useRef<HTMLDivElement | null>(null);
+
+  // Roadmap expand/collapse
+  const [openYear, setOpenYear] = useState<string | null>(null);
 
   useEffect(() => {
     supabase
@@ -42,7 +65,42 @@ const Sustainability = () => {
       });
   }, []);
 
+  // IntersectionObserver for the carbon bars (callback ref to survive DOM mutations from translation)
+  useEffect(() => {
+    const node = carbonRef.current;
+    if (!node) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            setBarsVisible(true);
+            obs.disconnect();
+          }
+        });
+      },
+      { threshold: 0.3 },
+    );
+    obs.observe(node);
+    return () => obs.disconnect();
+  }, []);
+
   const visible = cat === "all" ? articles : articles.filter((a) => a.category === cat);
+
+  const selectedThreshold = THRESHOLDS.find((t) => t.crop === tcCrop)!;
+  const tcCountNum = parseFloat(tcCount);
+  const tcResult =
+    tcCount === "" || isNaN(tcCountNum)
+      ? null
+      : tcCountNum >= selectedThreshold.value
+        ? { kind: "above" as const }
+        : { kind: "below" as const };
+
+  const acresNum = Math.max(0, parseFloat(acres) || 0);
+  // Per-acre savings vs conventional (kg CO2e / acre / yr)
+  const savedPerAcre = 92 - 28; // 64 kg CO2e
+  const totalSaved = Math.round(savedPerAcre * acresNum);
+  // Rough bee equivalence: ~1 bee colony pollinates ~1 acre; assume 12k bees protected per acre when avoiding broad-spectrum sprays.
+  const beesProtected = Math.round(12000 * acresNum);
 
   return (
     <Layout>
@@ -107,6 +165,66 @@ const Sustainability = () => {
                 </div>
               ))}
             </div>
+
+            {/* Check My Field — Threshold Calculator */}
+            <div className="mt-5 rounded-lg border border-primary/30 bg-card p-4 animate-fade-in">
+              <h4 className="font-heading font-semibold text-sm mb-3 flex items-center gap-2">
+                <Calculator className="h-4 w-4 text-primary" /> Check My Field
+              </h4>
+              <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] items-end">
+                <div>
+                  <Label className="text-xs">Crop</Label>
+                  <select
+                    value={tcCrop}
+                    onChange={(e) => setTcCrop(e.target.value)}
+                    className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  >
+                    {THRESHOLDS.map((t) => (
+                      <option key={t.crop} value={t.crop}>{t.crop} — {t.pest}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <Label className="text-xs">Pests counted ({selectedThreshold.unit})</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    value={tcCount}
+                    onChange={(e) => setTcCount(e.target.value)}
+                    placeholder={`e.g. ${selectedThreshold.value}`}
+                    className="mt-1"
+                  />
+                </div>
+                <Button variant="outline" onClick={() => setTcCount("")} className="h-10">Reset</Button>
+              </div>
+              {tcResult && (
+                <div
+                  className={`mt-3 rounded-md p-3 text-sm animate-fade-in border ${
+                    tcResult.kind === "above"
+                      ? "bg-destructive/10 border-destructive/40 text-destructive"
+                      : "bg-primary/10 border-primary/40 text-primary"
+                  }`}
+                >
+                  {tcResult.kind === "above" ? (
+                    <div className="flex items-start gap-2">
+                      <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
+                      <div>
+                        <p className="font-semibold">Above threshold ({selectedThreshold.value} {selectedThreshold.unit}). Action recommended.</p>
+                        <p className="text-xs mt-1 opacity-90">Suggested treatment: {selectedThreshold.treatment}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0" />
+                      <div>
+                        <p className="font-semibold">Below threshold. Do not spray today.</p>
+                        <p className="text-xs mt-1 opacity-90">Beneficial insects (ladybirds, spiders, lacewings) will keep the population in check. Re-scout in 3 days.</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>
@@ -163,7 +281,7 @@ const Sustainability = () => {
                 ))}
               </ul>
             </div>
-            <div className="rounded-xl bg-card border border-border p-6">
+            <div ref={carbonRef} className="rounded-xl bg-card border border-border p-6">
               <h3 className="font-heading font-semibold text-sm mb-4">Carbon stored per acre per year</h3>
               <div className="space-y-3">
                 {[
@@ -173,11 +291,46 @@ const Sustainability = () => {
                 ].map((row) => (
                   <div key={row.name}>
                     <div className="flex justify-between text-xs mb-1"><span>{row.name}</span><span className="font-semibold">{row.value} kg CO₂e</span></div>
-                    <div className="h-2 rounded-full bg-muted overflow-hidden"><div className={`h-full ${row.color}`} style={{ width: `${row.value}%` }} /></div>
+                    <div className="h-2 rounded-full bg-muted overflow-hidden">
+                      <div
+                        className={`h-full ${row.color} transition-[width] duration-[1400ms] ease-out`}
+                        style={{ width: barsVisible ? `${row.value}%` : "0%" }}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
               <p className="text-[11px] text-muted-foreground mt-3 italic">Indicative figures; based on ICAR field trials, 2024.</p>
+
+              {/* Farmer's Impact Calculator */}
+              <div className="mt-5 pt-5 border-t border-border">
+                <h4 className="font-heading font-semibold text-sm mb-2 flex items-center gap-2">
+                  <Calculator className="h-4 w-4 text-primary" /> Your Farm's Impact
+                </h4>
+                <div className="flex items-end gap-3">
+                  <div className="flex-1">
+                    <Label className="text-xs">Acres farmed with Balaji + IPM</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={acres}
+                      onChange={(e) => setAcres(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3 mt-3">
+                  <div className="rounded-md bg-primary/10 border border-primary/30 p-3 text-center">
+                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">CO₂ saved / yr</p>
+                    <p className="font-heading font-bold text-primary text-lg" translate="no">{totalSaved.toLocaleString()} kg</p>
+                  </div>
+                  <div className="rounded-md bg-accent/10 border border-accent/30 p-3 text-center">
+                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Pollinators protected</p>
+                    <p className="font-heading font-bold text-accent-foreground text-lg" translate="no">{beesProtected.toLocaleString()}</p>
+                  </div>
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-2 italic">vs conventional broad-spectrum spraying on the same acreage.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -197,20 +350,44 @@ const Sustainability = () => {
               { year: "2028", title: "50% bio-degradable packaging", body: "Switch primary 1L packs to plant-based PLA bottles.", done: false },
               { year: "2029", title: "Carbon-neutral plant", body: "Solar + bio-gas covers 100% of factory power.", done: false },
               { year: "2030", title: "100% recyclable packaging", body: "Every label, cap and bottle in the Balaji range becomes recyclable.", done: false },
-            ].map((m) => (
-              <li key={m.year} className="ml-6">
-                <span className={`absolute -left-[11px] flex h-5 w-5 items-center justify-center rounded-full ${m.done ? "bg-primary text-primary-foreground" : "bg-card border-2 border-primary/40"}`}>
-                  {m.done ? <CheckCircle2 className="h-3 w-3" /> : <span className="h-2 w-2 rounded-full bg-primary/50" />}
-                </span>
-                <div className="rounded-lg border border-border bg-card p-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Badge variant={m.done ? "default" : "outline"} className="text-[10px]">{m.year}</Badge>
-                    <h3 className="font-heading font-semibold text-sm">{m.title}</h3>
-                  </div>
-                  <p className="text-xs text-muted-foreground">{m.body}</p>
-                </div>
-              </li>
-            ))}
+            ].map((m) => {
+              const isOpen = openYear === m.year;
+              return (
+                <li key={m.year} className="ml-6">
+                  <span className={`absolute -left-[11px] flex h-5 w-5 items-center justify-center rounded-full ${m.done ? "bg-primary text-primary-foreground" : "bg-card border-2 border-primary/40"}`}>
+                    {m.done ? <CheckCircle2 className="h-3 w-3" /> : <span className="h-2 w-2 rounded-full bg-primary/50" />}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setOpenYear(isOpen ? null : m.year)}
+                    className={`w-full text-left rounded-lg border bg-card p-4 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 ${isOpen ? "border-primary shadow-md" : "border-border"}`}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge variant={m.done ? "default" : "outline"} className="text-[10px]">{m.year}</Badge>
+                      <h3 className="font-heading font-semibold text-sm flex-1">{m.title}</h3>
+                      <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
+                    </div>
+                    <p className="text-xs text-muted-foreground">{m.body}</p>
+                    <div
+                      className={`grid transition-all duration-500 ease-out ${isOpen ? "grid-rows-[1fr] opacity-100 mt-3" : "grid-rows-[0fr] opacity-0"}`}
+                    >
+                      <div className="overflow-hidden">
+                        <div className="rounded-md bg-primary/5 border border-primary/20 p-3 text-xs text-foreground/80 animate-fade-in">
+                          <p className="font-semibold text-primary mb-1">Behind the milestone</p>
+                          <p>
+                            {m.year === "2026" && "Pilot trials on 240 farms across Dhule & Jalgaon. Yield parity with full chemical programs at 18% lower input cost."}
+                            {m.year === "2027" && "Drop-points equipped with triple-rinse stations + barcode tracking. Farmers earn loyalty points for every empty container returned."}
+                            {m.year === "2028" && "PLA bottles tested to withstand 45 °C storage and UV exposure. Compostable in 180 days under industrial conditions."}
+                            {m.year === "2029" && "1.2 MW solar rooftop + bio-gas digester running on factory effluent. Target: net-zero scope 1 & 2 emissions."}
+                            {m.year === "2030" && "Full circular packaging: caps from rPET, labels from sugarcane bagasse, bottles fully recyclable through dealer network."}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                </li>
+              );
+            })}
           </ol>
         </div>
       </section>
