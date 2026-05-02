@@ -49,7 +49,7 @@ const HeroSection = () => {
             <Link to="/contact">
               <Button variant="hero-outline" size="lg" className="gap-2 text-base">
                 <Mail className="h-5 w-5" />
-                Contact Us
+                {t("hero.cta.contact")}
               </Button>
             </Link>
           </div>
