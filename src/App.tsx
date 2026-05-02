@@ -81,6 +81,7 @@ const App = () => (
             <EmergencyFirstAidButton />
           </ComparisonProvider>
         </AuthProvider>
+        </I18nProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
