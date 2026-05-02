@@ -137,6 +137,7 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
   const [isTranslating, setIsTranslating] = useState(false);
   const translatingTimer = useRef<number | null>(null);
   const mutationPasses = useRef(0);
+  const lastMutationTranslateAt = useRef(0);
 
   const applyWholePageTranslation = useCallback(async (l: Lang) => {
     setGoogTransCookie(l);
@@ -176,10 +177,11 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
     let queued = false;
     const observer = new MutationObserver(() => {
       normalizeTranslateLayout();
-      if (queued || mutationPasses.current >= 8) return;
+      if (queued || Date.now() - lastMutationTranslateAt.current < 1200) return;
       queued = true;
       window.setTimeout(() => {
         queued = false;
+        lastMutationTranslateAt.current = Date.now();
         mutationPasses.current += 1;
         void applyWholePageTranslation(lang);
       }, 650);
