@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Leaf, Camera, UserCircle2 } from "lucide-react";
+import { ArrowRight, Leaf, Mail, Phone } from "lucide-react";
 import heroImage from "@/assets/hero-farm.jpg";
 import { useI18n } from "@/i18n/I18nProvider";
 
@@ -46,16 +46,16 @@ const HeroSection = () => {
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
-            <Link to="/ask-ai">
+            <Link to="/contact">
               <Button variant="hero-outline" size="lg" className="gap-2 text-base">
-                <Camera className="h-5 w-5" />
-                {t("hero.cta.scan")}
+                <Mail className="h-5 w-5" />
+                Contact Us
               </Button>
             </Link>
-            <Link to="/auth/farmer">
+            <Link to="/contact">
               <Button variant="hero-outline" size="lg" className="gap-2 text-base">
-                <UserCircle2 className="h-5 w-5" />
-                {t("hero.cta.farmer")}
+                <Phone className="h-5 w-5" />
+                Get in Touch
               </Button>
             </Link>
           </div>
