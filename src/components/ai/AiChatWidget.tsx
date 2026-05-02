@@ -42,7 +42,7 @@ const AiChatWidget = () => {
       {/* Email floating button */}
       <a
         href="mailto:sbaindia44@gmail.com"
-        className="fixed bottom-[10.5rem] right-6 z-50 h-14 w-14 rounded-full bg-secondary text-secondary-foreground shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
+        className="fixed bottom-[10.5rem] right-4 z-50 h-14 w-14 rounded-full bg-secondary text-secondary-foreground shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
         aria-label="Email us"
       >
         <Mail className="h-6 w-6" />
@@ -53,7 +53,7 @@ const AiChatWidget = () => {
         href="https://wa.me/917744998998"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-24 right-6 z-50 h-14 w-14 rounded-full bg-[#25D366] shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
+        className="fixed bottom-24 right-4 z-50 h-14 w-14 rounded-full bg-[#25D366] shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
         aria-label="Chat on WhatsApp"
       >
         <img src={whatsappIcon} alt="WhatsApp" className="h-7 w-7" />
@@ -63,7 +63,7 @@ const AiChatWidget = () => {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
+          className="fixed bottom-6 right-4 z-50 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
           aria-label="Open AI Assistant"
         >
           <MessageCircle className="h-6 w-6" />
@@ -72,7 +72,7 @@ const AiChatWidget = () => {
 
       {/* Chat panel */}
       {open && (
-        <div className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[520px] max-h-[calc(100vh-4rem)] rounded-2xl border border-border bg-background shadow-2xl flex flex-col overflow-hidden">
+        <div className="fixed bottom-6 right-4 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[520px] max-h-[calc(100vh-4rem)] rounded-2xl border border-border bg-background shadow-2xl flex flex-col overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 bg-primary text-primary-foreground">
             <div className="flex items-center gap-2">
