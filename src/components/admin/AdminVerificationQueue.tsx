@@ -26,12 +26,20 @@ interface PendingDealer {
   verification_status: string;
   verification_notes: string | null;
   created_at: string;
+  requested_role: string;
+  employee_id: string | null;
+  assigned_territory: string | null;
 }
 
 const STATUS_TABS = [
   { value: "pending", label: "Pending" },
   { value: "approved", label: "Approved" },
   { value: "rejected", label: "Rejected" },
+];
+
+const ROLE_TABS = [
+  { value: "distributor", label: "Dealers" },
+  { value: "field_officer", label: "Field Officers" },
 ];
 
 const statusBadge = (s: string) => {
@@ -42,6 +50,7 @@ const statusBadge = (s: string) => {
 
 const AdminVerificationQueue = () => {
   const [tab, setTab] = useState<string>("pending");
+  const [roleTab, setRoleTab] = useState<string>("distributor");
   const [items, setItems] = useState<PendingDealer[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -54,7 +63,7 @@ const AdminVerificationQueue = () => {
     const { data, error } = await supabase
       .from("profiles")
       .select("*")
-      .eq("requested_role", "distributor")
+      .eq("requested_role", roleTab)
       .eq("verification_status", tab)
       .order("created_at", { ascending: false });
     setLoading(false);
@@ -65,7 +74,7 @@ const AdminVerificationQueue = () => {
     setItems((data ?? []) as PendingDealer[]);
   };
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [tab]);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [tab, roleTab]);
 
   const viewDoc = async (path: string | null, key: string) => {
     if (!path) return;
@@ -98,7 +107,11 @@ const AdminVerificationQueue = () => {
       toast.error(error.message);
       return;
     }
-    toast.success(status === "approved" ? "Dealer approved — distributor role granted." : "Dealer rejected.");
+    toast.success(
+      status === "approved"
+        ? `Approved — ${roleTab === "distributor" ? "distributor" : "field officer"} role granted.`
+        : "Application rejected.",
+    );
     load();
   };
 
@@ -108,12 +121,22 @@ const AdminVerificationQueue = () => {
     return (
       (i.shop_name ?? "").toLowerCase().includes(q) ||
       (i.full_name ?? "").toLowerCase().includes(q) ||
-      (i.gst_number ?? "").toLowerCase().includes(q)
+      (i.gst_number ?? "").toLowerCase().includes(q) ||
+      (i.employee_id ?? "").toLowerCase().includes(q) ||
+      (i.assigned_territory ?? "").toLowerCase().includes(q)
     );
   });
 
   return (
     <div className="space-y-4">
+      <Tabs value={roleTab} onValueChange={setRoleTab}>
+        <TabsList>
+          {ROLE_TABS.map((r) => (
+            <TabsTrigger key={r.value} value={r.value}>{r.label}</TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+
       <div className="flex flex-wrap items-center gap-3 justify-between">
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList>
@@ -123,7 +146,7 @@ const AdminVerificationQueue = () => {
           </TabsList>
         </Tabs>
         <Input
-          placeholder="Search shop, name or GST…"
+          placeholder={roleTab === "distributor" ? "Search shop, name or GST…" : "Search name, employee ID or territory…"}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-sm"
@@ -134,7 +157,7 @@ const AdminVerificationQueue = () => {
         <div className="flex justify-center py-10"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
       ) : filtered.length === 0 ? (
         <Card><CardContent className="p-6 text-center text-sm text-muted-foreground">
-          No {tab} dealer applications.
+          No {tab} {roleTab === "distributor" ? "dealer" : "field officer"} applications.
         </CardContent></Card>
       ) : (
         <div className="space-y-3">
@@ -143,9 +166,11 @@ const AdminVerificationQueue = () => {
               <CardContent className="p-4 space-y-3">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
-                    <h3 className="font-heading font-semibold">{d.shop_name || "—"}</h3>
+                    <h3 className="font-heading font-semibold">
+                      {roleTab === "distributor" ? (d.shop_name || "—") : (d.full_name || "—")}
+                    </h3>
                     <p className="text-xs text-muted-foreground">
-                      Owner: {d.full_name ?? "—"} · {d.phone ?? "no phone"}
+                      {roleTab === "distributor" ? `Owner: ${d.full_name ?? "—"}` : `Employee: ${d.employee_id ?? "—"}`} · {d.phone ?? "no phone"}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       Submitted {new Date(d.created_at).toLocaleDateString("en-IN")}
@@ -154,6 +179,7 @@ const AdminVerificationQueue = () => {
                   <Badge className={statusBadge(d.verification_status)}>{d.verification_status}</Badge>
                 </div>
 
+                {roleTab === "distributor" ? (
                 <div className="grid sm:grid-cols-2 gap-3 text-sm">
                   <div>
                     <div className="text-xs text-muted-foreground">GST Number</div>
@@ -178,7 +204,20 @@ const AdminVerificationQueue = () => {
                     )}
                   </div>
                 </div>
+                ) : (
+                <div className="grid sm:grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Employee ID</div>
+                    <div className="font-mono">{d.employee_id || "—"}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Assigned Territory</div>
+                    <div>{d.assigned_territory || "—"}</div>
+                  </div>
+                </div>
+                )}
 
+                {roleTab === "distributor" && (
                 <div className="flex flex-wrap gap-2">
                   {d.gst_document_url && (
                     <Button size="sm" variant="outline" onClick={() => viewDoc(d.gst_document_url, `gst-${d.id}`)}>
@@ -193,6 +232,7 @@ const AdminVerificationQueue = () => {
                     </Button>
                   )}
                 </div>
+                )}
 
                 {tab === "pending" && (
                   <>
