@@ -164,12 +164,12 @@ export default AdminMarketingManager;
 
 const EditAssetButton = ({ asset, onSaved }: { asset: Asset; onSaved: () => void }) => {
   const [draft, setDraft] = useState({
-    title: asset.title, description: asset.description ?? "", asset_type: asset.asset_type,
+    title: asset.title, description: asset.description ?? "", asset_type: asset.asset_type, audience: asset.audience ?? "dealers",
   });
   const save = async () => {
     const { error } = await supabase.from("marketing_assets").update({
-      title: draft.title, description: draft.description || null, asset_type: draft.asset_type,
-    }).eq("id", asset.id);
+      title: draft.title, description: draft.description || null, asset_type: draft.asset_type, audience: draft.audience,
+    } as any).eq("id", asset.id);
     if (error) { toast.error(error.message); return false; }
     toast.success("Updated");
     onSaved();
@@ -178,14 +178,20 @@ const EditAssetButton = ({ asset, onSaved }: { asset: Asset; onSaved: () => void
     <EditDialog title={`Edit ${asset.title}`} onSave={save}>
       <div><Label>Title</Label><Input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} /></div>
       <div>
-        <Label>Type</Label>
+        <Label>Category</Label>
         <Select value={draft.asset_type} onValueChange={(v) => setDraft({ ...draft, asset_type: v })}>
           <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="banner">Banner</SelectItem>
-            <SelectItem value="poster">Poster</SelectItem>
-            <SelectItem value="social">Social</SelectItem>
-            <SelectItem value="video">Video</SelectItem>
+            {TYPE_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+          </SelectContent>
+        </Select>
+      </div>
+      <div>
+        <Label>Audience</Label>
+        <Select value={draft.audience} onValueChange={(v) => setDraft({ ...draft, audience: v })}>
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            {AUDIENCE_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
