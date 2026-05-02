@@ -63,7 +63,7 @@ const AdminVerificationQueue = () => {
     const { data, error } = await supabase
       .from("profiles")
       .select("*")
-      .eq("requested_role", roleTab)
+      .eq("requested_role", roleTab as "distributor" | "field_officer")
       .eq("verification_status", tab)
       .order("created_at", { ascending: false });
     setLoading(false);
