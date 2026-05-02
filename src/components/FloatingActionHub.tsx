@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Plus, X, AlertOctagon, AlertTriangle, Mail,
-  Calculator, Camera, TrendingUp, Timer, Bug, MapPin, Sparkles,
+  Calculator, Camera, TrendingUp, Timer, Bug, MapPin, Sparkles, Languages,
 } from "lucide-react";
 import whatsappIcon from "@/assets/whatsapp-icon.svg";
 import AiChatWidget from "@/components/ai/AiChatWidget";
@@ -12,8 +12,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import EmergencyFirstAidButton from "@/components/safety/EmergencyFirstAidButton";
 import EmergencyContactButton from "@/components/safety/EmergencyContactButton";
 import { useI18n } from "@/i18n/I18nProvider";
+import type { Lang } from "@/i18n/translations";
 
-type PanelKey = "ai" | "spray" | "disease" | "firstaid" | "contact" | null;
+type PanelKey = "ai" | "spray" | "disease" | "firstaid" | "contact" | "lang" | null;
+
+const LANGUAGES: { code: Lang; label: string; native: string }[] = [
+  { code: "en", label: "English", native: "English" },
+  { code: "hi", label: "Hindi", native: "हिन्दी" },
+  { code: "mr", label: "Marathi", native: "मराठी" },
+];
 
 interface ActionItem {
   key: string;
@@ -27,7 +34,7 @@ interface ActionItem {
 }
 
 const FloatingActionHub = () => {
-  const { t } = useI18n();
+  const { t, lang, setLang } = useI18n();
   const [expanded, setExpanded] = useState(false);
   const [panel, setPanel] = useState<PanelKey>(null);
 
@@ -42,6 +49,7 @@ const FloatingActionHub = () => {
     { key: "ai", label: t("fab.ai"), icon: <Sparkles className="h-5 w-5" />, bg: "bg-primary text-primary-foreground", onClick: () => openPanel("ai") },
     { key: "spray", label: t("fab.spray"), icon: <Calculator className="h-5 w-5" />, bg: "bg-primary text-primary-foreground", onClick: () => openPanel("spray") },
     { key: "disease", label: t("fab.disease"), icon: <Camera className="h-5 w-5" />, bg: "bg-accent text-accent-foreground", onClick: () => openPanel("disease") },
+    { key: "lang", label: t("fab.language"), icon: <Languages className="h-5 w-5" />, bg: "bg-accent text-accent-foreground", onClick: () => openPanel("lang") },
     { key: "firstaid", label: t("fab.firstaid"), icon: <AlertOctagon className="h-5 w-5" />, bg: "bg-destructive text-destructive-foreground", onClick: () => openPanel("firstaid") },
     { key: "contact", label: t("fab.emergency"), icon: <AlertTriangle className="h-5 w-5" />, bg: "bg-destructive text-destructive-foreground", onClick: () => openPanel("contact") },
     { key: "profit", label: t("fab.profit"), icon: <TrendingUp className="h-5 w-5" />, bg: "bg-secondary text-secondary-foreground", to: "/yield-simulator" },
@@ -113,6 +121,29 @@ const FloatingActionHub = () => {
       </Dialog>
       <EmergencyFirstAidButton hideTrigger open={panel === "firstaid"} onOpenChange={(o) => setPanel(o ? "firstaid" : null)} />
       <EmergencyContactButton hideTrigger open={panel === "contact"} onOpenChange={(o) => setPanel(o ? "contact" : null)} />
+      <Dialog open={panel === "lang"} onOpenChange={(o) => setPanel(o ? "lang" : null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{t("fab.languageDialog")}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-2 mt-2 notranslate" translate="no">
+            {LANGUAGES.map((l) => (
+              <button
+                key={l.code}
+                onClick={() => { setLang(l.code); setPanel(null); }}
+                className={`flex items-center justify-between w-full px-4 py-3 rounded-lg border transition-colors ${
+                  lang === l.code
+                    ? "border-primary bg-primary/10 text-primary font-semibold"
+                    : "border-border hover:bg-muted"
+                }`}
+              >
+                <span className="text-base">{l.native}</span>
+                <span className="text-xs text-muted-foreground">{l.label}</span>
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {!anyPanelOpen && (
         <>
