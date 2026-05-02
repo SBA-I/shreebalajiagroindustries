@@ -187,7 +187,7 @@ const AdminProductsManager = () => {
       features: splitList(form.features),
       safety_precautions: splitList(form.safety_precautions),
       pack_sizes: cleanPacks.map((p) => p.size),
-      pricing: cleanPacks,
+      pricing: cleanPacks as any,
       price: form.price ? Number(form.price) : null,
       unit: form.unit || "L",
       image_url: form.image_url || null,
