@@ -18,7 +18,7 @@ interface Dealer {
 }
 
 const blank = {
-  name: "", contact_person: "", phone: "", whatsapp: "", email: "",
+  name: "", contact_person: "", phone: "", whatsapp: "", email: "", password: "",
   address_line: "", city: "", taluka: "", district: "", state: "Maharashtra",
   pincode: "", lat: "", lng: "", photo_url: "",
   gst_number: "", license_number: "", shop_url: "",
@@ -43,36 +43,52 @@ const AdminDealersManager = () => {
     if (!form.name || !form.phone || !form.address_line || !form.city || !form.state || !/^\d{6}$/.test(form.pincode)) {
       return toast.error("Fill all required fields incl. valid 6-digit pincode");
     }
+    if (!form.email || !form.password) {
+      return toast.error("Email & password are required so the dealer can sign in");
+    }
+    if (form.password.length < 8) return toast.error("Password must be at least 8 characters");
     setBusy(true);
-    const { error } = await supabase.from("dealers").insert({
-      ...form,
-      contact_person: form.contact_person || null,
-      email: form.email || null,
-      district: form.district || null,
-      taluka: form.taluka || null,
-      whatsapp: form.whatsapp || null,
-      photo_url: form.photo_url || null,
-      gst_number: form.gst_number || null,
-      license_number: form.license_number || null,
-      shop_url: form.shop_url || null,
-      lat: form.lat ? Number(form.lat) : null,
-      lng: form.lng ? Number(form.lng) : null,
+    const { data, error } = await supabase.functions.invoke("admin-create-dealer", {
+      body: {
+        email: form.email,
+        password: form.password,
+        full_name: form.contact_person || form.name,
+        phone: form.phone,
+        shop_name: form.name,
+        gst_number: form.gst_number || null,
+        license_number: form.license_number || null,
+        shop_address: form.address_line,
+        state: form.state,
+        district: form.district || null,
+        taluka: form.taluka || null,
+        shop_lat: form.lat || null,
+        shop_lng: form.lng || null,
+        // extra dealer-only fields
+        address_line: form.address_line,
+        city: form.city,
+        pincode: form.pincode,
+        whatsapp: form.whatsapp || null,
+        photo_url: form.photo_url || null,
+        shop_url: form.shop_url || null,
+      },
     });
     setBusy(false);
-    if (error) return toast.error(error.message);
-    toast.success("Dealer added");
+    if (error || (data as any)?.error) {
+      return toast.error((data as any)?.error ?? error?.message ?? "Failed to create dealer");
+    }
+    toast.success("Dealer added & approved — they can now sign in");
     setForm(blank);
     refresh();
   };
 
   const remove = async (id: string) => {
-    if (!confirm("Delete this dealer? Their application will also be moved to Rejected in the Verification queue.")) return;
+    if (!confirm("Delete this dealer? Their account will be removed and the application moved to Rejected in the Verification queue.")) return;
     const dealer = dealers.find((x) => x.id === id);
 
-    // 1. Move the linked profile to "rejected" so it appears in the Verification → Rejected tab
+    // 1. Mark profile rejected so it shows in Verification → Rejected
     if (dealer?.user_id) {
       const { data: { user } } = await supabase.auth.getUser();
-      const { error: profErr } = await supabase
+      await supabase
         .from("profiles")
         .update({
           verification_status: "rejected",
@@ -82,25 +98,13 @@ const AdminDealersManager = () => {
         })
         .eq("user_id", dealer.user_id)
         .eq("requested_role", "distributor");
-      if (profErr) {
-        toast.error(`Could not update verification status: ${profErr.message}`);
-        return;
-      }
-
-      // 2. Revoke the distributor role so the user loses portal access
-      await supabase
-        .from("user_roles")
-        .delete()
-        .eq("user_id", dealer.user_id)
-        .eq("role", "distributor");
+      // 2. Revoke distributor role
+      await supabase.from("user_roles")
+        .delete().eq("user_id", dealer.user_id).eq("role", "distributor");
     }
-
-    // 3. Delete the dealer record itself
+    // 3. Delete the dealer record
     const { error } = await supabase.from("dealers").delete().eq("id", id);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
+    if (error) { toast.error(error.message); return; }
     toast.success(dealer?.user_id ? "Dealer deleted and moved to Rejected" : "Dealer deleted");
     refresh();
   };
@@ -115,11 +119,13 @@ const AdminDealersManager = () => {
             <div className="md:col-span-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               Business details (same as dealer signup)
             </div>
+            <div><Label>Login email *</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="dealer@example.com" /></div>
+            <div><Label>Temporary password *</Label><Input type="text" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="Min 8 characters" /></div>
+            <div className="hidden md:block" />
             <div><Label>Shop / Firm name *</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
             <div><Label>Owner / Contact person</Label><Input value={form.contact_person} onChange={(e) => setForm({ ...form, contact_person: e.target.value })} /></div>
             <div><Label>Phone *</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
             <div><Label>WhatsApp</Label><Input value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} placeholder="10-digit number" /></div>
-            <div><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
             <div><Label>GST number</Label><Input value={form.gst_number} onChange={(e) => setForm({ ...form, gst_number: e.target.value.toUpperCase() })} maxLength={15} placeholder="27AAACB1234C1Z5" /></div>
             <div><Label>License number</Label><Input value={form.license_number} onChange={(e) => setForm({ ...form, license_number: e.target.value })} placeholder="Pesticide / Seed license" /></div>
             <div className="md:col-span-3"><Label>Shop address *</Label><Input value={form.address_line} onChange={(e) => setForm({ ...form, address_line: e.target.value })} /></div>
