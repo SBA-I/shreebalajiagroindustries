@@ -25,7 +25,13 @@ const BCP47: Record<Lang, string> = {
   mr: "mr-IN",
 };
 
-// SEO: keep <html lang>, og:locale, hreflang alternates in sync with the active language
+const GOOGLE_TARGET_LANG: Record<Lang, string> = {
+  en: "",
+  hi: "hi",
+  mr: "mr",
+};
+
+// SEO: keep <html lang>, og:locale, hreflang in sync
 const updateSeoLanguageTags = (lang: Lang) => {
   if (typeof document === "undefined") return;
   const html = document.documentElement;
@@ -49,37 +55,12 @@ const updateSeoLanguageTags = (lang: Lang) => {
     name: "content-language",
     content: BCP47[lang],
   });
-
-  // hreflang alternates — point each to the current URL with a ?lang= hint
-  const url = new URL(window.location.href);
-  url.searchParams.delete("lang");
-  document.head
-    .querySelectorAll('link[rel="alternate"][data-i18n="1"]')
-    .forEach((l) => l.remove());
-  (Object.keys(BCP47) as Lang[]).forEach((code) => {
-    const link = document.createElement("link");
-    link.setAttribute("rel", "alternate");
-    link.setAttribute("hreflang", BCP47[code]);
-    const u = new URL(url.toString());
-    u.searchParams.set("lang", code);
-    link.setAttribute("href", u.toString());
-    link.setAttribute("data-i18n", "1");
-    document.head.appendChild(link);
-  });
-  const xDefault = document.createElement("link");
-  xDefault.setAttribute("rel", "alternate");
-  xDefault.setAttribute("hreflang", "x-default");
-  xDefault.setAttribute("href", url.toString());
-  xDefault.setAttribute("data-i18n", "1");
-  document.head.appendChild(xDefault);
 };
 
-// Drive the Google Translate widget. Returns true when a reload is needed.
 const setGoogTransCookie = (lang: Lang) => {
   if (typeof document === "undefined") return;
   const host = window.location.hostname;
   const expire = "Thu, 01 Jan 1970 00:00:00 GMT";
-  // Clear any existing cookie on all path/domain combos
   ["/", ""].forEach((p) => {
     const path = p || "/";
     document.cookie = `googtrans=; expires=${expire}; path=${path}`;
@@ -88,26 +69,17 @@ const setGoogTransCookie = (lang: Lang) => {
   });
   if (lang === "en") return;
   const value = `/en/${lang}`;
-  // Set new cookie
   document.cookie = `googtrans=${value}; path=/`;
   document.cookie = `googtrans=${value}; path=/; domain=${host}`;
   document.cookie = `googtrans=${value}; path=/; domain=.${host}`;
 };
 
-const GOOGLE_TARGET_LANG: Record<Lang, string> = {
-  en: "",
-  hi: "hi",
-  mr: "mr",
-};
-
 const normalizeTranslateLayout = () => {
   if (typeof document === "undefined") return;
-  document.documentElement.classList.toggle("translation-active", document.documentElement.lang !== BCP47.en);
   document.body.style.top = "0px";
   document.body.style.position = "static";
 };
 
-// Try to drive the in-page combo; if not ready yet, poll briefly
 const triggerCombo = (lang: Lang): Promise<boolean> => {
   return new Promise((resolve) => {
     let attempts = 0;
@@ -121,11 +93,11 @@ const triggerCombo = (lang: Lang): Promise<boolean> => {
         resolve(true);
         return;
       }
-      if (++attempts > 20) {
+      if (++attempts > 30) {
         resolve(false);
         return;
       }
-      setTimeout(tryNow, 150);
+      setTimeout(tryNow, 200);
     };
     tryNow();
   });
@@ -133,83 +105,67 @@ const triggerCombo = (lang: Lang): Promise<boolean> => {
 
 export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
-  const [lang, setLangState] = useState<Lang>("en");
+  const [lang, setLangState] = useState<Lang>(() => {
+    if (typeof window === "undefined") return "en";
+    const saved = localStorage.getItem("sbai-lang");
+    return isLang(saved) ? saved : "en";
+  });
   const [isTranslating, setIsTranslating] = useState(false);
   const translatingTimer = useRef<number | null>(null);
-  const mutationPasses = useRef(0);
-  const lastMutationTranslateAt = useRef(0);
 
-  const applyWholePageTranslation = useCallback(async (l: Lang) => {
+  const applyGoogleFallback = useCallback(async (l: Lang) => {
     setGoogTransCookie(l);
+    if (l === "en") return true;
     const ok = await triggerCombo(l);
     normalizeTranslateLayout();
     return ok;
   }, []);
 
+  // Initial mount: sync SEO + Google fallback
   useEffect(() => {
-    const saved = localStorage.getItem("sbai-lang");
-    if (isLang(saved)) {
-      setLangState(saved);
-      updateSeoLanguageTags(saved);
-      void applyWholePageTranslation(saved);
-    } else {
-      updateSeoLanguageTags("en");
-    }
-    const handler = (e: Event) => {
-      const detail = (e as CustomEvent<string>).detail;
-      if (isLang(detail)) setLangState(detail);
-    };
-    window.addEventListener("sbai-lang-change", handler);
-    return () => window.removeEventListener("sbai-lang-change", handler);
-  }, [applyWholePageTranslation]);
+    updateSeoLanguageTags(lang);
+    void applyGoogleFallback(lang);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
+  // On route change while non-English, re-trigger google fallback for any unkeyed text
   useEffect(() => {
     if (lang === "en") return;
-    mutationPasses.current = 0;
-    const rerun = window.setTimeout(() => {
-      void applyWholePageTranslation(lang);
-    }, 250);
-    return () => window.clearTimeout(rerun);
-  }, [lang, location.pathname, location.search, applyWholePageTranslation]);
-
-  useEffect(() => {
-    if (lang === "en") return;
-    let queued = false;
-    const observer = new MutationObserver(() => {
-      normalizeTranslateLayout();
-      if (queued || Date.now() - lastMutationTranslateAt.current < 1200) return;
-      queued = true;
-      window.setTimeout(() => {
-        queued = false;
-        lastMutationTranslateAt.current = Date.now();
-        mutationPasses.current += 1;
-        void applyWholePageTranslation(lang);
-      }, 650);
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-    return () => observer.disconnect();
-  }, [lang, applyWholePageTranslation]);
+    const t = window.setTimeout(() => {
+      void applyGoogleFallback(lang);
+    }, 300);
+    return () => window.clearTimeout(t);
+  }, [lang, location.pathname, location.search, applyGoogleFallback]);
 
   const setLang = useCallback(async (l: Lang) => {
+    if (l === lang) return;
     setIsTranslating(true);
-    setLangState(l);
     localStorage.setItem("sbai-lang", l);
     updateSeoLanguageTags(l);
-    window.dispatchEvent(new CustomEvent("sbai-lang-change", { detail: l }));
+    setGoogTransCookie(l);
 
-    const ok = await applyWholePageTranslation(l);
-    if (!ok && l !== "en") {
-      setTimeout(() => window.location.reload(), 80);
+    // Switching to or from non-English: hard reload to fully reset Google Translate state
+    // This prevents HI showing MR (or vice versa) due to stale cookie/state
+    if (lang !== "en" || l !== "en") {
+      window.setTimeout(() => window.location.reload(), 100);
       return;
     }
+
+    setLangState(l);
     if (translatingTimer.current) window.clearTimeout(translatingTimer.current);
     translatingTimer.current = window.setTimeout(() => {
       setIsTranslating(false);
       translatingTimer.current = null;
-    }, 900);
-  }, [applyWholePageTranslation]);
+    }, 400);
+  }, [lang]);
 
-  const t = useCallback((key: TKey) => translations.en[key] ?? key, []);
+  const t = useCallback(
+    (key: TKey) => {
+      const dict = translations[lang] as Record<string, string>;
+      return dict[key] ?? translations.en[key] ?? key;
+    },
+    [lang]
+  );
 
   return (
     <Ctx.Provider value={{ lang, setLang, t, isTranslating }}>
@@ -223,7 +179,7 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
           <div className="flex flex-col items-center gap-3 px-6 py-5 rounded-2xl bg-card border border-border shadow-elevated">
             <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
             <p className="text-sm font-medium text-foreground">
-              Translating to {LANG_NAMES[lang]}…
+              Loading {LANG_NAMES[lang]}…
             </p>
           </div>
         </div>
