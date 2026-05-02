@@ -16,21 +16,37 @@ interface Asset {
   description: string | null;
   asset_type: string;
   file_url: string;
+  audience?: string;
 }
+
+const TYPE_OPTIONS = [
+  { value: "catalog", label: "Product Catalog (PDF)" },
+  { value: "social", label: "Social Media Image" },
+  { value: "video", label: "Explainer Video" },
+  { value: "printable", label: "Printable (Banner/Pamphlet)" },
+  { value: "bulletin", label: "Technical Bulletin (PDF)" },
+  { value: "banner", label: "Banner" },
+  { value: "poster", label: "Poster" },
+];
+const AUDIENCE_OPTIONS = [
+  { value: "dealers", label: "Dealers only" },
+  { value: "public", label: "Public" },
+];
 
 const AdminMarketingManager = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [type, setType] = useState("banner");
+  const [type, setType] = useState("catalog");
+  const [audience, setAudience] = useState("dealers");
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const refresh = async () => {
     setLoading(true);
-    const { data } = await supabase.from("marketing_assets").select("id, title, description, asset_type, file_url").order("created_at", { ascending: false });
+    const { data } = await supabase.from("marketing_assets").select("id, title, description, asset_type, file_url, audience").order("created_at", { ascending: false });
     setAssets((data ?? []) as Asset[]);
     setLoading(false);
   };
@@ -52,11 +68,12 @@ const AdminMarketingManager = () => {
       asset_type: type,
       file_url: pub.publicUrl,
       thumbnail_url: pub.publicUrl,
-    });
+      audience,
+    } as any);
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success("Asset uploaded");
-    setTitle(""); setDescription(""); setType("banner"); setFile(null);
+    setTitle(""); setDescription(""); setType("catalog"); setAudience("dealers"); setFile(null);
     if (fileRef.current) fileRef.current.value = "";
     refresh();
   };
@@ -79,18 +96,24 @@ const AdminMarketingManager = () => {
               <Input value={title} onChange={(e) => setTitle(e.target.value)} />
             </div>
             <div>
-              <Label>Type</Label>
+              <Label>Category</Label>
               <Select value={type} onValueChange={setType}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="banner">Banner</SelectItem>
-                  <SelectItem value="poster">Poster</SelectItem>
-                  <SelectItem value="social">Social</SelectItem>
-                  <SelectItem value="video">Video</SelectItem>
+                  {TYPE_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div>
+              <Label>Audience</Label>
+              <Select value={audience} onValueChange={setAudience}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {AUDIENCE_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="md:col-span-2">
               <Label>File</Label>
               <Input ref={fileRef} type="file" accept="image/*,video/*,application/pdf" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
             </div>
@@ -120,7 +143,7 @@ const AdminMarketingManager = () => {
                 <div key={a.id} className="flex items-center justify-between py-2 gap-2">
                   <div className="min-w-0">
                     <p className="text-sm font-medium truncate">{a.title}</p>
-                    <p className="text-xs text-muted-foreground capitalize">{a.asset_type}</p>
+                    <p className="text-xs text-muted-foreground capitalize">{a.asset_type} · {a.audience ?? "dealers"}</p>
                   </div>
                   <div className="flex gap-1">
                     <Button asChild size="icon" variant="ghost"><a href={a.file_url} target="_blank" rel="noopener"><ExternalLink className="h-4 w-4" /></a></Button>
