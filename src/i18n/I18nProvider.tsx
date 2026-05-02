@@ -175,13 +175,14 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
     if (lang === "en") return;
     let queued = false;
     const observer = new MutationObserver(() => {
-      if (queued || mutationPasses.current >= 3) return;
+      normalizeTranslateLayout();
+      if (queued || mutationPasses.current >= 8) return;
       queued = true;
       window.setTimeout(() => {
         queued = false;
         mutationPasses.current += 1;
         void applyWholePageTranslation(lang);
-      }, 500);
+      }, 650);
     });
     observer.observe(document.body, { childList: true, subtree: true });
     return () => observer.disconnect();
@@ -195,7 +196,7 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
     window.dispatchEvent(new CustomEvent("sbai-lang-change", { detail: l }));
 
     const ok = await applyWholePageTranslation(l);
-    if (!ok) {
+    if (!ok && l !== "en") {
       setTimeout(() => window.location.reload(), 80);
       return;
     }
