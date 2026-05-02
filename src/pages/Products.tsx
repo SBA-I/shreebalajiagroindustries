@@ -9,17 +9,18 @@ import { Button } from "@/components/ui/button";
 import { useProducts } from "@/hooks/use-db-products";
 import { categoryLabels, type ProductCategory } from "@/types/product";
 import { Search, SlidersHorizontal, X, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { useI18n } from "@/i18n/I18nProvider";
 
 const ITEMS_PER_PAGE = 9;
 
-const sortOptions = [
-  { value: "popularity", label: "Most Popular" },
-  { value: "name-asc", label: "Name A–Z" },
-  { value: "name-desc", label: "Name Z–A" },
-  { value: "newest", label: "Newest First" },
-];
-
 const Products = () => {
+  const { t } = useI18n();
+  const sortOptions = [
+    { value: "popularity", label: t("products.sort.popular") },
+    { value: "name-asc", label: t("products.sort.az") },
+    { value: "name-desc", label: t("products.sort.za") },
+    { value: "newest", label: t("products.sort.new") },
+  ];
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("popularity");
@@ -83,7 +84,7 @@ const Products = () => {
   const Sidebar = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="font-heading font-semibold text-foreground mb-3">Categories</h3>
+        <h3 className="font-heading font-semibold text-foreground mb-3">{t("products.categories")}</h3>
         <ul className="space-y-1">
           <li>
             <button
@@ -92,7 +93,7 @@ const Products = () => {
                 !activeCategory ? "bg-primary/10 text-primary font-medium" : "hover:bg-muted text-foreground"
               }`}
             >
-              All Products
+              {t("products.all")}
               <span className="text-xs text-muted-foreground">{products.length}</span>
             </button>
           </li>
@@ -116,7 +117,7 @@ const Products = () => {
       </div>
 
       <div>
-        <h3 className="font-heading font-semibold text-foreground mb-3">Quick Info</h3>
+        <h3 className="font-heading font-semibold text-foreground mb-3">{t("products.quickInfo")}</h3>
         <div className="bg-muted rounded-lg p-4 text-sm text-muted-foreground space-y-2">
           <p><span className="font-medium text-foreground">SL</span> – Soluble Liquid</p>
           <p><span className="font-medium text-foreground">EC</span> – Emulsifiable Concentrate</p>
@@ -131,12 +132,8 @@ const Products = () => {
     <Layout>
       <section className="bg-primary py-16">
         <div className="container mx-auto px-4 lg:px-8 text-center">
-          <h1 className="font-heading text-4xl md:text-5xl font-bold text-primary-foreground mb-4">
-            Our Products
-          </h1>
-          <p className="text-primary-foreground/80 max-w-2xl mx-auto text-lg">
-            Comprehensive range of crop protection solutions for every farming need.
-          </p>
+          <h1 className="font-heading text-4xl md:text-5xl font-bold text-primary-foreground mb-4">{t("products.title")}</h1>
+          <p className="text-primary-foreground/80 max-w-2xl mx-auto text-lg">{t("products.subtitle")}</p>
         </div>
       </section>
 
@@ -146,7 +143,7 @@ const Products = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search by product, crop, pest, or composition..."
+                placeholder={t("products.search")}
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(1); }}
                 className="pl-10 pr-10"
@@ -180,13 +177,13 @@ const Products = () => {
               className="lg:hidden gap-2"
               onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
             >
-              <SlidersHorizontal className="h-4 w-4" /> Filters
+              <SlidersHorizontal className="h-4 w-4" /> {t("products.filters")}
             </Button>
           </div>
 
           {activeCategory && (
             <div className="flex items-center gap-2 mb-6">
-              <span className="text-sm text-muted-foreground">Filtering by:</span>
+              <span className="text-sm text-muted-foreground">{t("products.filteringBy")}</span>
               <span className="inline-flex items-center gap-1 bg-primary/10 text-primary text-sm font-medium px-3 py-1 rounded-full">
                 {categoryLabels[activeCategory]}
                 <button onClick={() => setSearchParams({})}><X className="h-3 w-3" /></button>
@@ -203,7 +200,7 @@ const Products = () => {
               <div className="fixed inset-0 z-50 bg-foreground/50 lg:hidden" onClick={() => setMobileFiltersOpen(false)}>
                 <div className="absolute left-0 top-0 bottom-0 w-72 bg-card p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                   <div className="flex justify-between items-center mb-6">
-                    <h2 className="font-heading font-bold text-foreground">Filters</h2>
+                    <h2 className="font-heading font-bold text-foreground">{t("products.filters")}</h2>
                     <button onClick={() => setMobileFiltersOpen(false)}><X className="h-5 w-5" /></button>
                   </div>
                   <Sidebar />
@@ -218,15 +215,15 @@ const Products = () => {
                 </div>
               ) : paginated.length === 0 ? (
                 <div className="text-center py-16">
-                  <p className="text-lg text-muted-foreground">No products found matching your criteria.</p>
+                  <p className="text-lg text-muted-foreground">{t("products.none")}</p>
                   <Button variant="link" onClick={() => { setSearch(""); setSearchParams({}); }}>
-                    Clear all filters
+                    {t("products.clear")}
                   </Button>
                 </div>
               ) : (
                 <>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Showing {(page - 1) * ITEMS_PER_PAGE + 1}–{Math.min(page * ITEMS_PER_PAGE, filtered.length)} of {filtered.length} products
+                    {t("products.showing")} {(page - 1) * ITEMS_PER_PAGE + 1}–{Math.min(page * ITEMS_PER_PAGE, filtered.length)} {t("products.of")} {filtered.length} {t("products.productsLabel")}
                   </p>
                   <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
                     {paginated.map((product) => (

@@ -11,6 +11,7 @@ import CropImageDetector from "@/components/ai/CropImageDetector";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import EmergencyFirstAidButton from "@/components/safety/EmergencyFirstAidButton";
 import EmergencyContactButton from "@/components/safety/EmergencyContactButton";
+import { useI18n } from "@/i18n/I18nProvider";
 
 type PanelKey = "ai" | "spray" | "disease" | "firstaid" | "contact" | null;
 
@@ -26,6 +27,7 @@ interface ActionItem {
 }
 
 const FloatingActionHub = () => {
+  const { t } = useI18n();
   const [expanded, setExpanded] = useState(false);
   const [panel, setPanel] = useState<PanelKey>(null);
 
@@ -37,17 +39,17 @@ const FloatingActionHub = () => {
   const close = () => setExpanded(false);
 
   const actions: ActionItem[] = [
-    { key: "ai", label: "Balaji AI", icon: <Sparkles className="h-5 w-5" />, bg: "bg-primary text-primary-foreground", onClick: () => openPanel("ai") },
-    { key: "spray", label: "Spray Calc.", icon: <Calculator className="h-5 w-5" />, bg: "bg-primary text-primary-foreground", onClick: () => openPanel("spray") },
-    { key: "disease", label: "Disease Scan", icon: <Camera className="h-5 w-5" />, bg: "bg-accent text-accent-foreground", onClick: () => openPanel("disease") },
-    { key: "firstaid", label: "First-Aid", icon: <AlertOctagon className="h-5 w-5" />, bg: "bg-destructive text-destructive-foreground", onClick: () => openPanel("firstaid") },
-    { key: "contact", label: "Emergency", icon: <AlertTriangle className="h-5 w-5" />, bg: "bg-destructive text-destructive-foreground", onClick: () => openPanel("contact") },
-    { key: "profit", label: "Profit", icon: <TrendingUp className="h-5 w-5" />, bg: "bg-secondary text-secondary-foreground", to: "/yield-simulator" },
-    { key: "harvest", label: "Harvest", icon: <Timer className="h-5 w-5" />, bg: "bg-secondary text-secondary-foreground", to: "/tools/harvest-timer" },
-    { key: "pest", label: "Pest Cal.", icon: <Bug className="h-5 w-5" />, bg: "bg-secondary text-secondary-foreground", to: "/tools/pest-calendar" },
-    { key: "dealer", label: "Dealers", icon: <MapPin className="h-5 w-5" />, bg: "bg-primary text-primary-foreground", to: "/dealers" },
-    { key: "wa", label: "WhatsApp", icon: <img src={whatsappIcon} alt="" className="h-5 w-5" />, bg: "bg-[#25D366] text-white", href: "https://wa.me/917744998998", external: true },
-    { key: "email", label: "Email", icon: <Mail className="h-5 w-5" />, bg: "bg-muted text-foreground", href: "mailto:sbaindia44@gmail.com" },
+    { key: "ai", label: t("fab.ai"), icon: <Sparkles className="h-5 w-5" />, bg: "bg-primary text-primary-foreground", onClick: () => openPanel("ai") },
+    { key: "spray", label: t("fab.spray"), icon: <Calculator className="h-5 w-5" />, bg: "bg-primary text-primary-foreground", onClick: () => openPanel("spray") },
+    { key: "disease", label: t("fab.disease"), icon: <Camera className="h-5 w-5" />, bg: "bg-accent text-accent-foreground", onClick: () => openPanel("disease") },
+    { key: "firstaid", label: t("fab.firstaid"), icon: <AlertOctagon className="h-5 w-5" />, bg: "bg-destructive text-destructive-foreground", onClick: () => openPanel("firstaid") },
+    { key: "contact", label: t("fab.emergency"), icon: <AlertTriangle className="h-5 w-5" />, bg: "bg-destructive text-destructive-foreground", onClick: () => openPanel("contact") },
+    { key: "profit", label: t("fab.profit"), icon: <TrendingUp className="h-5 w-5" />, bg: "bg-secondary text-secondary-foreground", to: "/yield-simulator" },
+    { key: "harvest", label: t("fab.harvest"), icon: <Timer className="h-5 w-5" />, bg: "bg-secondary text-secondary-foreground", to: "/tools/harvest-timer" },
+    { key: "pest", label: t("fab.pest"), icon: <Bug className="h-5 w-5" />, bg: "bg-secondary text-secondary-foreground", to: "/tools/pest-calendar" },
+    { key: "dealer", label: t("fab.dealer"), icon: <MapPin className="h-5 w-5" />, bg: "bg-primary text-primary-foreground", to: "/dealers" },
+    { key: "wa", label: t("fab.wa"), icon: <img src={whatsappIcon} alt="" className="h-5 w-5" />, bg: "bg-[#25D366] text-white", href: "https://wa.me/917744998998", external: true },
+    { key: "email", label: t("fab.email"), icon: <Mail className="h-5 w-5" />, bg: "bg-muted text-foreground", href: "mailto:sbaindia44@gmail.com" },
   ];
 
   const renderTile = (a: ActionItem) => {
@@ -96,7 +98,7 @@ const FloatingActionHub = () => {
       <Dialog open={panel === "spray"} onOpenChange={(o) => setPanel(o ? "spray" : null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Spray Calculator</DialogTitle>
+            <DialogTitle>{t("fab.sprayDialog")}</DialogTitle>
           </DialogHeader>
           <SprayCalculator />
         </DialogContent>
@@ -104,7 +106,7 @@ const FloatingActionHub = () => {
       <Dialog open={panel === "disease"} onOpenChange={(o) => setPanel(o ? "disease" : null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Disease Detector</DialogTitle>
+            <DialogTitle>{t("fab.diseaseDialog")}</DialogTitle>
           </DialogHeader>
           <CropImageDetector />
         </DialogContent>
@@ -128,7 +130,7 @@ const FloatingActionHub = () => {
           {expanded && (
             <div className="fixed bottom-20 right-3 z-50 w-[280px] max-w-[calc(100vw-1.5rem)] rounded-2xl border border-border bg-card shadow-elevated p-4 animate-fade-in">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-heading font-semibold text-foreground">Quick Actions</p>
+                <p className="text-sm font-heading font-semibold text-foreground">{t("fab.title")}</p>
                 <button onClick={close} className="p-1 hover:bg-muted rounded" aria-label="Close">
                   <X className="h-4 w-4" />
                 </button>
