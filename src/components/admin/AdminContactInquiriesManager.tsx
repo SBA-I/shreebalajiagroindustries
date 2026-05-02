@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Trash2, Check, Mail } from "lucide-react";
+import { Loader2, Trash2, Check, Mail, Phone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -11,6 +11,7 @@ interface Inquiry {
   created_at: string;
   name: string;
   email: string;
+  phone: string | null;
   inquiry_type: string;
   message: string;
   is_resolved: boolean;
@@ -70,6 +71,13 @@ const AdminContactInquiriesManager = () => {
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <Mail className="h-3 w-3" />
                       <a href={`mailto:${i.email}`} className="hover:underline">{i.email}</a>
+                      {i.phone && (
+                        <>
+                          <span className="mx-1">·</span>
+                          <Phone className="h-3 w-3" />
+                          <a href={`tel:${i.phone}`} className="hover:underline">{i.phone}</a>
+                        </>
+                      )}
                       <Badge variant="outline" className="ml-1 capitalize">{i.inquiry_type}</Badge>
                       {i.is_resolved && <Badge className="bg-primary/15 text-primary">Resolved</Badge>}
                     </p>

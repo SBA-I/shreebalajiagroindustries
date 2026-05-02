@@ -11,7 +11,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 
 const Contact = () => {
   const { t } = useI18n();
-  const [form, setForm] = useState({ name: "", email: "", type: "general", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", type: "general", message: "" });
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -22,12 +22,13 @@ const Contact = () => {
       const { error } = await supabase.from("contact_inquiries").insert({
         name: form.name,
         email: form.email,
+        phone: form.phone || null,
         inquiry_type: form.type,
         message: form.message,
       });
       if (error) throw error;
       toast.success(t("contact.thanks"));
-      setForm({ name: "", email: "", type: "general", message: "" });
+      setForm({ name: "", email: "", phone: "", type: "general", message: "" });
     } catch {
       toast.error(t("contact.failed"));
     } finally {
@@ -88,6 +89,18 @@ const Contact = () => {
                     <label className="text-sm font-medium text-foreground mb-1.5 block">{t("contact.email")}</label>
                     <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
                   </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Mobile number *</label>
+                  <Input
+                    type="tel"
+                    inputMode="tel"
+                    pattern="[0-9+\-\s]{7,20}"
+                    placeholder="+91 ..."
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    required
+                  />
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">{t("contact.inquiryType")}</label>

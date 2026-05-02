@@ -17,7 +17,7 @@ const ProductDetail = () => {
   const { data: product, isLoading } = useProductById(productId || "");
   const { data: allProducts = [] } = useProducts();
   const [activeTab, setActiveTab] = useState<"details" | "safety" | "documents">("details");
-  const [inquiryForm, setInquiryForm] = useState({ name: "", email: "", message: "" });
+  const [inquiryForm, setInquiryForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [submittingInquiry, setSubmittingInquiry] = useState(false);
 
   if (isLoading) {
@@ -51,12 +51,13 @@ const ProductDetail = () => {
       const { error } = await supabase.from("contact_inquiries").insert({
         name: inquiryForm.name,
         email: inquiryForm.email,
+        phone: inquiryForm.phone || null,
         inquiry_type: "product",
         message: `[Product: ${product.name}]\n\n${inquiryForm.message}`,
       });
       if (error) throw error;
       toast.success("Inquiry submitted! We'll get back to you soon.");
-      setInquiryForm({ name: "", email: "", message: "" });
+      setInquiryForm({ name: "", email: "", phone: "", message: "" });
     } catch {
       toast.error("Failed to send inquiry. Please try again.");
     } finally {
@@ -270,6 +271,18 @@ const ProductDetail = () => {
                   <Input value={inquiryForm.name} onChange={(e) => setInquiryForm({ ...inquiryForm, name: e.target.value })} required /></div>
                 <div><label className="text-sm font-medium text-foreground mb-1.5 block">Email</label>
                   <Input type="email" value={inquiryForm.email} onChange={(e) => setInquiryForm({ ...inquiryForm, email: e.target.value })} required /></div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Mobile number</label>
+                <Input
+                  type="tel"
+                  inputMode="tel"
+                  pattern="[0-9+\-\s]{7,20}"
+                  placeholder="+91 ..."
+                  value={inquiryForm.phone}
+                  onChange={(e) => setInquiryForm({ ...inquiryForm, phone: e.target.value })}
+                  required
+                />
               </div>
               <div><label className="text-sm font-medium text-foreground mb-1.5 block">Message</label>
                 <Textarea rows={4} value={inquiryForm.message} onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })} required /></div>
