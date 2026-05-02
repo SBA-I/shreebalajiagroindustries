@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  Plus, X, MessageCircle, AlertOctagon, AlertTriangle, Mail,
-  Sprout, TrendingUp, Timer, Bug, MapPin,
+  Plus, X, AlertOctagon, AlertTriangle, Mail,
+  Calculator, Camera, TrendingUp, Timer, Bug, MapPin,
 } from "lucide-react";
 import whatsappIcon from "@/assets/whatsapp-icon.svg";
-import AiChatWidget from "@/components/ai/AiChatWidget";
+import SprayCalculator from "@/components/ai/SprayCalculator";
+import CropImageDetector from "@/components/ai/CropImageDetector";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import EmergencyFirstAidButton from "@/components/safety/EmergencyFirstAidButton";
 import EmergencyContactButton from "@/components/safety/EmergencyContactButton";
 
-type PanelKey = "ai" | "firstaid" | "contact" | null;
+type PanelKey = "spray" | "disease" | "firstaid" | "contact" | null;
 
 interface ActionItem {
   key: string;
@@ -34,10 +36,10 @@ const FloatingActionHub = () => {
   const close = () => setExpanded(false);
 
   const actions: ActionItem[] = [
-    { key: "ai", label: "Ask AI", icon: <MessageCircle className="h-5 w-5" />, bg: "bg-primary text-primary-foreground", onClick: () => openPanel("ai") },
+    { key: "spray", label: "Spray Calc.", icon: <Calculator className="h-5 w-5" />, bg: "bg-primary text-primary-foreground", onClick: () => openPanel("spray") },
+    { key: "disease", label: "Disease Scan", icon: <Camera className="h-5 w-5" />, bg: "bg-accent text-accent-foreground", onClick: () => openPanel("disease") },
     { key: "firstaid", label: "First-Aid", icon: <AlertOctagon className="h-5 w-5" />, bg: "bg-destructive text-destructive-foreground", onClick: () => openPanel("firstaid") },
     { key: "contact", label: "Emergency", icon: <AlertTriangle className="h-5 w-5" />, bg: "bg-destructive text-destructive-foreground", onClick: () => openPanel("contact") },
-    { key: "askai-page", label: "AI Chat 🌱", icon: <Sprout className="h-5 w-5" />, bg: "bg-accent text-accent-foreground", to: "/ask-ai" },
     { key: "profit", label: "Profit", icon: <TrendingUp className="h-5 w-5" />, bg: "bg-secondary text-secondary-foreground", to: "/yield-simulator" },
     { key: "harvest", label: "Harvest", icon: <Timer className="h-5 w-5" />, bg: "bg-secondary text-secondary-foreground", to: "/tools/harvest-timer" },
     { key: "pest", label: "Pest Cal.", icon: <Bug className="h-5 w-5" />, bg: "bg-secondary text-secondary-foreground", to: "/tools/pest-calendar" },
@@ -88,7 +90,22 @@ const FloatingActionHub = () => {
   return (
     <>
       {/* Controlled panels */}
-      <AiChatWidget hideTrigger open={panel === "ai"} onOpenChange={(o) => setPanel(o ? "ai" : null)} />
+      <Dialog open={panel === "spray"} onOpenChange={(o) => setPanel(o ? "spray" : null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Spray Calculator</DialogTitle>
+          </DialogHeader>
+          <SprayCalculator />
+        </DialogContent>
+      </Dialog>
+      <Dialog open={panel === "disease"} onOpenChange={(o) => setPanel(o ? "disease" : null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Disease Detector</DialogTitle>
+          </DialogHeader>
+          <CropImageDetector />
+        </DialogContent>
+      </Dialog>
       <EmergencyFirstAidButton hideTrigger open={panel === "firstaid"} onOpenChange={(o) => setPanel(o ? "firstaid" : null)} />
       <EmergencyContactButton hideTrigger open={panel === "contact"} onOpenChange={(o) => setPanel(o ? "contact" : null)} />
 
