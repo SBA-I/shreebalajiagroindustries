@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Pencil, Save, X } from "lucide-react";
+import { UserCog, Pencil, Save, X } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -97,8 +97,11 @@ const ProfileCard = () => {
     <Card className="p-4 md:p-6">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <User className="h-5 w-5 text-primary" />
-          <h2 className="font-heading font-semibold text-lg">My Profile</h2>
+          <UserCog className="h-5 w-5 text-primary" />
+          <div>
+            <h2 className="font-heading font-semibold text-lg leading-tight">Account Details</h2>
+            <p className="text-xs text-muted-foreground">Information from your sign-up. Edit anytime.</p>
+          </div>
         </div>
         {!editing ? (
           <Button size="sm" variant="outline" onClick={startEdit}>
