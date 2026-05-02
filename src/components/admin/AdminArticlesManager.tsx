@@ -8,8 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Trash2, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import EditDialog from "./EditDialog";
 
-interface Row { id: string; slug: string; title: string; category: string; is_published: boolean; }
+interface Row { id: string; slug: string; title: string; category: string; is_published: boolean; excerpt: string | null; body: string; hero_image_url: string | null; }
 const blank = { slug: "", title: "", excerpt: "", body: "", category: "sustainability", hero_image_url: "" };
 const slugify = (s: string) => s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
@@ -21,7 +22,9 @@ const AdminArticlesManager = () => {
 
   const refresh = async () => {
     setLoading(true);
-    const { data } = await supabase.from("sustainability_articles").select("id, slug, title, category, is_published").order("published_at", { ascending: false });
+    const { data } = await supabase.from("sustainability_articles")
+      .select("id, slug, title, category, is_published, excerpt, body, hero_image_url")
+      .order("published_at", { ascending: false });
     setRows((data ?? []) as Row[]);
     setLoading(false);
   };
@@ -100,6 +103,7 @@ const AdminArticlesManager = () => {
                   </div>
                   <div className="flex gap-1">
                     <Button size="sm" variant="outline" onClick={() => togglePublish(r.id, r.is_published)}>{r.is_published ? "Unpublish" : "Publish"}</Button>
+                    <EditArticleButton row={r} onSaved={refresh} />
                     <Button size="icon" variant="ghost" onClick={() => remove(r.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                   </div>
                 </div>
@@ -113,3 +117,44 @@ const AdminArticlesManager = () => {
 };
 
 export default AdminArticlesManager;
+
+const EditArticleButton = ({ row, onSaved }: { row: Row; onSaved: () => void }) => {
+  const [draft, setDraft] = useState({
+    title: row.title, slug: row.slug, category: row.category,
+    excerpt: row.excerpt ?? "", body: row.body,
+    hero_image_url: row.hero_image_url ?? "",
+  });
+  const save = async () => {
+    const { error } = await supabase.from("sustainability_articles").update({
+      title: draft.title, slug: draft.slug, category: draft.category,
+      excerpt: draft.excerpt || null, body: draft.body,
+      hero_image_url: draft.hero_image_url || null,
+    }).eq("id", row.id);
+    if (error) { toast.error(error.message); return false; }
+    toast.success("Updated");
+    onSaved();
+  };
+  return (
+    <EditDialog title={`Edit ${row.title}`} onSave={save}>
+      <div className="grid gap-3">
+        <div><Label>Title</Label><Input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} /></div>
+        <div><Label>Slug</Label><Input value={draft.slug} onChange={(e) => setDraft({ ...draft, slug: e.target.value })} /></div>
+        <div>
+          <Label>Category</Label>
+          <Select value={draft.category} onValueChange={(v) => setDraft({ ...draft, category: v })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="sustainability">Sustainability</SelectItem>
+              <SelectItem value="ipm">IPM</SelectItem>
+              <SelectItem value="soil">Soil Health</SelectItem>
+              <SelectItem value="rnd">R&amp;D</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div><Label>Hero image URL</Label><Input value={draft.hero_image_url} onChange={(e) => setDraft({ ...draft, hero_image_url: e.target.value })} /></div>
+        <div><Label>Excerpt</Label><Textarea rows={2} value={draft.excerpt} onChange={(e) => setDraft({ ...draft, excerpt: e.target.value })} /></div>
+        <div><Label>Body (Markdown)</Label><Textarea rows={8} value={draft.body} onChange={(e) => setDraft({ ...draft, body: e.target.value })} /></div>
+      </div>
+    </EditDialog>
+  );
+};

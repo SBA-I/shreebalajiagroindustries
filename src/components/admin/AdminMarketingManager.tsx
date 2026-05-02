@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Trash2, Upload, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import EditDialog from "./EditDialog";
 
 interface Asset {
   id: string;
@@ -123,6 +124,7 @@ const AdminMarketingManager = () => {
                   </div>
                   <div className="flex gap-1">
                     <Button asChild size="icon" variant="ghost"><a href={a.file_url} target="_blank" rel="noopener"><ExternalLink className="h-4 w-4" /></a></Button>
+                    <EditAssetButton asset={a} onSaved={refresh} />
                     <Button size="icon" variant="ghost" onClick={() => remove(a.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                   </div>
                 </div>
@@ -136,3 +138,35 @@ const AdminMarketingManager = () => {
 };
 
 export default AdminMarketingManager;
+
+const EditAssetButton = ({ asset, onSaved }: { asset: Asset; onSaved: () => void }) => {
+  const [draft, setDraft] = useState({
+    title: asset.title, description: asset.description ?? "", asset_type: asset.asset_type,
+  });
+  const save = async () => {
+    const { error } = await supabase.from("marketing_assets").update({
+      title: draft.title, description: draft.description || null, asset_type: draft.asset_type,
+    }).eq("id", asset.id);
+    if (error) { toast.error(error.message); return false; }
+    toast.success("Updated");
+    onSaved();
+  };
+  return (
+    <EditDialog title={`Edit ${asset.title}`} onSave={save}>
+      <div><Label>Title</Label><Input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} /></div>
+      <div>
+        <Label>Type</Label>
+        <Select value={draft.asset_type} onValueChange={(v) => setDraft({ ...draft, asset_type: v })}>
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="banner">Banner</SelectItem>
+            <SelectItem value="poster">Poster</SelectItem>
+            <SelectItem value="social">Social</SelectItem>
+            <SelectItem value="video">Video</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div><Label>Description</Label><Textarea rows={3} value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} /></div>
+    </EditDialog>
+  );
+};

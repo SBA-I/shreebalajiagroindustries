@@ -8,9 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Trash2, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import EditDialog from "./EditDialog";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-interface Row { id: string; pest_name: string; crop: string; season: string; active_months: number[]; severity: string; }
+interface Row { id: string; pest_name: string; crop: string; season: string; active_months: number[]; severity: string; preventive_tips: string | null; }
 const blank = { pest_name: "", crop: "", season: "Kharif", severity: "medium", preventive_tips: "", active_months: [] as number[] };
 
 const AdminPestCalendarManager = () => {
@@ -112,6 +113,7 @@ const AdminPestCalendarManager = () => {
                     <p className="text-xs text-muted-foreground">{r.season} · {r.severity} · months {r.active_months.join(", ")}</p>
                   </div>
                   <Button size="icon" variant="ghost" onClick={() => remove(r.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                  <EditPestButton row={r} onSaved={refresh} />
                 </div>
               ))}
             </div>
@@ -123,3 +125,57 @@ const AdminPestCalendarManager = () => {
 };
 
 export default AdminPestCalendarManager;
+
+const EditPestButton = ({ row, onSaved }: { row: Row; onSaved: () => void }) => {
+  const [draft, setDraft] = useState({
+    pest_name: row.pest_name, crop: row.crop, season: row.season, severity: row.severity,
+    preventive_tips: row.preventive_tips ?? "", active_months: row.active_months ?? [],
+  });
+  const toggle = (m: number) =>
+    setDraft((d) => ({ ...d, active_months: d.active_months.includes(m) ? d.active_months.filter((x) => x !== m) : [...d.active_months, m].sort((a, b) => a - b) }));
+  const save = async () => {
+    const { error } = await supabase.from("pest_calendar").update({
+      pest_name: draft.pest_name, crop: draft.crop, season: draft.season, severity: draft.severity,
+      preventive_tips: draft.preventive_tips || null, active_months: draft.active_months,
+    }).eq("id", row.id);
+    if (error) { toast.error(error.message); return false; }
+    toast.success("Updated");
+    onSaved();
+  };
+  return (
+    <EditDialog title={`Edit ${row.pest_name}`} onSave={save}>
+      <div className="grid gap-3 md:grid-cols-2">
+        <div><Label>Pest name</Label><Input value={draft.pest_name} onChange={(e) => setDraft({ ...draft, pest_name: e.target.value })} /></div>
+        <div><Label>Crop</Label><Input value={draft.crop} onChange={(e) => setDraft({ ...draft, crop: e.target.value })} /></div>
+        <div>
+          <Label>Season</Label>
+          <Select value={draft.season} onValueChange={(v) => setDraft({ ...draft, season: v })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent><SelectItem value="Kharif">Kharif</SelectItem><SelectItem value="Rabi">Rabi</SelectItem><SelectItem value="Zaid">Zaid</SelectItem></SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label>Severity</Label>
+          <Select value={draft.severity} onValueChange={(v) => setDraft({ ...draft, severity: v })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent><SelectItem value="low">Low</SelectItem><SelectItem value="medium">Medium</SelectItem><SelectItem value="high">High</SelectItem></SelectContent>
+          </Select>
+        </div>
+      </div>
+      <div>
+        <Label>Active months</Label>
+        <div className="grid grid-cols-6 gap-1 mt-1">
+          {MONTHS.map((m, i) => {
+            const month = i + 1;
+            const active = draft.active_months.includes(month);
+            return (
+              <button key={m} type="button" onClick={() => toggle(month)}
+                className={`text-xs py-1.5 rounded-md border transition-colors ${active ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:border-primary"}`}>{m}</button>
+            );
+          })}
+        </div>
+      </div>
+      <div><Label>Preventive tips</Label><Textarea rows={2} value={draft.preventive_tips} onChange={(e) => setDraft({ ...draft, preventive_tips: e.target.value })} /></div>
+    </EditDialog>
+  );
+};

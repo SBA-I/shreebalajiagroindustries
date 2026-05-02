@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Trash2, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import EditDialog from "./EditDialog";
 
 interface Dealer {
   id: string; name: string; contact_person: string | null; phone: string;
@@ -105,7 +106,10 @@ const AdminDealersManager = () => {
                     <p className="text-sm font-medium truncate">{d.name}</p>
                     <p className="text-xs text-muted-foreground truncate">{d.city}, {d.state} – {d.pincode} · {d.phone}</p>
                   </div>
-                  <Button size="icon" variant="ghost" onClick={() => remove(d.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                  <div className="flex gap-1">
+                    <EditDealerButton dealer={d} onSaved={refresh} />
+                    <Button size="icon" variant="ghost" onClick={() => remove(d.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -117,3 +121,64 @@ const AdminDealersManager = () => {
 };
 
 export default AdminDealersManager;
+
+const EditDealerButton = ({ dealer, onSaved }: { dealer: Dealer; onSaved: () => void }) => {
+  const [draft, setDraft] = useState({
+    name: dealer.name,
+    contact_person: dealer.contact_person ?? "",
+    phone: dealer.phone,
+    whatsapp: dealer.whatsapp ?? "",
+    email: dealer.email ?? "",
+    address_line: dealer.address_line,
+    city: dealer.city,
+    taluka: dealer.taluka ?? "",
+    district: dealer.district ?? "",
+    state: dealer.state,
+    pincode: dealer.pincode,
+    lat: dealer.lat?.toString() ?? "",
+    lng: dealer.lng?.toString() ?? "",
+    photo_url: dealer.photo_url ?? "",
+  });
+  const save = async () => {
+    if (!/^\d{6}$/.test(draft.pincode)) { toast.error("Invalid pincode"); return false; }
+    const { error } = await supabase.from("dealers").update({
+      name: draft.name,
+      contact_person: draft.contact_person || null,
+      phone: draft.phone,
+      whatsapp: draft.whatsapp || null,
+      email: draft.email || null,
+      address_line: draft.address_line,
+      city: draft.city,
+      taluka: draft.taluka || null,
+      district: draft.district || null,
+      state: draft.state,
+      pincode: draft.pincode,
+      lat: draft.lat ? Number(draft.lat) : null,
+      lng: draft.lng ? Number(draft.lng) : null,
+      photo_url: draft.photo_url || null,
+    }).eq("id", dealer.id);
+    if (error) { toast.error(error.message); return false; }
+    toast.success("Updated");
+    onSaved();
+  };
+  return (
+    <EditDialog title={`Edit ${dealer.name}`} onSave={save}>
+      <div className="grid gap-3 md:grid-cols-2">
+        <div><Label>Name</Label><Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} /></div>
+        <div><Label>Contact person</Label><Input value={draft.contact_person} onChange={(e) => setDraft({ ...draft, contact_person: e.target.value })} /></div>
+        <div><Label>Phone</Label><Input value={draft.phone} onChange={(e) => setDraft({ ...draft, phone: e.target.value })} /></div>
+        <div><Label>WhatsApp</Label><Input value={draft.whatsapp} onChange={(e) => setDraft({ ...draft, whatsapp: e.target.value })} /></div>
+        <div className="md:col-span-2"><Label>Email</Label><Input type="email" value={draft.email} onChange={(e) => setDraft({ ...draft, email: e.target.value })} /></div>
+        <div className="md:col-span-2"><Label>Address</Label><Input value={draft.address_line} onChange={(e) => setDraft({ ...draft, address_line: e.target.value })} /></div>
+        <div><Label>City</Label><Input value={draft.city} onChange={(e) => setDraft({ ...draft, city: e.target.value })} /></div>
+        <div><Label>Taluka</Label><Input value={draft.taluka} onChange={(e) => setDraft({ ...draft, taluka: e.target.value })} /></div>
+        <div><Label>District</Label><Input value={draft.district} onChange={(e) => setDraft({ ...draft, district: e.target.value })} /></div>
+        <div><Label>State</Label><Input value={draft.state} onChange={(e) => setDraft({ ...draft, state: e.target.value })} /></div>
+        <div><Label>Pincode</Label><Input value={draft.pincode} maxLength={6} onChange={(e) => setDraft({ ...draft, pincode: e.target.value.replace(/\D/g, "") })} /></div>
+        <div><Label>Latitude</Label><Input value={draft.lat} onChange={(e) => setDraft({ ...draft, lat: e.target.value })} /></div>
+        <div><Label>Longitude</Label><Input value={draft.lng} onChange={(e) => setDraft({ ...draft, lng: e.target.value })} /></div>
+        <div className="md:col-span-2"><Label>Shop photo URL</Label><Input value={draft.photo_url} onChange={(e) => setDraft({ ...draft, photo_url: e.target.value })} /></div>
+      </div>
+    </EditDialog>
+  );
+};

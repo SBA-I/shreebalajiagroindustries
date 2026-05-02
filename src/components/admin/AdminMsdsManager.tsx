@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Trash2, Upload, FileDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import EditDialog from "./EditDialog";
 
 interface Doc {
   id: string;
@@ -126,6 +127,7 @@ const AdminMsdsManager = () => {
                   </div>
                   <div className="flex gap-1">
                     <Button asChild size="icon" variant="ghost"><a href={d.file_url} target="_blank" rel="noopener"><FileDown className="h-4 w-4" /></a></Button>
+                    <EditMsdsButton doc={d} onSaved={refresh} />
                     <Button size="icon" variant="ghost" onClick={() => remove(d.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                   </div>
                 </div>
@@ -139,3 +141,32 @@ const AdminMsdsManager = () => {
 };
 
 export default AdminMsdsManager;
+
+const EditMsdsButton = ({ doc, onSaved }: { doc: Doc; onSaved: () => void }) => {
+  const [draft, setDraft] = useState({ product_name: doc.product_name, language: doc.language, version: doc.version ?? "" });
+  const save = async () => {
+    const { error } = await supabase.from("msds_documents").update({
+      product_name: draft.product_name, language: draft.language, version: draft.version || null,
+    }).eq("id", doc.id);
+    if (error) { toast.error(error.message); return false; }
+    toast.success("Updated");
+    onSaved();
+  };
+  return (
+    <EditDialog title={`Edit ${doc.product_name}`} onSave={save}>
+      <div><Label>Product Name</Label><Input value={draft.product_name} onChange={(e) => setDraft({ ...draft, product_name: e.target.value })} /></div>
+      <div>
+        <Label>Language</Label>
+        <Select value={draft.language} onValueChange={(v) => setDraft({ ...draft, language: v })}>
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="en">English</SelectItem>
+            <SelectItem value="hi">Hindi</SelectItem>
+            <SelectItem value="mr">Marathi</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div><Label>Version</Label><Input value={draft.version} onChange={(e) => setDraft({ ...draft, version: e.target.value })} /></div>
+    </EditDialog>
+  );
+};
