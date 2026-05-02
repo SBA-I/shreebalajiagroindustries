@@ -95,6 +95,39 @@ export type Database = {
         }
         Relationships: []
       }
+      disease_scans: {
+        Row: {
+          crop: string | null
+          diagnosis: string
+          id: string
+          image_url: string | null
+          recommendation: string | null
+          scan_date: string
+          severity: string | null
+          user_id: string
+        }
+        Insert: {
+          crop?: string | null
+          diagnosis: string
+          id?: string
+          image_url?: string | null
+          recommendation?: string | null
+          scan_date?: string
+          severity?: string | null
+          user_id: string
+        }
+        Update: {
+          crop?: string | null
+          diagnosis?: string
+          id?: string
+          image_url?: string | null
+          recommendation?: string | null
+          scan_date?: string
+          severity?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       dispatches: {
         Row: {
           carrier: string | null
@@ -156,6 +189,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      farmer_crops: {
+        Row: {
+          area_acres: number | null
+          created_at: string
+          crop: string
+          id: string
+          sowing_date: string
+          user_id: string
+          variety: string | null
+        }
+        Insert: {
+          area_acres?: number | null
+          created_at?: string
+          crop: string
+          id?: string
+          sowing_date: string
+          user_id: string
+          variety?: string | null
+        }
+        Update: {
+          area_acres?: number | null
+          created_at?: string
+          crop?: string
+          id?: string
+          sowing_date?: string
+          user_id?: string
+          variety?: string | null
+        }
+        Relationships: []
       }
       inventory: {
         Row: {
@@ -579,6 +642,51 @@ export type Database = {
           user_id?: string
           verification_notes?: string | null
           verification_status?: string
+        }
+        Relationships: []
+      }
+      spray_logs: {
+        Row: {
+          created_at: string
+          crop: string | null
+          dosage: string | null
+          id: string
+          notes: string | null
+          phi_days: number
+          product_category: string | null
+          product_name: string
+          safe_harvest_date: string | null
+          spray_date: string
+          target_pest: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          crop?: string | null
+          dosage?: string | null
+          id?: string
+          notes?: string | null
+          phi_days?: number
+          product_category?: string | null
+          product_name: string
+          safe_harvest_date?: string | null
+          spray_date?: string
+          target_pest?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          crop?: string | null
+          dosage?: string | null
+          id?: string
+          notes?: string | null
+          phi_days?: number
+          product_category?: string | null
+          product_name?: string
+          safe_harvest_date?: string | null
+          spray_date?: string
+          target_pest?: string | null
+          user_id?: string
         }
         Relationships: []
       }
