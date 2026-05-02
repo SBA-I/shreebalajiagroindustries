@@ -110,13 +110,13 @@ const EmergencyFirstAidButton = () => {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label="Emergency First Aid"
-        className="fixed bottom-40 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-elevated hover:scale-105 transition-transform animate-pulse"
+        className="fixed bottom-[17.5rem] right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-elevated hover:scale-105 transition-transform animate-pulse"
       >
         {open ? <X className="h-6 w-6" /> : <AlertOctagon className="h-6 w-6" />}
       </button>
 
       {open && (
-        <div className="fixed inset-0 sm:inset-auto sm:bottom-56 sm:right-4 z-40 sm:w-[380px] flex items-stretch sm:items-end justify-center sm:justify-end p-2 sm:p-0">
+        <div className="fixed inset-0 sm:inset-auto sm:bottom-[21rem] sm:right-4 z-40 sm:w-[380px] flex items-stretch sm:items-end justify-center sm:justify-end p-2 sm:p-0">
           <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto p-4 shadow-elevated border-destructive/30 animate-fade-in">
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
