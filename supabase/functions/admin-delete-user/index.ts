@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
     await admin.from("user_roles").delete().eq("user_id", user_id);
     await admin.from("profiles").delete().eq("user_id", user_id);
     const { error: delErr } = await admin.auth.admin.deleteUser(user_id);
-    if (delErr) throw delErr;
+    if (delErr && !/not.?found/i.test(delErr.message)) throw delErr;
 
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
