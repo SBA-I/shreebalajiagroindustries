@@ -70,8 +70,32 @@ const RoleAuthForm = ({
 
   useEffect(() => {
     if (!loading && user) {
-      const redirectTo = (location.state as any)?.from ?? roleHomePath(roles);
-      navigate(redirectTo, { replace: true });
+      // Enforce: each role must use its own portal/email.
+      // If the logged-in user has no role for this portal, sign them out
+      // and keep them on the sign-in page.
+      const portalRoleMap: Record<RoleKey, AppRole[]> = {
+        farmer: ["farmer"],
+        distributor: ["distributor"],
+        field_officer: ["field_officer"],
+        admin: ["admin"],
+      } as const as any;
+      const required = portalRoleMap[role];
+      const hasRequired = roles.some((r) => required.includes(r));
+
+      // Wait for roles to load (roles array is empty until DB lookup completes).
+      // We only act once we either have roles or have confirmed the user has none.
+      if (!hasRequired && roles.length > 0) {
+        // Wrong portal for this account — sign out and stay on sign-in page.
+        toast.error(
+          `This account is not registered as a ${role.replace("_", " ")}. Please use the correct portal or sign up first.`,
+        );
+        supabase.auth.signOut();
+        return;
+      }
+      if (hasRequired) {
+        const redirectTo = (location.state as any)?.from ?? roleHomePath(roles);
+        navigate(redirectTo, { replace: true });
+      }
     }
   }, [user, roles, loading, navigate, location.state]);
 
