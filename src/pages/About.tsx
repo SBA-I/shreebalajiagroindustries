@@ -40,7 +40,7 @@ const StatItem = ({ icon: Icon, value, suffix, label }: typeof stats[number]) =>
         <Icon className="h-6 w-6 text-primary" />
       </div>
       <p className="font-heading text-3xl md:text-4xl font-bold text-foreground tabular-nums">
-        {current.toLocaleString()}
+        <span className="notranslate" translate="no">{current.toLocaleString()}</span>
         {suffix}
       </p>
       <p className="text-sm text-muted-foreground mt-1">{label}</p>
