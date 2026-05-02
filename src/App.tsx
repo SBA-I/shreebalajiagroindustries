@@ -29,6 +29,7 @@ import FarmerAuth from "./pages/auth/FarmerAuth";
 import DistributorAuth from "./pages/auth/DistributorAuth";
 import FieldOfficerAuth from "./pages/auth/FieldOfficerAuth";
 import AdminAuth from "./pages/auth/AdminAuth";
+import ResetPassword from "./pages/auth/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import AdminPortal from "./pages/portals/AdminPortal";
 import DistributorPortal from "./pages/portals/DistributorPortal";
@@ -71,6 +72,7 @@ const App = () => (
               <Route path="/auth/distributor" element={<DistributorAuth />} />
               <Route path="/auth/field-officer" element={<FieldOfficerAuth />} />
               <Route path="/auth/admin" element={<AdminAuth />} />
+              <Route path="/auth/reset-password" element={<ResetPassword />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPortal /></ProtectedRoute>} />
               <Route path="/distributor" element={<ProtectedRoute allowedRoles={["distributor", "admin"]}><DistributorPortal /></ProtectedRoute>} />
