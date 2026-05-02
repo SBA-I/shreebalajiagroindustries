@@ -26,6 +26,8 @@ interface RoleAuthFormProps {
   allowSignup?: boolean;
   showGoogle?: boolean;
   extraPhone?: boolean;
+  /** When true (farmer portal): mobile is required, email is optional, and login accepts mobile or email. */
+  mobileFirst?: boolean;
   /** Optional render prop to inject role-specific signup fields. */
   renderExtraFields?: (props: {
     value: ExtraFieldsData;
@@ -44,10 +46,22 @@ const signupSchema = z.object({
   password: z.string().min(8, "At least 8 characters").max(72),
 });
 
+const mobileFirstSignupSchema = z.object({
+  fullName: z.string().trim().min(2, "Name too short").max(100),
+  email: z.string().trim().email("Invalid email").max(255).optional().or(z.literal("")),
+  phone: z.string().trim().min(7, "Mobile number is required").max(20),
+  password: z.string().min(8, "At least 8 characters").max(72),
+});
+
 const loginSchema = z.object({
   email: z.string().trim().email("Invalid email").max(255),
   password: z.string().min(1, "Password required").max(72),
 });
+
+const FARMER_PHONE_DOMAIN = "farmer.sbai.local";
+const normalizePhone = (raw: string) => raw.replace(/[^0-9]/g, "");
+const phoneToFarmerEmail = (phone: string) => `${normalizePhone(phone)}@${FARMER_PHONE_DOMAIN}`;
+const looksLikeEmail = (s: string) => /@/.test(s);
 
 const RoleAuthForm = ({
   role,
@@ -58,6 +72,7 @@ const RoleAuthForm = ({
   allowSignup = true,
   showGoogle = true,
   extraPhone = true,
+  mobileFirst = false,
   renderExtraFields,
   validateExtras,
   extrasToMetadata,
@@ -165,12 +180,23 @@ const RoleAuthForm = ({
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const parsed = loginSchema.safeParse({ email: loginEmail, password: loginPassword });
-    if (!parsed.success) return toast.error(parsed.error.errors[0].message);
+    const identifier = loginEmail.trim();
+    if (!identifier) return toast.error(mobileFirst ? "Enter your mobile or email" : "Email required");
+    if (!loginPassword) return toast.error("Password required");
+    let emailToUse = identifier;
+    if (mobileFirst && !looksLikeEmail(identifier)) {
+      const digits = normalizePhone(identifier);
+      if (digits.length < 7) return toast.error("Enter a valid mobile number or email");
+      emailToUse = phoneToFarmerEmail(digits);
+    } else if (!mobileFirst) {
+      const parsed = loginSchema.safeParse({ email: identifier, password: loginPassword });
+      if (!parsed.success) return toast.error(parsed.error.errors[0].message);
+      emailToUse = parsed.data.email;
+    }
     setBusy(true);
     const { error } = await supabase.auth.signInWithPassword({
-      email: parsed.data.email,
-      password: parsed.data.password,
+      email: emailToUse,
+      password: loginPassword,
     });
     setBusy(false);
     if (error) {
@@ -191,11 +217,16 @@ const RoleAuthForm = ({
   };
 
   const handleForgotPassword = async () => {
-    const email = loginEmail.trim();
-    if (!email || !email.includes("@")) {
+    const identifier = loginEmail.trim();
+    if (!identifier) {
       toast.error("Enter your email above first, then click Forgot password.");
       return;
     }
+    if (!identifier.includes("@")) {
+      toast.error("Password reset requires an email. If you signed up with mobile only, please contact support.");
+      return;
+    }
+    const email = identifier;
     setBusy(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/reset-password`,
@@ -211,15 +242,20 @@ const RoleAuthForm = ({
       toast.error("Admin accounts are provisioned manually.");
       return;
     }
-    const parsed = signupSchema.safeParse({ fullName: name, email, phone, password });
+    const schema = mobileFirst ? mobileFirstSignupSchema : signupSchema;
+    const parsed = schema.safeParse({ fullName: name, email, phone, password });
     if (!parsed.success) return toast.error(parsed.error.errors[0].message);
     if (validateExtras) {
       const err = validateExtras(extras);
       if (err) return toast.error(err);
     }
     setBusy(true);
+    const signupEmail =
+      mobileFirst && !parsed.data.email
+        ? phoneToFarmerEmail(parsed.data.phone)
+        : parsed.data.email;
     const { error } = await supabase.auth.signUp({
-      email: parsed.data.email,
+      email: signupEmail,
       password: parsed.data.password,
       options: {
         emailRedirectTo: window.location.origin,
@@ -234,9 +270,9 @@ const RoleAuthForm = ({
     setBusy(false);
     if (error) {
       if (error.message.toLowerCase().includes("already")) {
-        toast.error("This email is already registered. Please log in.");
+        toast.error(mobileFirst ? "This account already exists. Please log in." : "This email is already registered. Please log in.");
         setTab("login");
-        setLoginEmail(parsed.data.email);
+        setLoginEmail(parsed.data.email || parsed.data.phone);
       } else {
         toast.error(error.message);
       }
@@ -248,7 +284,7 @@ const RoleAuthForm = ({
     await supabase.auth.signOut();
     toast.success("Account created! Please sign in to continue.");
     setTab("login");
-    setLoginEmail(parsed.data.email);
+    setLoginEmail(parsed.data.email || parsed.data.phone);
     setName("");
     setEmail("");
     setPhone("");
@@ -319,6 +355,7 @@ const RoleAuthForm = ({
                     showGoogle={showGoogle}
                     onGoogle={handleGoogle}
                     onForgotPassword={handleForgotPassword}
+                    mobileFirst={mobileFirst}
                   />
                 </TabsContent>
 
@@ -328,15 +365,30 @@ const RoleAuthForm = ({
                       <Label htmlFor="signup-name">Full Name</Label>
                       <Input id="signup-name" value={name} onChange={(e) => setName(e.target.value)} required />
                     </div>
-                    <div>
-                      <Label htmlFor="signup-email">Email</Label>
-                      <Input id="signup-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                    </div>
-                    {extraPhone && (
-                      <div>
-                        <Label htmlFor="signup-phone">Mobile (optional)</Label>
-                        <Input id="signup-phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 ..." />
-                      </div>
+                    {mobileFirst ? (
+                      <>
+                        <div>
+                          <Label htmlFor="signup-phone">Mobile number *</Label>
+                          <Input id="signup-phone" type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 ..." required />
+                        </div>
+                        <div>
+                          <Label htmlFor="signup-email">Email <span className="text-muted-foreground text-xs">(optional)</span></Label>
+                          <Input id="signup-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div>
+                          <Label htmlFor="signup-email">Email</Label>
+                          <Input id="signup-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                        </div>
+                        {extraPhone && (
+                          <div>
+                            <Label htmlFor="signup-phone">Mobile (optional)</Label>
+                            <Input id="signup-phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 ..." />
+                          </div>
+                        )}
+                      </>
                     )}
                     <div>
                       <Label htmlFor="signup-password">Password</Label>
@@ -369,6 +421,7 @@ const RoleAuthForm = ({
                 showGoogle={showGoogle && role !== "admin"}
                 onGoogle={handleGoogle}
                 onForgotPassword={handleForgotPassword}
+                mobileFirst={mobileFirst}
               />
             )}
 
@@ -403,11 +456,20 @@ const LoginFormFields = ({
   showGoogle,
   onGoogle,
   onForgotPassword,
-}: LoginFieldsProps & { showGoogle?: boolean; onGoogle?: () => void; onForgotPassword?: () => void }) => (
+  mobileFirst,
+}: LoginFieldsProps & { showGoogle?: boolean; onGoogle?: () => void; onForgotPassword?: () => void; mobileFirst?: boolean }) => (
   <form onSubmit={onSubmit} className="space-y-4">
     <div>
-      <Label htmlFor="login-email">Email</Label>
-      <Input id="login-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+      <Label htmlFor="login-email">{mobileFirst ? "Mobile number or Email" : "Email"}</Label>
+      <Input
+        id="login-email"
+        type={mobileFirst ? "text" : "email"}
+        autoComplete={mobileFirst ? "username" : "email"}
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder={mobileFirst ? "+91 9876543210 or you@example.com" : undefined}
+        required
+      />
     </div>
     <div>
       <div className="flex items-center justify-between">

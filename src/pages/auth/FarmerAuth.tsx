@@ -9,8 +9,9 @@ const FarmerAuth = () => (
   <RoleAuthForm
     role="farmer"
     title="Farmer Login"
-    description="Sign in or create your farmer account."
+    description="Sign in with your mobile number (or email) and password."
     icon={Tractor}
+    mobileFirst
     renderExtraFields={(p) => <FarmerSignupExtras {...p} />}
     validateExtras={validateFarmerExtras}
     extrasToMetadata={farmerExtrasToMetadata}
