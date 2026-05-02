@@ -91,6 +91,18 @@ const Contact = () => {
                   </div>
                 </div>
                 <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Mobile number *</label>
+                  <Input
+                    type="tel"
+                    inputMode="tel"
+                    pattern="[0-9+\-\s]{7,20}"
+                    placeholder="+91 ..."
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">{t("contact.inquiryType")}</label>
                   <select
                     value={form.type}
