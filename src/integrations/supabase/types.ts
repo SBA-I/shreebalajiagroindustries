@@ -44,6 +44,56 @@ export type Database = {
         }
         Relationships: []
       }
+      dealer_invoices: {
+        Row: {
+          created_at: string
+          dealer_id: string
+          id: string
+          invoice_date: string
+          invoice_number: string
+          notes: string | null
+          pdf_url: string
+          product_summary: string | null
+          quantity_summary: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          dealer_id: string
+          id?: string
+          invoice_date?: string
+          invoice_number: string
+          notes?: string | null
+          pdf_url: string
+          product_summary?: string | null
+          quantity_summary?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          dealer_id?: string
+          id?: string
+          invoice_date?: string
+          invoice_number?: string
+          notes?: string | null
+          pdf_url?: string
+          product_summary?: string | null
+          quantity_summary?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dealer_invoices_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dealers: {
         Row: {
           address_line: string
@@ -55,11 +105,17 @@ export type Database = {
           id: string
           is_active: boolean
           is_authorized: boolean
+          lat: number | null
+          lng: number | null
           name: string
           phone: string
+          photo_url: string | null
           pincode: string
           state: string
+          taluka: string | null
           updated_at: string
+          user_id: string | null
+          whatsapp: string | null
         }
         Insert: {
           address_line: string
@@ -71,11 +127,17 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_authorized?: boolean
+          lat?: number | null
+          lng?: number | null
           name: string
           phone: string
+          photo_url?: string | null
           pincode: string
           state: string
+          taluka?: string | null
           updated_at?: string
+          user_id?: string | null
+          whatsapp?: string | null
         }
         Update: {
           address_line?: string
@@ -87,11 +149,17 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_authorized?: boolean
+          lat?: number | null
+          lng?: number | null
           name?: string
           phone?: string
+          photo_url?: string | null
           pincode?: string
           state?: string
+          taluka?: string | null
           updated_at?: string
+          user_id?: string | null
+          whatsapp?: string | null
         }
         Relationships: []
       }
@@ -765,6 +833,34 @@ export type Database = {
         }
         Returns: boolean
       }
+      list_dealer_talukas_public: {
+        Args: never
+        Returns: {
+          dealer_count: number
+          district: string
+          state: string
+          taluka: string
+        }[]
+      }
+      nearest_dealers_public: {
+        Args: { _lat: number; _limit?: number; _lng: number }
+        Returns: {
+          address_line: string
+          city: string
+          distance_km: number
+          district: string
+          id: string
+          is_authorized: boolean
+          lat: number
+          lng: number
+          name: string
+          photo_url: string
+          pincode: string
+          state: string
+          taluka: string
+          whatsapp: string
+        }[]
+      }
       search_dealers_public: {
         Args: { _pincode: string }
         Returns: {
@@ -773,9 +869,14 @@ export type Database = {
           district: string
           id: string
           is_authorized: boolean
+          lat: number
+          lng: number
           name: string
+          photo_url: string
           pincode: string
           state: string
+          taluka: string
+          whatsapp: string
         }[]
       }
     }
