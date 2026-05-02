@@ -12,13 +12,13 @@ const EmergencyContactButton = () => {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label="Emergency contact"
-        className="fixed bottom-24 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-elevated hover:scale-105 transition-transform"
+        className="fixed bottom-[14rem] right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-elevated hover:scale-105 transition-transform"
       >
         {open ? <X className="h-6 w-6" /> : <AlertTriangle className="h-6 w-6" />}
       </button>
 
       {open && (
-        <Card className="fixed bottom-44 right-4 z-40 w-72 p-4 shadow-elevated animate-fade-in border-destructive/30">
+        <Card className="fixed bottom-[18rem] right-4 z-40 w-72 p-4 shadow-elevated animate-fade-in border-destructive/30">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="h-5 w-5 text-destructive" />
             <h3 className="font-heading font-semibold text-sm">Emergency Contacts</h3>
