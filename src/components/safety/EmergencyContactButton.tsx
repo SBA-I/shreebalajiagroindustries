@@ -3,50 +3,40 @@ import { Phone, X, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-const EmergencyContactButton = () => {
-  const [open, setOpen] = useState(false);
-  const [hidden, setHidden] = useState(false);
+interface Props {
+  open?: boolean;
+  onOpenChange?: (v: boolean) => void;
+  hideTrigger?: boolean;
+}
 
-  useEffect(() => {
-    if (sessionStorage.getItem("sbai-hide-emg-contact") === "1") setHidden(true);
-  }, []);
-
-  const dismiss = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    sessionStorage.setItem("sbai-hide-emg-contact", "1");
-    setHidden(true);
-  };
-
-  if (hidden) return null;
+const EmergencyContactButton = ({ open: openProp, onOpenChange, hideTrigger }: Props = {}) => {
+  const [openState, setOpenState] = useState(false);
+  const open = openProp ?? openState;
+  const setOpen = (v: boolean) => (onOpenChange ? onOpenChange(v) : setOpenState(v));
 
   return (
     <>
-      <div className="fixed bottom-[10.75rem] right-3 z-40">
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-label="Emergency contact"
-          className="flex h-11 w-11 items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-elevated hover:scale-105 transition-transform"
-        >
-          {open ? <X className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
-        </button>
-        {open && (
+      {!hideTrigger && (
+        <div className="fixed bottom-[10.75rem] right-3 z-40">
           <button
             type="button"
-            onClick={dismiss}
-            aria-label="Hide emergency contact button"
-            className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-background border border-border text-muted-foreground flex items-center justify-center shadow hover:text-foreground"
+            onClick={() => setOpen(!open)}
+            aria-label="Emergency contact"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-elevated hover:scale-105 transition-transform"
           >
-            <X className="h-2.5 w-2.5" />
+            {open ? <X className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {open && (
-        <Card className="fixed bottom-[15.25rem] right-3 z-40 w-72 p-4 shadow-elevated animate-fade-in border-destructive/30">
+        <Card className="fixed bottom-20 right-3 z-50 w-72 p-4 shadow-elevated animate-fade-in border-destructive/30">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="h-5 w-5 text-destructive" />
             <h3 className="font-heading font-semibold text-sm">Emergency Contacts</h3>
+            <button onClick={() => setOpen(false)} className="ml-auto p-1 hover:bg-muted rounded" aria-label="Close">
+              <X className="h-4 w-4" />
+            </button>
           </div>
           <p className="text-xs text-muted-foreground mb-3">
             For accidental exposure, ingestion or spills, call immediately.
