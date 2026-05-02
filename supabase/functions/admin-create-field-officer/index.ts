@@ -59,7 +59,12 @@ Deno.serve(async (req) => {
       },
     });
     if (createErr || !created.user) {
-      return new Response(JSON.stringify({ error: createErr?.message ?? "Failed to create user" }), {
+      const raw = createErr?.message ?? "Failed to create user";
+      const friendly =
+        raw.toLowerCase().includes("already")
+          ? `A user with email "${email}" already exists. Use a different email, or remove the existing account first (Users tab).`
+          : raw;
+      return new Response(JSON.stringify({ error: friendly }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
