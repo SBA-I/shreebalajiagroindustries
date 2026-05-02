@@ -11,6 +11,31 @@ const Ctx = createContext<I18nCtx | undefined>(undefined);
 
 const isLang = (v: string | null): v is Lang => v === "en" || v === "hi" || v === "mr";
 
+// Drive the Google Translate widget by setting its cookie + selecting the lang in the hidden combo.
+const applyGoogleTranslate = (lang: Lang) => {
+  if (typeof document === "undefined") return;
+  const value = lang === "en" ? "/en/en" : `/en/${lang}`;
+  const host = window.location.hostname;
+  // Clear existing cookies on all relevant scopes.
+  const expire = "Thu, 01 Jan 1970 00:00:00 GMT";
+  document.cookie = `googtrans=; expires=${expire}; path=/`;
+  document.cookie = `googtrans=; expires=${expire}; path=/; domain=${host}`;
+  document.cookie = `googtrans=; expires=${expire}; path=/; domain=.${host}`;
+  // Set new cookies.
+  document.cookie = `googtrans=${value}; path=/`;
+  document.cookie = `googtrans=${value}; path=/; domain=${host}`;
+  document.cookie = `googtrans=${value}; path=/; domain=.${host}`;
+  // Try the in-page combo as a fast path; otherwise reload.
+  const combo = document.querySelector<HTMLSelectElement>(".goog-te-combo");
+  if (combo) {
+    combo.value = lang;
+    combo.dispatchEvent(new Event("change"));
+  } else {
+    // Defer one tick so cookie is written before reload.
+    setTimeout(() => window.location.reload(), 50);
+  }
+};
+
 export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
   const [lang, setLangState] = useState<Lang>("en");
 
@@ -33,6 +58,7 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem("sbai-lang", l);
     document.documentElement.lang = l;
     window.dispatchEvent(new CustomEvent("sbai-lang-change", { detail: l }));
+    applyGoogleTranslate(l);
   }, []);
 
   const t = useCallback(
