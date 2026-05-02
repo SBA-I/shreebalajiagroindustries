@@ -1,12 +1,12 @@
 import Layout from "@/components/layout/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShieldCheck, FileText, Megaphone, Store, Truck, Bug, Leaf, UserCheck, Receipt, Package, MessageSquare, Users, Boxes, UserCog } from "lucide-react";
+import { ShieldCheck, FileText, Megaphone, Store, Truck, Bug, BookOpen, UserCheck, Receipt, Package, MessageSquare, Users, Boxes, UserCog } from "lucide-react";
 import AdminMsdsManager from "@/components/admin/AdminMsdsManager";
 import AdminMarketingManager from "@/components/admin/AdminMarketingManager";
 import AdminDealersManager from "@/components/admin/AdminDealersManager";
 import AdminDispatchManager from "@/components/admin/AdminDispatchManager";
 import AdminPestCalendarManager from "@/components/admin/AdminPestCalendarManager";
-import AdminArticlesManager from "@/components/admin/AdminArticlesManager";
+import AdminResourcesManager from "@/components/admin/AdminArticlesManager";
 import AdminVerificationQueue from "@/components/admin/AdminVerificationQueue";
 import AdminInvoicesManager from "@/components/admin/AdminInvoicesManager";
 import AdminProductsManager from "@/components/admin/AdminProductsManager";
@@ -42,7 +42,7 @@ const AdminPortal = () => (
             <TabsTrigger value="msds" className="gap-1.5 justify-start"><FileText className="h-4 w-4 shrink-0" /> MSDS</TabsTrigger>
             <TabsTrigger value="marketing" className="gap-1.5 justify-start"><Megaphone className="h-4 w-4 shrink-0" /> Marketing</TabsTrigger>
             <TabsTrigger value="pest" className="gap-1.5 justify-start"><Bug className="h-4 w-4 shrink-0" /> Pest Calendar</TabsTrigger>
-            <TabsTrigger value="articles" className="gap-1.5 justify-start"><Leaf className="h-4 w-4 shrink-0" /> Articles</TabsTrigger>
+            <TabsTrigger value="resources" className="gap-1.5 justify-start"><BookOpen className="h-4 w-4 shrink-0" /> Resources</TabsTrigger>
             <TabsTrigger value="inquiries" className="gap-1.5 justify-start"><MessageSquare className="h-4 w-4 shrink-0" /> Inquiries</TabsTrigger>
           </TabsList>
           <TabsContent value="verification"><AdminVerificationQueue /></TabsContent>
@@ -56,7 +56,7 @@ const AdminPortal = () => (
           <TabsContent value="msds"><AdminMsdsManager /></TabsContent>
           <TabsContent value="marketing"><AdminMarketingManager /></TabsContent>
           <TabsContent value="pest"><AdminPestCalendarManager /></TabsContent>
-          <TabsContent value="articles"><AdminArticlesManager /></TabsContent>
+          <TabsContent value="resources"><AdminResourcesManager /></TabsContent>
           <TabsContent value="inquiries"><AdminContactInquiriesManager /></TabsContent>
         </Tabs>
       </div>

@@ -847,42 +847,69 @@ export type Database = {
       }
       sustainability_articles: {
         Row: {
+          author: string | null
+          author_role: string | null
           body: string
           category: string
+          content: string[]
           created_at: string
+          display_date: string | null
           excerpt: string | null
+          featured: boolean
           hero_image_url: string | null
           id: string
           is_published: boolean
           published_at: string
+          read_time: string | null
           slug: string
+          sort_order: number
+          tags: string[]
           title: string
+          type: string
           updated_at: string
         }
         Insert: {
+          author?: string | null
+          author_role?: string | null
           body: string
           category?: string
+          content?: string[]
           created_at?: string
+          display_date?: string | null
           excerpt?: string | null
+          featured?: boolean
           hero_image_url?: string | null
           id?: string
           is_published?: boolean
           published_at?: string
+          read_time?: string | null
           slug: string
+          sort_order?: number
+          tags?: string[]
           title: string
+          type?: string
           updated_at?: string
         }
         Update: {
+          author?: string | null
+          author_role?: string | null
           body?: string
           category?: string
+          content?: string[]
           created_at?: string
+          display_date?: string | null
           excerpt?: string | null
+          featured?: boolean
           hero_image_url?: string | null
           id?: string
           is_published?: boolean
           published_at?: string
+          read_time?: string | null
           slug?: string
+          sort_order?: number
+          tags?: string[]
           title?: string
+          type?: string
           updated_at?: string
         }
         Relationships: []
