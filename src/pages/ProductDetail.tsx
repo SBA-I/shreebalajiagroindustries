@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useProductById, useProducts } from "@/hooks/use-db-products";
 import { getRelatedProducts } from "@/types/product";
 import { ArrowLeft, Shield, AlertTriangle, Beaker, Leaf, Package, FileText, Send, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
@@ -19,6 +19,20 @@ const ProductDetail = () => {
   const [activeTab, setActiveTab] = useState<"details" | "safety" | "documents">("details");
   const [inquiryForm, setInquiryForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [submittingInquiry, setSubmittingInquiry] = useState(false);
+  const [msdsDocs, setMsdsDocs] = useState<Array<{ id: string; language: string; version: string | null; file_url: string; file_size_kb: number | null }>>([]);
+
+  useEffect(() => {
+    if (!product?.id) return;
+    (async () => {
+      const { data } = await supabase
+        .from("msds_documents")
+        .select("id, language, version, file_url, file_size_kb")
+        .eq("product_id", product.id)
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
+      setMsdsDocs(data ?? []);
+    })();
+  }, [product?.id]);
 
   if (isLoading) {
     return (
@@ -247,13 +261,34 @@ const ProductDetail = () => {
           )}
 
           {activeTab === "documents" && (
-            <div className="max-w-2xl">
-              <div className="bg-card rounded-xl border border-border p-6 text-center">
-                <FileText className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-                <h3 className="font-heading font-semibold text-foreground mb-2">Technical Documents</h3>
-                <p className="text-sm text-muted-foreground mb-4">Technical data sheets, MSDS, and compliance certificates will be available for download soon.</p>
-                <Button variant="outline" disabled>Coming Soon</Button>
-              </div>
+            <div className="max-w-3xl space-y-4">
+              <h3 className="font-heading font-semibold text-foreground">Material Safety Data Sheets (MSDS)</h3>
+              {msdsDocs.length === 0 ? (
+                <div className="bg-card rounded-xl border border-border p-6 text-center">
+                  <FileText className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+                  <p className="text-sm text-muted-foreground">No MSDS documents have been uploaded for this product yet.</p>
+                </div>
+              ) : (
+                <div className="grid sm:grid-cols-2 gap-3">
+                  {msdsDocs.map((d) => (
+                    <a
+                      key={d.id}
+                      href={d.file_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 bg-card rounded-xl border border-border p-4 hover:border-primary/40 hover:shadow-elevated transition-all"
+                    >
+                      <FileText className="h-8 w-8 text-primary shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-foreground truncate">{product.name} MSDS</p>
+                        <p className="text-xs text-muted-foreground">
+                          {d.language.toUpperCase()}{d.version ? ` · v${d.version}` : ""}{d.file_size_kb ? ` · ${d.file_size_kb} KB` : ""}
+                        </p>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
