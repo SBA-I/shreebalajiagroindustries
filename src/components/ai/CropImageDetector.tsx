@@ -3,6 +3,7 @@ import { Camera, Upload, Loader2, Sprout, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ReactMarkdown from "react-markdown";
+import { toast } from "sonner";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assistant`;
 
@@ -13,9 +14,24 @@ const CropImageDetector = () => {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (file: File) => {
-    if (!file.type.startsWith("image/")) return;
+    const name = file.name.toLowerCase();
+    const isHeic = /\.(heic|heif)$/i.test(name) || file.type === "image/heic" || file.type === "image/heif";
+    if (isHeic) {
+      toast.error("HEIC images aren't supported. Please share as JPG or PNG (most phones can convert in the share menu).");
+      return;
+    }
+    const isImage = file.type.startsWith("image/") || /\.(jpe?g|png|webp|gif|bmp)$/i.test(name);
+    if (!isImage) {
+      toast.error("Please upload an image file (JPG, PNG, WebP).");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      toast.error("Image is too large. Please use a photo under 8 MB.");
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (e) => setImage(e.target?.result as string);
+    reader.onerror = () => toast.error("Could not read this image. Try another photo.");
     reader.readAsDataURL(file);
   };
 
