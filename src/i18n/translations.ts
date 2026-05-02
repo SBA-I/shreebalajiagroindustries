@@ -181,6 +181,8 @@ const en = {
   "fab.title": "Quick Actions",
   "fab.sprayDialog": "Spray Calculator",
   "fab.diseaseDialog": "Disease Detector",
+  "fab.language": "Language",
+  "fab.languageDialog": "Choose Language",
 } as const;
 
 type Dict = Record<keyof typeof en, string>;
