@@ -32,6 +32,7 @@ const TYPE_OPTIONS = [
 ];
 const AUDIENCE_OPTIONS = [
   { value: "dealers", label: "Dealers only" },
+  { value: "field_officers", label: "Field Officers only" },
   { value: "public", label: "Public" },
 ];
 
