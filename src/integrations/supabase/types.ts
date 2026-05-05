@@ -47,6 +47,63 @@ export type Database = {
         }
         Relationships: []
       }
+      dealer_audits: {
+        Row: {
+          audit_date: string
+          created_at: string
+          dealer_id: string | null
+          dealer_name: string
+          id: string
+          lat: number | null
+          lng: number | null
+          marketing_material_needed: boolean
+          notes: string | null
+          officer_id: string
+          photo_url: string | null
+          rating: number | null
+          shelves_stocked: boolean
+          signage_visible: boolean
+          staff_trained: boolean
+          updated_at: string
+        }
+        Insert: {
+          audit_date?: string
+          created_at?: string
+          dealer_id?: string | null
+          dealer_name: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          marketing_material_needed?: boolean
+          notes?: string | null
+          officer_id: string
+          photo_url?: string | null
+          rating?: number | null
+          shelves_stocked?: boolean
+          signage_visible?: boolean
+          staff_trained?: boolean
+          updated_at?: string
+        }
+        Update: {
+          audit_date?: string
+          created_at?: string
+          dealer_id?: string | null
+          dealer_name?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          marketing_material_needed?: boolean
+          notes?: string | null
+          officer_id?: string
+          photo_url?: string | null
+          rating?: number | null
+          shelves_stocked?: boolean
+          signage_visible?: boolean
+          staff_trained?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       dealer_invoices: {
         Row: {
           created_at: string
@@ -378,6 +435,174 @@ export type Database = {
           sowing_date?: string
           user_id?: string
           variety?: string | null
+        }
+        Relationships: []
+      }
+      farmer_leads: {
+        Row: {
+          created_at: string
+          crops: string[] | null
+          district: string | null
+          farmer_name: string
+          id: string
+          land_size_acres: number | null
+          lat: number | null
+          linked_dealer_id: string | null
+          lng: number | null
+          notes: string | null
+          officer_id: string
+          phone: string | null
+          pincode: string | null
+          state: string | null
+          status: string
+          taluka: string | null
+          updated_at: string
+          village: string | null
+        }
+        Insert: {
+          created_at?: string
+          crops?: string[] | null
+          district?: string | null
+          farmer_name: string
+          id?: string
+          land_size_acres?: number | null
+          lat?: number | null
+          linked_dealer_id?: string | null
+          lng?: number | null
+          notes?: string | null
+          officer_id: string
+          phone?: string | null
+          pincode?: string | null
+          state?: string | null
+          status?: string
+          taluka?: string | null
+          updated_at?: string
+          village?: string | null
+        }
+        Update: {
+          created_at?: string
+          crops?: string[] | null
+          district?: string | null
+          farmer_name?: string
+          id?: string
+          land_size_acres?: number | null
+          lat?: number | null
+          linked_dealer_id?: string | null
+          lng?: number | null
+          notes?: string | null
+          officer_id?: string
+          phone?: string | null
+          pincode?: string | null
+          state?: string | null
+          status?: string
+          taluka?: string | null
+          updated_at?: string
+          village?: string | null
+        }
+        Relationships: []
+      }
+      field_officer_attendance: {
+        Row: {
+          check_in_at: string
+          check_in_lat: number | null
+          check_in_lng: number | null
+          check_out_at: string | null
+          check_out_lat: number | null
+          check_out_lng: number | null
+          created_at: string
+          id: string
+          notes: string | null
+          officer_id: string
+          villages_covered: string[] | null
+        }
+        Insert: {
+          check_in_at?: string
+          check_in_lat?: number | null
+          check_in_lng?: number | null
+          check_out_at?: string | null
+          check_out_lat?: number | null
+          check_out_lng?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          officer_id: string
+          villages_covered?: string[] | null
+        }
+        Update: {
+          check_in_at?: string
+          check_in_lat?: number | null
+          check_in_lng?: number | null
+          check_out_at?: string | null
+          check_out_lat?: number | null
+          check_out_lng?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          officer_id?: string
+          villages_covered?: string[] | null
+        }
+        Relationships: []
+      }
+      field_visits: {
+        Row: {
+          acreage: number | null
+          created_at: string
+          crop: string | null
+          district: string | null
+          farmer_name: string
+          farmer_phone: string | null
+          id: string
+          lat: number | null
+          lng: number | null
+          observations: string | null
+          officer_id: string
+          photo_url: string | null
+          recommendation: string | null
+          recommended_products: string[] | null
+          state: string | null
+          updated_at: string
+          village: string | null
+          visit_date: string
+        }
+        Insert: {
+          acreage?: number | null
+          created_at?: string
+          crop?: string | null
+          district?: string | null
+          farmer_name: string
+          farmer_phone?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          observations?: string | null
+          officer_id: string
+          photo_url?: string | null
+          recommendation?: string | null
+          recommended_products?: string[] | null
+          state?: string | null
+          updated_at?: string
+          village?: string | null
+          visit_date?: string
+        }
+        Update: {
+          acreage?: number | null
+          created_at?: string
+          crop?: string | null
+          district?: string | null
+          farmer_name?: string
+          farmer_phone?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          observations?: string | null
+          officer_id?: string
+          photo_url?: string | null
+          recommendation?: string | null
+          recommended_products?: string[] | null
+          state?: string | null
+          updated_at?: string
+          village?: string | null
+          visit_date?: string
         }
         Relationships: []
       }
