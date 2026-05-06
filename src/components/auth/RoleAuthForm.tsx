@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth, roleHomePath, type AppRole } from "@/hooks/use-auth";
 import logo from "@/assets/logo-sbai.png";
+import InquiryForm, { type InquiryRole } from "@/components/auth/InquiryForm";
 
 export type RoleKey = "farmer" | "distributor" | "field_officer" | "admin";
 
@@ -80,7 +81,7 @@ const RoleAuthForm = ({
   const navigate = useNavigate();
   const location = useLocation();
   const { user, roles, loading } = useAuth();
-  const [tab, setTab] = useState<"login" | "signup">("login");
+  const [tab, setTab] = useState<"login" | "signup" | "inquiry">("login");
   const [busy, setBusy] = useState(false);
   const [linking, setLinking] = useState(false);
 
@@ -338,10 +339,11 @@ const RoleAuthForm = ({
           </CardHeader>
           <CardContent>
             {showSignup ? (
-              <Tabs value={tab} onValueChange={(v) => setTab(v as "login" | "signup")}>
-                <TabsList className="grid w-full grid-cols-2 mb-4">
+              <Tabs value={tab} onValueChange={(v) => setTab(v as "login" | "signup" | "inquiry")}>
+                <TabsList className="grid w-full grid-cols-3 mb-4">
                   <TabsTrigger value="login">Log In</TabsTrigger>
                   <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                  <TabsTrigger value="inquiry">Inquiry</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="login">
@@ -408,6 +410,10 @@ const RoleAuthForm = ({
                       {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Account"}
                     </Button>
                   </form>
+                </TabsContent>
+
+                <TabsContent value="inquiry">
+                  <InquiryForm role={role as InquiryRole} />
                 </TabsContent>
               </Tabs>
             ) : (
