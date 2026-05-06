@@ -9,6 +9,9 @@ import SprayLog from "@/components/farmer/SprayLog";
 import DiseaseGallery from "@/components/farmer/DiseaseGallery";
 import YieldCalculator from "@/components/farmer/YieldCalculator";
 import ProfileCard from "@/components/farmer/ProfileCard";
+import InquiryForm from "@/components/portal/InquiryForm";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MessageSquare } from "lucide-react";
 
 interface ProfileLite {
   full_name: string | null;
@@ -78,6 +81,17 @@ const FarmerPortal = () => {
 
           {/* Account Details (signup info, editable) */}
           <ProfileCard />
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <MessageSquare className="h-4 w-4 text-primary" /> Send an Inquiry
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <InquiryForm role="farmer" />
+            </CardContent>
+          </Card>
         </div>
       </section>
     </Layout>
