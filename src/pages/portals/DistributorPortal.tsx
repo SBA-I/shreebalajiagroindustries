@@ -148,6 +148,13 @@ const DistributorPortal = () => {
                 </CardContent>
               </Card>
             </TabsContent>
+
+            <TabsContent value="inquiry">
+              <Card>
+                <CardHeader><CardTitle className="text-base flex items-center gap-2"><MessageSquare className="h-4 w-4" /> Send an Inquiry</CardTitle></CardHeader>
+                <CardContent><InquiryForm role="distributor" /></CardContent>
+              </Card>
+            </TabsContent>
           </Tabs>
         </div>
       </section>
