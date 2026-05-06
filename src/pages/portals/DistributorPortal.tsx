@@ -4,12 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Store, FileText, Download, Loader2, Package, Truck, Megaphone, Receipt } from "lucide-react";
+import { Store, FileText, Download, Loader2, Package, Truck, Megaphone, Receipt, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import PackageTracker from "@/components/dealer/PackageTracker";
 import MarketingLibrary from "@/components/dealer/MarketingLibrary";
+import InquiryForm from "@/components/portal/InquiryForm";
 
 interface Invoice {
   id: string; invoice_number: string; invoice_date: string;
@@ -74,10 +75,11 @@ const DistributorPortal = () => {
       <section className="py-8">
         <div className="container mx-auto px-4 lg:px-8 max-w-5xl">
           <Tabs defaultValue="shipments">
-            <TabsList className="grid grid-cols-3 mb-6">
+            <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-6">
               <TabsTrigger value="shipments" className="gap-1.5"><Truck className="h-4 w-4" /> Live Shipments</TabsTrigger>
               <TabsTrigger value="brand" className="gap-1.5"><Megaphone className="h-4 w-4" /> Brand Assets</TabsTrigger>
               <TabsTrigger value="invoices" className="gap-1.5"><Receipt className="h-4 w-4" /> Invoices</TabsTrigger>
+              <TabsTrigger value="inquiry" className="gap-1.5"><MessageSquare className="h-4 w-4" /> Inquiry</TabsTrigger>
             </TabsList>
 
             <TabsContent value="shipments">
