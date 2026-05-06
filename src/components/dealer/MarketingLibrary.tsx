@@ -35,7 +35,18 @@ const TABS: Array<{ key: string; label: string }> = [
   { key: "bulletin", label: "Bulletins" },
 ];
 
-const MarketingLibrary = () => {
+interface Props {
+  /** Audience values to include. Defaults to dealers + public. */
+  audiences?: string[];
+  title?: string;
+  subtitle?: string;
+}
+
+const MarketingLibrary = ({
+  audiences = ["dealers", "public"],
+  title = "Marketing Library",
+  subtitle = "High-quality SBA visuals, catalogs, and explainer videos. Download and share on WhatsApp Status, Facebook, or print for your shop.",
+}: Props) => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("all");
@@ -48,12 +59,13 @@ const MarketingLibrary = () => {
         .from("marketing_assets")
         .select("id,title,description,asset_type,file_url,thumbnail_url")
         .eq("is_active", true)
+        .in("audience", audiences)
         .order("created_at", { ascending: false });
       if (error) toast.error("Could not load brand assets");
       setAssets((data ?? []) as Asset[]);
       setLoading(false);
     })();
-  }, []);
+  }, [audiences.join(",")]);
 
   const filtered = assets.filter((a) => {
     if (tab !== "all" && a.asset_type !== tab) return false;
@@ -65,11 +77,9 @@ const MarketingLibrary = () => {
     <Card className="shadow-card">
       <CardHeader>
         <CardTitle className="font-heading text-lg flex items-center gap-2">
-          <Megaphone className="h-5 w-5 text-primary" /> Marketing Library
+          <Megaphone className="h-5 w-5 text-primary" /> {title}
         </CardTitle>
-        <p className="text-xs text-muted-foreground">
-          High-quality SBA visuals, catalogs, and explainer videos. Download and share on WhatsApp Status, Facebook, or print for your shop.
-        </p>
+        <p className="text-xs text-muted-foreground">{subtitle}</p>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex flex-col sm:flex-row gap-2">

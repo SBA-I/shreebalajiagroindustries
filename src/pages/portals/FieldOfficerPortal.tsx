@@ -8,6 +8,7 @@ import DealerAuditManager from "@/components/field-officer/DealerAuditManager";
 import FarmerLeadManager from "@/components/field-officer/FarmerLeadManager";
 import InquiryForm from "@/components/portal/InquiryForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import MarketingLibrary from "@/components/dealer/MarketingLibrary";
 
 const FieldOfficerPortal = () => {
   const { user, loading } = useAuth();
@@ -37,15 +38,23 @@ const FieldOfficerPortal = () => {
         <div className="container mx-auto px-4 lg:px-8 max-w-5xl space-y-4">
           <AttendanceCard userId={user.id} />
           <Tabs defaultValue="visits">
-            <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full">
+            <TabsList className="grid grid-cols-2 md:grid-cols-5 w-full">
               <TabsTrigger value="visits">Visits</TabsTrigger>
               <TabsTrigger value="audits">Dealer Audits</TabsTrigger>
               <TabsTrigger value="leads">Farmer Leads</TabsTrigger>
+              <TabsTrigger value="assets">Assets</TabsTrigger>
               <TabsTrigger value="inquiry">Inquiry</TabsTrigger>
             </TabsList>
             <TabsContent value="visits" className="mt-4"><VisitLogManager userId={user.id} /></TabsContent>
             <TabsContent value="audits" className="mt-4"><DealerAuditManager userId={user.id} /></TabsContent>
             <TabsContent value="leads" className="mt-4"><FarmerLeadManager userId={user.id} /></TabsContent>
+            <TabsContent value="assets" className="mt-4">
+              <MarketingLibrary
+                audiences={["field_officers", "public"]}
+                title="Field Officer Assets"
+                subtitle="Marketing kits, brochures, and demo videos shared by Admin for field activities."
+              />
+            </TabsContent>
             <TabsContent value="inquiry" className="mt-4">
               <Card>
                 <CardHeader><CardTitle className="text-base">Send an Inquiry</CardTitle></CardHeader>
