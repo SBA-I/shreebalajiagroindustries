@@ -75,11 +75,11 @@ const DistributorPortal = () => {
       <section className="py-8">
         <div className="container mx-auto px-4 lg:px-8 max-w-5xl">
           <Tabs defaultValue="shipments">
-            <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-6">
-              <TabsTrigger value="shipments" className="gap-1.5"><Truck className="h-4 w-4" /> Live Shipments</TabsTrigger>
-              <TabsTrigger value="brand" className="gap-1.5"><Megaphone className="h-4 w-4" /> Brand Assets</TabsTrigger>
-              <TabsTrigger value="invoices" className="gap-1.5"><Receipt className="h-4 w-4" /> Invoices</TabsTrigger>
-              <TabsTrigger value="inquiry" className="gap-1.5"><MessageSquare className="h-4 w-4" /> Inquiry</TabsTrigger>
+            <TabsList className="flex w-full h-auto flex-wrap justify-start gap-1 p-1 mb-6 md:grid md:grid-cols-4">
+              <TabsTrigger value="shipments" className="gap-1.5 flex-1 min-w-[140px]"><Truck className="h-4 w-4" /> Live Shipments</TabsTrigger>
+              <TabsTrigger value="brand" className="gap-1.5 flex-1 min-w-[140px]"><Megaphone className="h-4 w-4" /> Brand Assets</TabsTrigger>
+              <TabsTrigger value="invoices" className="gap-1.5 flex-1 min-w-[140px]"><Receipt className="h-4 w-4" /> Invoices</TabsTrigger>
+              <TabsTrigger value="inquiry" className="gap-1.5 flex-1 min-w-[140px]"><MessageSquare className="h-4 w-4" /> Inquiry</TabsTrigger>
             </TabsList>
 
             <TabsContent value="shipments">

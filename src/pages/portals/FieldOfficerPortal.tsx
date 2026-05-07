@@ -38,12 +38,12 @@ const FieldOfficerPortal = () => {
         <div className="container mx-auto px-4 lg:px-8 max-w-5xl space-y-4">
           <AttendanceCard userId={user.id} />
           <Tabs defaultValue="visits">
-            <TabsList className="grid grid-cols-2 md:grid-cols-5 w-full">
-              <TabsTrigger value="visits">Visits</TabsTrigger>
-              <TabsTrigger value="audits">Dealer Audits</TabsTrigger>
-              <TabsTrigger value="leads">Farmer Leads</TabsTrigger>
-              <TabsTrigger value="assets">Assets</TabsTrigger>
-              <TabsTrigger value="inquiry">Inquiry</TabsTrigger>
+            <TabsList className="flex w-full h-auto flex-wrap justify-start gap-1 p-1 md:grid md:grid-cols-5">
+              <TabsTrigger value="visits" className="flex-1 min-w-[110px]">Visits</TabsTrigger>
+              <TabsTrigger value="audits" className="flex-1 min-w-[110px]">Dealer Audits</TabsTrigger>
+              <TabsTrigger value="leads" className="flex-1 min-w-[110px]">Farmer Leads</TabsTrigger>
+              <TabsTrigger value="assets" className="flex-1 min-w-[110px]">Assets</TabsTrigger>
+              <TabsTrigger value="inquiry" className="flex-1 min-w-[110px]">Inquiry</TabsTrigger>
             </TabsList>
             <TabsContent value="visits" className="mt-4"><VisitLogManager userId={user.id} /></TabsContent>
             <TabsContent value="audits" className="mt-4"><DealerAuditManager userId={user.id} /></TabsContent>
