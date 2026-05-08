@@ -6,6 +6,8 @@ import logo from "@/assets/logo-sbai.png";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/i18n/I18nProvider";
 import type { TKey } from "@/i18n/translations";
+import NotificationsBell from "@/components/notifications/NotificationsBell";
+import GlobalSearch from "@/components/search/GlobalSearch";
 
 type NavChild = { key: string; tKey: TKey; path: string };
 type NavItem = { key: string; tKey: TKey; path: string; children?: NavChild[] };
@@ -90,6 +92,8 @@ const Header = () => {
 
         {/* Desktop Actions */}
         <div className="hidden lg:flex items-center gap-3">
+          <GlobalSearch variant="icon" />
+          <NotificationsBell />
           {user ? (
             <>
               <Link to="/dashboard">
@@ -110,14 +114,18 @@ const Header = () => {
           )}
         </div>
 
-        {/* Mobile Toggle */}
-        <button
-          className="lg:hidden p-2 rounded-md hover:bg-muted transition-colors"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
-        >
-          {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        {/* Mobile Actions */}
+        <div className="lg:hidden flex items-center gap-1">
+          <GlobalSearch variant="icon" />
+          <NotificationsBell />
+          <button
+            className="p-2 rounded-md hover:bg-muted transition-colors"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
