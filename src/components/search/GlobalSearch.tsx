@@ -74,11 +74,11 @@ const GlobalSearch = ({ variant = "icon" }: { variant?: "icon" | "input" }) => {
           {products.length > 0 && (
             <CommandGroup heading="Products">
               {products.slice(0, 30).map((p) => (
-                <CommandItem key={p.id} value={`product ${p.name} ${p.technicalName ?? ""} ${(p.targetCrops ?? []).join(" ")} ${(p.targetPests ?? []).join(" ")}`} onSelect={() => go(`/products/${p.slug}`)}>
+                <CommandItem key={p.id} value={`product ${p.name} ${(p as any).composition ?? ""} ${((p as any).targetCrops ?? []).join(" ")} ${((p as any).targetPests ?? []).join(" ")}`} onSelect={() => go(`/products/${p.slug}`)}>
                   <Package className="h-4 w-4 mr-2 text-primary" />
                   <div className="flex-1 min-w-0">
                     <p className="truncate">{p.name}</p>
-                    {p.technicalName && <p className="text-xs text-muted-foreground truncate">{p.technicalName}</p>}
+                    {(p as any).composition && <p className="text-xs text-muted-foreground truncate">{(p as any).composition}</p>}
                   </div>
                 </CommandItem>
               ))}
