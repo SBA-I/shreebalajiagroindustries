@@ -36,6 +36,7 @@ import DistributorPortal from "./pages/portals/DistributorPortal";
 import FieldOfficerPortal from "./pages/portals/FieldOfficerPortal";
 import FarmerPortal from "./pages/portals/FarmerPortal";
 import FloatingActionHub from "./components/FloatingActionHub";
+import InstallPrompt from "./components/pwa/InstallPrompt";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -81,6 +82,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
             <FloatingActionHub />
+            <InstallPrompt />
           </ComparisonProvider>
         </AuthProvider>
         </I18nProvider>
