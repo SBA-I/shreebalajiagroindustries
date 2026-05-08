@@ -57,9 +57,40 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Cleanup app rows then delete from auth
+    // Look up dealer rows owned by this user so we can clean dependent rows
+    const { data: dealerRows } = await admin
+      .from("dealers")
+      .select("id")
+      .eq("user_id", user_id);
+    const dealerIds = (dealerRows ?? []).map((d: any) => d.id);
+
+    if (dealerIds.length > 0) {
+      await admin.from("dealer_stock").delete().in("dealer_id", dealerIds);
+      await admin.from("dealer_invoices").delete().in("dealer_id", dealerIds);
+      await admin.from("dispatches").delete().in("dealer_id", dealerIds);
+      await admin.from("dealer_audits").delete().in("dealer_id", dealerIds);
+      await admin.from("farmer_leads").delete().in("linked_dealer_id", dealerIds);
+    }
+
+    // Field-officer-owned rows
+    await admin.from("dealer_audits").delete().eq("officer_id", user_id);
+    await admin.from("farmer_leads").delete().eq("officer_id", user_id);
+    await admin.from("field_visits").delete().eq("officer_id", user_id);
+    await admin.from("field_officer_attendance").delete().eq("officer_id", user_id);
+
+    // Farmer-owned rows
+    await admin.from("spray_logs").delete().eq("user_id", user_id);
+    await admin.from("disease_scans").delete().eq("user_id", user_id);
+    await admin.from("farmer_crops").delete().eq("user_id", user_id);
+    await admin.from("inventory").delete().eq("distributor_id", user_id);
+
+    // Notifications + dealer + roles + profile
+    await admin.from("messages").delete().eq("user_id", user_id);
+    await admin.from("dealers").delete().eq("user_id", user_id);
     await admin.from("user_roles").delete().eq("user_id", user_id);
     await admin.from("profiles").delete().eq("user_id", user_id);
+
+    // Finally delete from auth — this is the actual account removal
     const { error: delErr } = await admin.auth.admin.deleteUser(user_id);
     if (delErr && !/not.?found/i.test(delErr.message)) throw delErr;
 
