@@ -1,6 +1,7 @@
 import Layout from "@/components/layout/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShieldCheck, FileText, Megaphone, Store, Truck, Bug, BookOpen, UserCheck, Receipt, Package, MessageSquare, Users, Boxes, UserCog, Newspaper, Mail, Activity } from "lucide-react";
+import { ShieldCheck, FileText, Megaphone, Store, Truck, Bug, BookOpen, UserCheck, Receipt, Package, MessageSquare, Users, Boxes, UserCog, Newspaper, Mail, Activity, LayoutDashboard } from "lucide-react";
+import AdminOverview from "@/components/admin/AdminOverview";
 import AdminMsdsManager from "@/components/admin/AdminMsdsManager";
 import AdminMarketingManager from "@/components/admin/AdminMarketingManager";
 import AdminDealersManager from "@/components/admin/AdminDealersManager";
@@ -32,8 +33,9 @@ const AdminPortal = () => (
 
     <section className="py-8">
       <div className="container mx-auto px-4 lg:px-8 max-w-6xl">
-        <Tabs defaultValue="verification">
+        <Tabs defaultValue="overview">
           <TabsList className="flex flex-wrap h-auto gap-1 mb-6 bg-muted/40 p-1 w-full justify-start">
+            <TabsTrigger value="overview" className="gap-1.5 flex-1 min-w-[140px] justify-start"><LayoutDashboard className="h-4 w-4 shrink-0" /> Overview</TabsTrigger>
             <TabsTrigger value="verification" className="gap-1.5 flex-1 min-w-[140px] justify-start"><UserCheck className="h-4 w-4 shrink-0" /> Verification</TabsTrigger>
             <TabsTrigger value="users" className="gap-1.5 flex-1 min-w-[140px] justify-start"><Users className="h-4 w-4 shrink-0" /> Users</TabsTrigger>
             <TabsTrigger value="products" className="gap-1.5 flex-1 min-w-[140px] justify-start"><Package className="h-4 w-4 shrink-0" /> Products</TabsTrigger>
@@ -51,6 +53,7 @@ const AdminPortal = () => (
             <TabsTrigger value="subscribers" className="gap-1.5 flex-1 min-w-[140px] justify-start"><Mail className="h-4 w-4 shrink-0" /> Subscribers</TabsTrigger>
             <TabsTrigger value="inquiries" className="gap-1.5 flex-1 min-w-[140px] justify-start"><MessageSquare className="h-4 w-4 shrink-0" /> Inquiries</TabsTrigger>
           </TabsList>
+          <TabsContent value="overview"><AdminOverview /></TabsContent>
           <TabsContent value="verification"><AdminVerificationQueue /></TabsContent>
           <TabsContent value="users"><AdminUsersManager /></TabsContent>
           <TabsContent value="products"><AdminProductsManager /></TabsContent>
