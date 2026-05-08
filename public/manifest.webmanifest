@@ -1,0 +1,15 @@
+{
+  "name": "Shree Balaji Agro Industries",
+  "short_name": "SBAI Agro",
+  "description": "Trusted crop protection — products, dealer network, and field tools.",
+  "theme_color": "#2E7D32",
+  "background_color": "#FFFFFF",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
