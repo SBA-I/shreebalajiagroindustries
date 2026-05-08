@@ -1293,6 +1293,16 @@ export type Database = {
           whatsapp: string
         }[]
       }
+      notify_admins: {
+        Args: {
+          _body: string
+          _from_name: string
+          _preview: string
+          _subject: string
+          _type: Database["public"]["Enums"]["message_type"]
+        }
+        Returns: undefined
+      }
       search_dealers_public: {
         Args: { _pincode: string }
         Returns: {
