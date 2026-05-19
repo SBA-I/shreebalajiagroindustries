@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, FileText, MapPin, CheckCircle2, XCircle, Eye } from "lucide-react";
+import { Loader2, FileText, MapPin, CheckCircle2, XCircle, Eye, ListChecks } from "lucide-react";
 import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
+import { logAudit } from "@/lib/audit";
 
 interface PendingDealer {
   id: string;
@@ -57,6 +59,8 @@ const AdminVerificationQueue = () => {
   const [notesById, setNotesById] = useState<Record<string, string>>({});
   const [busyId, setBusyId] = useState<string | null>(null);
   const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
+  const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [bulkBusy, setBulkBusy] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -75,6 +79,7 @@ const AdminVerificationQueue = () => {
   };
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [tab, roleTab]);
+  useEffect(() => { setSelected({}); }, [tab, roleTab, items]);
 
   const viewDoc = async (path: string | null, key: string) => {
     if (!path) return;
@@ -93,6 +98,7 @@ const AdminVerificationQueue = () => {
   const decide = async (id: string, status: "approved" | "rejected") => {
     setBusyId(id);
     const { data: { user } } = await supabase.auth.getUser();
+    const target = items.find((i) => i.id === id);
     const { error } = await supabase
       .from("profiles")
       .update({
@@ -107,11 +113,45 @@ const AdminVerificationQueue = () => {
       toast.error(error.message);
       return;
     }
+    await logAudit({
+      action: status === "approved" ? "verification.approved" : "verification.rejected",
+      target_type: "verification",
+      target_id: target?.user_id,
+      target_label: target?.shop_name || target?.full_name || undefined,
+      details: { role: roleTab },
+    });
     toast.success(
       status === "approved"
         ? `Approved — ${roleTab === "distributor" ? "distributor" : "field officer"} role granted.`
         : "Application rejected.",
     );
+    load();
+  };
+
+  const bulkApprove = async () => {
+    const ids = Object.keys(selected).filter((k) => selected[k]);
+    if (ids.length === 0) return toast.error("Select at least one application");
+    if (!confirm(`Approve ${ids.length} ${roleTab === "distributor" ? "dealer" : "field officer"} application(s)?`)) return;
+    setBulkBusy(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        verification_status: "approved",
+        reviewed_by: user?.id ?? null,
+        reviewed_at: new Date().toISOString(),
+      })
+      .in("id", ids);
+    setBulkBusy(false);
+    if (error) return toast.error(error.message);
+    await logAudit({
+      action: "verification.bulk_approved",
+      target_type: "verification",
+      target_label: `${ids.length} applications`,
+      details: { count: ids.length, role: roleTab },
+    });
+    toast.success(`Approved ${ids.length} application(s)`);
+    setSelected({});
     load();
   };
 
@@ -145,12 +185,20 @@ const AdminVerificationQueue = () => {
             ))}
           </TabsList>
         </Tabs>
+        <div className="flex gap-2 items-center flex-1 justify-end flex-wrap">
         <Input
           placeholder={roleTab === "distributor" ? "Search shop, name or GST…" : "Search name, employee ID or territory…"}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-sm"
         />
+        {tab === "pending" && Object.values(selected).filter(Boolean).length > 0 && (
+          <Button size="sm" onClick={bulkApprove} disabled={bulkBusy} className="gap-1.5">
+            {bulkBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ListChecks className="h-4 w-4" />}
+            Approve {Object.values(selected).filter(Boolean).length} selected
+          </Button>
+        )}
+        </div>
       </div>
 
       {loading ? (
@@ -165,7 +213,16 @@ const AdminVerificationQueue = () => {
             <Card key={d.id}>
               <CardContent className="p-4 space-y-3">
                 <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div>
+                  <div className="flex items-start gap-3">
+                    {tab === "pending" && (
+                      <Checkbox
+                        className="mt-1"
+                        checked={!!selected[d.id]}
+                        onCheckedChange={(v) => setSelected((s) => ({ ...s, [d.id]: !!v }))}
+                        aria-label="Select for bulk approve"
+                      />
+                    )}
+                    <div>
                     <h3 className="font-heading font-semibold">
                       {roleTab === "distributor" ? (d.shop_name || "—") : (d.full_name || "—")}
                     </h3>
@@ -175,6 +232,7 @@ const AdminVerificationQueue = () => {
                     <p className="text-xs text-muted-foreground">
                       Submitted {new Date(d.created_at).toLocaleDateString("en-IN")}
                     </p>
+                    </div>
                   </div>
                   <Badge className={statusBadge(d.verification_status)}>{d.verification_status}</Badge>
                 </div>

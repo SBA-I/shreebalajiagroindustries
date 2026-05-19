@@ -37,11 +37,14 @@ import FieldOfficerPortal from "./pages/portals/FieldOfficerPortal";
 import FarmerPortal from "./pages/portals/FarmerPortal";
 import FloatingActionHub from "./components/FloatingActionHub";
 import InstallPrompt from "./components/pwa/InstallPrompt";
+import OnboardingTour from "./components/onboarding/OnboardingTour";
+import { ThemeProvider } from "./components/theme/ThemeProvider";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => (
+  <ThemeProvider>
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <BrowserRouter>
@@ -83,12 +86,14 @@ const App = () => (
             </Routes>
             <FloatingActionHub />
             <InstallPrompt />
+            <OnboardingTour />
           </ComparisonProvider>
         </AuthProvider>
         </I18nProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
+  </ThemeProvider>
 );
 
 export default App;
