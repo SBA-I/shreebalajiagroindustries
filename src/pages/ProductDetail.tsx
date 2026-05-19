@@ -61,7 +61,7 @@ const ProductDetail = () => {
   useJsonLd("ld-product", product ? {
     "@type": "Product",
     name: product.name,
-    description: product.shortDescription || product.description,
+    description: (product as any).shortDescription || product.description,
     category: product.category,
     image: product.image,
     brand: { "@type": "Brand", name: "Shree Balaji Agro Industries" },

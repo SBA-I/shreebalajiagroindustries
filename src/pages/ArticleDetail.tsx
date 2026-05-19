@@ -49,8 +49,8 @@ const ArticleDetail = () => {
     "@type": "Article",
     headline: article.title,
     description: article.excerpt,
-    image: article.heroImage,
-    datePublished: article.publishedAt,
+    image: (article as any).heroImageUrl,
+    datePublished: (article as any).publishedAt || (article as any).published_at,
     author: { "@type": "Person", name: article.author || "Shree Balaji Agro Industries" },
     publisher: { "@type": "Organization", name: "Shree Balaji Agro Industries" },
   } : null);
