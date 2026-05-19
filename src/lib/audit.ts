@@ -27,15 +27,15 @@ export const logAudit = async (entry: AuditEntry) => {
       .select("full_name")
       .eq("user_id", user.id)
       .maybeSingle();
-    await supabase.from("admin_audit_log").insert({
+    await supabase.from("admin_audit_log").insert([{
       admin_id: user.id,
-      admin_name: prof?.full_name ?? user.email ?? null,
+      admin_name: prof?.full_name ?? user.email ?? undefined,
       action: entry.action,
       target_type: entry.target_type,
-      target_id: entry.target_id ?? null,
-      target_label: entry.target_label ?? null,
-      details: entry.details ?? {},
-    });
+      target_id: entry.target_id,
+      target_label: entry.target_label,
+      details: (entry.details ?? {}) as any,
+    }]);
   } catch {
     // never block user flow on audit failure
   }
