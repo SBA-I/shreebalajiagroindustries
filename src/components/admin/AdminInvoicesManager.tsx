@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Trash2, Upload } from "lucide-react";
+import { Loader2, Trash2, Upload, Printer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -122,7 +122,12 @@ const AdminInvoicesManager = () => {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">Uploaded Invoices ({invoices.length})</CardTitle></CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-base">Uploaded Invoices ({invoices.length})</CardTitle>
+          <Button size="sm" variant="outline" className="gap-1.5" onClick={() => window.print()} data-no-print>
+            <Printer className="h-4 w-4" /> Print list
+          </Button>
+        </CardHeader>
         <CardContent>
           {loading ? (
             <div className="flex justify-center py-6"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>

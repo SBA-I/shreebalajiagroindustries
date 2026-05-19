@@ -12,6 +12,7 @@ const CropImageDetector = () => {
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (file: File) => {
     const name = file.name.toLowerCase();
@@ -127,13 +128,35 @@ const CropImageDetector = () => {
         </p>
 
         {!image ? (
-          <div
-            className="border-2 border-dashed border-border rounded-xl p-8 text-center cursor-pointer hover:border-primary/50 transition-colors"
-            onClick={() => fileRef.current?.click()}
-          >
-            <Upload className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
-            <p className="text-sm font-medium text-foreground">Click to upload crop photo</p>
-            <p className="text-xs text-muted-foreground mt-1">JPG, PNG — Max 5MB</p>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                type="button"
+                onClick={() => cameraRef.current?.click()}
+                className="h-24 flex-col gap-2"
+              >
+                <Camera className="h-6 w-6" />
+                <span className="text-xs font-medium">Take Photo</span>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => fileRef.current?.click()}
+                className="h-24 flex-col gap-2"
+              >
+                <Upload className="h-6 w-6" />
+                <span className="text-xs font-medium">Upload</span>
+              </Button>
+            </div>
+            <p className="text-xs text-center text-muted-foreground">JPG, PNG, WebP — Max 8MB</p>
+            <input
+              ref={cameraRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+            />
             <input
               ref={fileRef}
               type="file"

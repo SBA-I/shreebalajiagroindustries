@@ -108,3 +108,17 @@
     background-clip: text;
   }
 }
+
+/* Print-friendly invoice / report styles */
+@media print {
+  @page { margin: 12mm; size: A4; }
+  body { background: #fff !important; color: #000 !important; }
+  header, footer, nav, aside,
+  .no-print, [data-no-print] { display: none !important; }
+  .print-only { display: block !important; }
+  .print-container { max-width: 100% !important; padding: 0 !important; box-shadow: none !important; }
+  a { color: #000 !important; text-decoration: none !important; }
+  /* Avoid breaking key blocks across pages */
+  table, .print-keep { page-break-inside: avoid; }
+}
+.print-only { display: none; }

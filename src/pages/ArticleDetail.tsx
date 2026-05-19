@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Clock, User, Tag, BookOpen, Share2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useResources, useResourceBySlug } from "@/hooks/use-resources";
+import { useJsonLd } from "@/lib/useJsonLd";
 
 const categoryLabels: Record<string, string> = {
   "crop-protection": "Crop Protection",
@@ -43,6 +44,16 @@ const ArticleDetail = () => {
   }
 
   const related = allArticles.filter((a) => a.id !== article.id && a.category === article.category).slice(0, 3);
+
+  useJsonLd("ld-article", article ? {
+    "@type": "Article",
+    headline: article.title,
+    description: article.excerpt,
+    image: (article as any).heroImageUrl,
+    datePublished: (article as any).publishedAt || (article as any).published_at,
+    author: { "@type": "Person", name: article.author || "Shree Balaji Agro Industries" },
+    publisher: { "@type": "Organization", name: "Shree Balaji Agro Industries" },
+  } : null);
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);

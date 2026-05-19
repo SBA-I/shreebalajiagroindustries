@@ -4,9 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, ShieldPlus, ShieldMinus, Trash2, ChevronDown, ChevronRight, MapPin, Phone, Mail, Briefcase, Store } from "lucide-react";
+import { Loader2, ShieldPlus, ShieldMinus, Trash2, ChevronDown, ChevronRight, MapPin, Phone, Briefcase, Store, UserX, UserCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { logAudit } from "@/lib/audit";
 
 type AppRole = "admin" | "moderator" | "field_officer" | "distributor" | "farmer" | "user";
 
@@ -38,6 +39,7 @@ interface ProfileRow {
   employee_id: string | null;
   assigned_territory: string | null;
   verification_status: string;
+  is_deactivated?: boolean;
   created_at: string;
 }
 
@@ -67,6 +69,7 @@ const AdminUsersManager = () => {
   const grant = async (user_id: string, role: AppRole) => {
     const { error } = await supabase.from("user_roles").insert({ user_id, role });
     if (error && !error.message.includes("duplicate")) return toast.error(error.message);
+    await logAudit({ action: "user.role_granted", target_type: "role", target_id: user_id, target_label: role });
     toast.success(`Granted ${role}`);
     refresh();
   };
@@ -75,7 +78,26 @@ const AdminUsersManager = () => {
     if (!confirm(`Remove ${role} role from this user?`)) return;
     const { error } = await supabase.from("user_roles").delete().eq("user_id", user_id).eq("role", role);
     if (error) return toast.error(error.message);
+    await logAudit({ action: "user.role_revoked", target_type: "role", target_id: user_id, target_label: role });
     toast.success(`Removed ${role}`);
+    refresh();
+  };
+
+  const toggleDeactivate = async (p: ProfileRow) => {
+    const next = !p.is_deactivated;
+    if (!confirm(next ? `Deactivate ${p.full_name || "this user"}? They keep their data but lose access.` : `Reactivate ${p.full_name}?`)) return;
+    const { error } = await supabase
+      .from("profiles")
+      .update({ is_deactivated: next, deactivated_at: next ? new Date().toISOString() : null })
+      .eq("user_id", p.user_id);
+    if (error) return toast.error(error.message);
+    await logAudit({
+      action: next ? "user.deactivated" : "user.reactivated",
+      target_type: "user",
+      target_id: p.user_id,
+      target_label: p.full_name ?? undefined,
+    });
+    toast.success(next ? "User deactivated" : "User reactivated");
     refresh();
   };
 
@@ -91,6 +113,7 @@ const AdminUsersManager = () => {
     if (error || (data as any)?.error) {
       return toast.error((data as any)?.error || error?.message || "Failed to delete user");
     }
+    await logAudit({ action: "user.deleted", target_type: "user", target_id: user_id, target_label: name ?? undefined });
     toast.success("User deleted");
     refresh();
   };
@@ -138,12 +161,18 @@ const AdminUsersManager = () => {
                 <span className="capitalize">Requested: {p.requested_role.replace("_", " ")}</span>
                 {p.state && <span>· {[p.taluka, p.district, p.state].filter(Boolean).join(", ")}</span>}
                 <Badge variant="outline" className="capitalize text-[10px]">{p.verification_status}</Badge>
+                {p.is_deactivated && <Badge variant="outline" className="capitalize text-[10px] border-destructive/40 text-destructive">deactivated</Badge>}
               </p>
             </div>
           </button>
-          <Button size="sm" variant="ghost" onClick={() => deleteUser(p.user_id, p.full_name)} className="text-destructive hover:bg-destructive/10 gap-1.5">
-            <Trash2 className="h-3.5 w-3.5" /> Delete
-          </Button>
+          <div className="flex gap-1">
+            <Button size="sm" variant="ghost" onClick={() => toggleDeactivate(p)} className="gap-1.5">
+              {p.is_deactivated ? <><UserCheck className="h-3.5 w-3.5" /> Reactivate</> : <><UserX className="h-3.5 w-3.5" /> Deactivate</>}
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => deleteUser(p.user_id, p.full_name)} className="text-destructive hover:bg-destructive/10 gap-1.5">
+              <Trash2 className="h-3.5 w-3.5" /> Delete
+            </Button>
+          </div>
         </div>
 
         {isOpen && (

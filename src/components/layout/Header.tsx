@@ -8,6 +8,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import type { TKey } from "@/i18n/translations";
 import NotificationsBell from "@/components/notifications/NotificationsBell";
 import GlobalSearch from "@/components/search/GlobalSearch";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 
 type NavChild = { key: string; tKey: TKey; path: string };
 type NavItem = { key: string; tKey: TKey; path: string; children?: NavChild[] };
@@ -93,6 +94,7 @@ const Header = () => {
         {/* Desktop Actions */}
         <div className="hidden lg:flex items-center gap-3">
           <GlobalSearch variant="icon" />
+          <ThemeToggle />
           <NotificationsBell />
           {user ? (
             <>
@@ -117,6 +119,7 @@ const Header = () => {
         {/* Mobile Actions */}
         <div className="lg:hidden flex items-center gap-1">
           <GlobalSearch variant="icon" />
+          <ThemeToggle />
           <NotificationsBell />
           <button
             className="p-2 rounded-md hover:bg-muted transition-colors"
