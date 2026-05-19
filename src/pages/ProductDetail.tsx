@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import PesticideLoadIndicator from "@/components/safety/PesticideLoadIndicator";
 import type { ChemCategory } from "@/data/firstAid";
 import { supabase } from "@/integrations/supabase/client";
+import { useJsonLd } from "@/lib/useJsonLd";
 
 const ProductDetail = () => {
   const { productId } = useParams();
@@ -56,6 +57,16 @@ const ProductDetail = () => {
   }
 
   const related = getRelatedProducts(product, allProducts);
+
+  useJsonLd("ld-product", product ? {
+    "@type": "Product",
+    name: product.name,
+    description: product.shortDescription || product.description,
+    category: product.category,
+    image: product.image,
+    brand: { "@type": "Brand", name: "Shree Balaji Agro Industries" },
+    ...(product.price ? { offers: { "@type": "Offer", price: String(product.price), priceCurrency: "INR", availability: "https://schema.org/InStock" } } : {}),
+  } : null);
 
   const handleInquiry = async (e: React.FormEvent) => {
     e.preventDefault();
