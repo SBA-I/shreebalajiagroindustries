@@ -235,7 +235,7 @@ const DealerLocator = () => {
       <section className="py-10">
         <div className="container mx-auto px-4 lg:px-8 max-w-3xl space-y-4">
           <Card className="shadow-card">
-            <CardContent className="p-4 grid gap-3 md:grid-cols-2">
+            <CardContent className="p-4 grid gap-3 md:grid-cols-3">
               <Button onClick={useMyLocation} disabled={geoBusy} className="gap-1.5">
                 {geoBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <LocateFixed className="h-4 w-4" />}
                 Use my current location
