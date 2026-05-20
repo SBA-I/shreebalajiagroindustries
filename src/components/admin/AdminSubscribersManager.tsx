@@ -7,7 +7,8 @@ import { toast } from "sonner";
 
 interface Sub {
   id: string;
-  email: string;
+  email: string | null;
+  phone: string | null;
   source: string | null;
   is_active: boolean;
   created_at: string;
@@ -21,7 +22,7 @@ const AdminSubscribersManager = () => {
     setLoading(true);
     const { data, error } = await supabase
       .from("newsletter_subscribers")
-      .select("id, email, source, is_active, created_at")
+      .select("id, email, phone, source, is_active, created_at")
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
     setRows((data ?? []) as Sub[]);
@@ -48,8 +49,8 @@ const AdminSubscribersManager = () => {
   };
 
   const exportCsv = () => {
-    const csv = ["email,source,active,created_at", ...rows.map((r) =>
-      [r.email, r.source ?? "", r.is_active, r.created_at].join(","),
+    const csv = ["phone,email,source,active,created_at", ...rows.map((r) =>
+      [r.phone ?? "", r.email ?? "", r.source ?? "", r.is_active, r.created_at].join(","),
     )].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -82,8 +83,11 @@ const AdminSubscribersManager = () => {
             {rows.map((r) => (
               <div key={r.id} className="flex items-center justify-between py-2 gap-2">
                 <div className="min-w-0">
-                  <p className="text-sm font-medium truncate">{r.email}</p>
+                  <p className="text-sm font-medium truncate">
+                    {r.phone ?? r.email ?? "—"}
+                  </p>
                   <p className="text-xs text-muted-foreground">
+                    {r.phone && r.email ? `${r.email} · ` : ""}
                     {r.source ?? "—"} · {new Date(r.created_at).toLocaleDateString()} · {r.is_active ? "Active" : "Unsubscribed"}
                   </p>
                 </div>
