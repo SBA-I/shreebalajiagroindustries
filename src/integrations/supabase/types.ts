@@ -870,33 +870,39 @@ export type Database = {
       newsletter_subscribers: {
         Row: {
           created_at: string
-          email: string
+          email: string | null
           id: string
           is_active: boolean
           language: string
+          phone: string | null
           source: string | null
           unsubscribed_at: string | null
           updated_at: string
+          whatsapp_opt_in: boolean
         }
         Insert: {
           created_at?: string
-          email: string
+          email?: string | null
           id?: string
           is_active?: boolean
           language?: string
+          phone?: string | null
           source?: string | null
           unsubscribed_at?: string | null
           updated_at?: string
+          whatsapp_opt_in?: boolean
         }
         Update: {
           created_at?: string
-          email?: string
+          email?: string | null
           id?: string
           is_active?: boolean
           language?: string
+          phone?: string | null
           source?: string | null
           unsubscribed_at?: string | null
           updated_at?: string
+          whatsapp_opt_in?: boolean
         }
         Relationships: []
       }
