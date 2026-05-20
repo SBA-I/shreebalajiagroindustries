@@ -57,6 +57,8 @@ const DealerLocator = () => {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [talukas, setTalukas] = useState<TalukaRow[]>([]);
+  const [districts, setDistricts] = useState<{ district: string; state: string; count: number }[]>([]);
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
   const [selectedTaluka, setSelectedTaluka] = useState<string>("");
   const [geoBusy, setGeoBusy] = useState(false);
   const [stockByDealer, setStockByDealer] = useState<Record<string, StockBadge[]>>({});
@@ -93,6 +95,22 @@ const DealerLocator = () => {
     supabase.rpc("list_dealer_talukas_public").then(({ data }) => {
       setTalukas((data ?? []) as TalukaRow[]);
     });
+    // Load distinct districts from dealers
+    supabase
+      .from("dealers")
+      .select("district,state")
+      .eq("is_active", true)
+      .not("district", "is", null)
+      .then(({ data }) => {
+        const map = new Map<string, { district: string; state: string; count: number }>();
+        (data ?? []).forEach((d: any) => {
+          const key = `${d.district}|${d.state}`;
+          const cur = map.get(key);
+          if (cur) cur.count += 1;
+          else map.set(key, { district: d.district, state: d.state, count: 1 });
+        });
+        setDistricts(Array.from(map.values()).sort((a, b) => a.district.localeCompare(b.district)));
+      });
   }, []);
 
   const search = async () => {
@@ -137,9 +155,33 @@ const DealerLocator = () => {
     );
   };
 
+  const loadDealersByDistrict = async (district: string) => {
+    setLoading(true);
+    setSearched(true);
+    const { data, error } = await supabase
+      .from("dealers")
+      .select("id,name,address_line,city,district,taluka,state,pincode,is_authorized,lat,lng,photo_url,whatsapp")
+      .eq("is_active", true)
+      .eq("district", district)
+      .order("city");
+    setLoading(false);
+    if (error) { toast.error("Could not load dealers"); setResults([]); return; }
+    setResults((data ?? []) as Dealer[]);
+  };
+
+  const onDistrictChange = (district: string) => {
+    setSelectedDistrict(district);
+    setSelectedTaluka("");
+    if (!district) { setResults([]); setSearched(false); return; }
+    loadDealersByDistrict(district);
+  };
+
   const filterByTaluka = async (taluka: string) => {
     setSelectedTaluka(taluka);
-    if (!taluka) return;
+    if (!taluka) {
+      if (selectedDistrict) loadDealersByDistrict(selectedDistrict);
+      return;
+    }
     setLoading(true);
     setSearched(true);
     const { data, error } = await supabase
@@ -152,6 +194,10 @@ const DealerLocator = () => {
     if (error) { toast.error("Could not load dealers"); setResults([]); return; }
     setResults((data ?? []) as Dealer[]);
   };
+
+  const talukasForDistrict = selectedDistrict
+    ? talukas.filter((t) => t.district === selectedDistrict)
+    : [];
 
   const mapsHref = (d: Dealer) =>
     d.lat != null && d.lng != null
@@ -189,19 +235,39 @@ const DealerLocator = () => {
       <section className="py-10">
         <div className="container mx-auto px-4 lg:px-8 max-w-3xl space-y-4">
           <Card className="shadow-card">
-            <CardContent className="p-4 grid gap-3 md:grid-cols-2">
+            <CardContent className="p-4 grid gap-3 md:grid-cols-3">
               <Button onClick={useMyLocation} disabled={geoBusy} className="gap-1.5">
                 {geoBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <LocateFixed className="h-4 w-4" />}
                 Use my current location
               </Button>
-              <Select value={selectedTaluka} onValueChange={filterByTaluka}>
-                <SelectTrigger><SelectValue placeholder="Filter by taluka" /></SelectTrigger>
+              <Select value={selectedDistrict} onValueChange={onDistrictChange}>
+                <SelectTrigger><SelectValue placeholder="1. Select district" /></SelectTrigger>
                 <SelectContent>
-                  {talukas.length === 0 ? (
-                    <SelectItem value="__none" disabled>No talukas yet</SelectItem>
-                  ) : talukas.map((t) => (
+                  {districts.length === 0 ? (
+                    <SelectItem value="__none" disabled>No districts yet</SelectItem>
+                  ) : districts.map((d) => (
+                    <SelectItem key={`${d.district}-${d.state}`} value={d.district}>
+                      {d.district} · {d.state} ({d.count})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={selectedTaluka}
+                onValueChange={filterByTaluka}
+                disabled={!selectedDistrict}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={selectedDistrict ? "2. Filter by taluka (optional)" : "Pick a district first"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {talukasForDistrict.length === 0 ? (
+                    <SelectItem value="__none" disabled>
+                      No talukas set for this district
+                    </SelectItem>
+                  ) : talukasForDistrict.map((t) => (
                     <SelectItem key={`${t.taluka}-${t.district}`} value={t.taluka}>
-                      {t.taluka} {t.district ? `· ${t.district}` : ""} ({t.dealer_count})
+                      {t.taluka} ({t.dealer_count})
                     </SelectItem>
                   ))}
                 </SelectContent>
