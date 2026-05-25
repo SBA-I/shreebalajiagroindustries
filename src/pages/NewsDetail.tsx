@@ -50,13 +50,13 @@ const NewsDetail = () => {
         description={article.excerpt || article.title}
         path={`/news/${article.slug}`}
         type="article"
-        image={article.hero_image_url || undefined}
+        image={article.heroImageUrl || undefined}
         jsonLd={{
           "@type": "NewsArticle",
           headline: article.title,
           description: article.excerpt,
-          datePublished: article.published_at,
-          image: article.hero_image_url || undefined,
+          datePublished: article.date,
+          image: article.heroImageUrl || undefined,
           author: { "@type": "Organization", name: article.author || "Shree Balaji Agro Industries" },
           publisher: {
             "@type": "Organization",

@@ -101,15 +101,15 @@ const ProductDetail = () => {
     <Layout>
       <SEO
         title={product.name}
-        description={product.short_description || product.description || `${product.name} — ${product.categoryLabel} from Shree Balaji Agro Industries.`}
+        description={product.tagline || product.description || `${product.name} — ${product.categoryLabel} from Shree Balaji Agro Industries.`}
         path={`/products/${product.slug || product.id}`}
         type="product"
-        image={product.image_url || undefined}
+        image={product.image || undefined}
         jsonLd={{
           "@type": "Product",
           name: product.name,
-          description: product.short_description || product.description,
-          image: product.image_url || undefined,
+          description: product.tagline || product.description,
+          image: product.image || undefined,
           category: product.categoryLabel,
           brand: { "@type": "Brand", name: "Shree Balaji Agro Industries" },
         }}
