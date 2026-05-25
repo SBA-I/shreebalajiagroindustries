@@ -99,6 +99,21 @@ const ProductDetail = () => {
 
   return (
     <Layout>
+      <SEO
+        title={product.name}
+        description={product.short_description || product.description || `${product.name} — ${product.categoryLabel} from Shree Balaji Agro Industries.`}
+        path={`/products/${product.slug || product.id}`}
+        type="product"
+        image={product.image_url || undefined}
+        jsonLd={{
+          "@type": "Product",
+          name: product.name,
+          description: product.short_description || product.description,
+          image: product.image_url || undefined,
+          category: product.categoryLabel,
+          brand: { "@type": "Brand", name: "Shree Balaji Agro Industries" },
+        }}
+      />
       {/* Breadcrumb */}
       <div className="bg-muted border-b border-border">
         <div className="container mx-auto px-4 lg:px-8 py-3">

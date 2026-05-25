@@ -63,6 +63,22 @@ const ArticleDetail = () => {
 
   return (
     <Layout>
+      <SEO
+        title={article.title}
+        description={article.excerpt || article.title}
+        path={`/resources/${article.slug}`}
+        type="article"
+        image={article.hero_image_url || undefined}
+        jsonLd={{
+          "@type": "Article",
+          headline: article.title,
+          description: article.excerpt,
+          datePublished: article.published_at,
+          image: article.hero_image_url || undefined,
+          author: { "@type": "Person", name: article.author || "Editorial Team" },
+          publisher: { "@type": "Organization", name: "Shree Balaji Agro Industries" },
+        }}
+      />
       {/* Breadcrumb */}
       <div className="bg-muted border-b border-border">
         <div className="container mx-auto px-4 lg:px-8 py-3">

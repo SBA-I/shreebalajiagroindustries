@@ -45,6 +45,25 @@ const NewsDetail = () => {
 
   return (
     <Layout>
+      <SEO
+        title={article.title}
+        description={article.excerpt || article.title}
+        path={`/news/${article.slug}`}
+        type="article"
+        image={article.hero_image_url || undefined}
+        jsonLd={{
+          "@type": "NewsArticle",
+          headline: article.title,
+          description: article.excerpt,
+          datePublished: article.published_at,
+          image: article.hero_image_url || undefined,
+          author: { "@type": "Organization", name: article.author || "Shree Balaji Agro Industries" },
+          publisher: {
+            "@type": "Organization",
+            name: "Shree Balaji Agro Industries",
+          },
+        }}
+      />
       <div className="bg-muted border-b border-border">
         <div className="container mx-auto px-4 lg:px-8 py-3">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">

@@ -219,6 +219,11 @@ const DealerLocator = () => {
 
   return (
     <Layout>
+      <SEO
+        title="Find an Authorized Dealer — Shree Balaji Agro"
+        description="Locate your nearest authorized Shree Balaji Agro distributor. Search by pincode, district, or taluka across Maharashtra and India."
+        path="/find-dealer"
+      />
       <section className="bg-gradient-to-br from-primary to-primary/80 py-12">
         <div className="container mx-auto px-4 lg:px-8 text-primary-foreground">
           <div className="flex items-center gap-3">

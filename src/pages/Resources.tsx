@@ -48,6 +48,11 @@ const Resources = () => {
 
   return (
     <Layout>
+      <SEO
+        title="Knowledge Base — Farming Resources & Guides"
+        description="Expert articles, guides and videos on crop protection, application techniques, IPM, soil health, and pesticide safety."
+        path="/resources"
+      />
       <section className="bg-primary py-16">
         <div className="container mx-auto px-4 lg:px-8 text-center">
           <h1 className="font-heading text-4xl md:text-5xl font-bold text-primary-foreground mb-4">Knowledge Base</h1>
