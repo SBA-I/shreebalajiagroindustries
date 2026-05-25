@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
+import SEO from "@/components/seo/SEO";
 import { Button } from "@/components/ui/button";
 import { useProductById, useProducts } from "@/hooks/use-db-products";
 import { getRelatedProducts } from "@/types/product";

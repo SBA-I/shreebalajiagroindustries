@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
+import SEO from "@/components/seo/SEO";
 import ProductCard from "@/components/products/ProductCard";
 import ComparisonBar from "@/components/products/ComparisonBar";
 import VoiceSearchButton from "@/components/products/VoiceSearchButton";

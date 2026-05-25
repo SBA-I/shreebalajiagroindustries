@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
+import SEO from "@/components/seo/SEO";
 import { Input } from "@/components/ui/input";
 import { Calendar, Search, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Layout from "@/components/layout/Layout";
+import SEO from "@/components/seo/SEO";
 import { teamMembers, milestones } from "@/data/content";
 import {
   Building2,

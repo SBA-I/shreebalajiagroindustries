@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
+import SEO from "@/components/seo/SEO";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, User, Share2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
