@@ -1,0 +1,26 @@
+# Shree Balaji Agro Industries
+
+> Manufacturer of crop protection solutions — insecticides, fungicides, herbicides, and plant growth regulators (PGR) — serving Indian farmers, distributors, and field officers from Dhule, Maharashtra.
+
+Shree Balaji Agro Industries is an agricultural chemicals company offering a tested catalog of pesticides and PGR products along with a multilingual platform (English, Hindi, Marathi) for farmers, distributors, and field officers. The platform includes a product catalog, disease detector, dosage calculator, dealer locator, news and advisories, and sustainability resources.
+
+## Pages
+
+- [Home](/): Overview of the company, featured products, and farmer resources.
+- [About](/about): Company history, leadership, milestones, and manufacturing capabilities.
+- [Products](/products): Full catalog of insecticides, fungicides, herbicides, and PGR products with filters and search.
+- [Compare Products](/products/compare): Side-by-side comparison of selected products.
+- [Find a Dealer](/find-dealer): Locate authorized distributors by pincode, district, or taluka across India.
+- [Contact](/contact): Office address, phone, email, and inquiry form.
+- [News](/news): Company announcements, product launches, industry updates, and advisories.
+- [Resources](/resources): Articles and guides on crop protection, application techniques, IPM, soil health, and safety.
+- [Sustainability](/sustainability): Eco-friendly farming practices and the company's environmental commitments.
+- [Safety Hub](/safety): Safety precautions, first-aid information, and best practices for pesticide handling.
+- [Pest Calendar](/tools/pest-calendar): Seasonal pest activity calendar for major crops.
+- [Harvest Timer](/tools/harvest-timer): PHI (pre-harvest interval) calculator for safe harvesting after spraying.
+- [Yield Simulator](/yield-simulator): Estimate crop yield based on inputs and recommended products.
+- [Ask AI](/ask-ai): Trilingual AI assistant for farming questions, disease identification, and product recommendations.
+
+## Optional
+
+- [Sign in](/auth): Account access for farmers, distributors, field officers, and admins.
