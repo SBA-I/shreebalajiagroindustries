@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
+import SEO from "@/components/seo/SEO";
 import { Button } from "@/components/ui/button";
 import { useProductById, useProducts } from "@/hooks/use-db-products";
 import { getRelatedProducts } from "@/types/product";
@@ -98,6 +99,21 @@ const ProductDetail = () => {
 
   return (
     <Layout>
+      <SEO
+        title={product.name}
+        description={product.tagline || product.description || `${product.name} — ${product.categoryLabel} from Shree Balaji Agro Industries.`}
+        path={`/products/${product.slug || product.id}`}
+        type="product"
+        image={product.image || undefined}
+        jsonLd={{
+          "@type": "Product",
+          name: product.name,
+          description: product.tagline || product.description,
+          image: product.image || undefined,
+          category: product.categoryLabel,
+          brand: { "@type": "Brand", name: "Shree Balaji Agro Industries" },
+        }}
+      />
       {/* Breadcrumb */}
       <div className="bg-muted border-b border-border">
         <div className="container mx-auto px-4 lg:px-8 py-3">

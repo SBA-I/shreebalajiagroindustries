@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
+import SEO from "@/components/seo/SEO";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, User, Share2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -44,6 +45,25 @@ const NewsDetail = () => {
 
   return (
     <Layout>
+      <SEO
+        title={article.title}
+        description={article.excerpt || article.title}
+        path={`/news/${article.slug}`}
+        type="article"
+        image={article.heroImageUrl || undefined}
+        jsonLd={{
+          "@type": "NewsArticle",
+          headline: article.title,
+          description: article.excerpt,
+          datePublished: article.date,
+          image: article.heroImageUrl || undefined,
+          author: { "@type": "Organization", name: article.author || "Shree Balaji Agro Industries" },
+          publisher: {
+            "@type": "Organization",
+            name: "Shree Balaji Agro Industries",
+          },
+        }}
+      />
       <div className="bg-muted border-b border-border">
         <div className="container mx-auto px-4 lg:px-8 py-3">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">

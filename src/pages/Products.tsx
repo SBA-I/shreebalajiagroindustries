@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
+import SEO from "@/components/seo/SEO";
 import ProductCard from "@/components/products/ProductCard";
 import ComparisonBar from "@/components/products/ComparisonBar";
 import VoiceSearchButton from "@/components/products/VoiceSearchButton";
@@ -130,6 +131,11 @@ const Products = () => {
 
   return (
     <Layout>
+      <SEO
+        title={activeCategory ? `${categoryLabels[activeCategory]} — Products` : "Crop Protection Products"}
+        description="Browse our full catalog of insecticides, fungicides, herbicides, and PGR products. Search, filter, and compare crop protection solutions for Indian farms."
+        path={activeCategory ? `/products?category=${activeCategory}` : "/products"}
+      />
       <section className="bg-primary py-16">
         <div className="container mx-auto px-4 lg:px-8 text-center">
           <h1 className="font-heading text-4xl md:text-5xl font-bold text-primary-foreground mb-4">{t("products.title")}</h1>

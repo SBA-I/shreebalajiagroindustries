@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
+import SEO from "@/components/seo/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -104,6 +105,11 @@ const Sustainability = () => {
 
   return (
     <Layout>
+      <SEO
+        title="Sustainability & R&D — Shree Balaji Agro"
+        description="Our commitment to safer, smarter crop protection. R&D, sustainable farming practices, and environmental responsibility at Shree Balaji Agro Industries."
+        path="/sustainability"
+      />
       <section className="bg-gradient-to-br from-primary to-primary/80 py-12">
         <div className="container mx-auto px-4 lg:px-8 text-primary-foreground">
           <div className="flex items-center gap-3">

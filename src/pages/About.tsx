@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Layout from "@/components/layout/Layout";
+import SEO from "@/components/seo/SEO";
 import { teamMembers, milestones } from "@/data/content";
 import {
   Building2,
@@ -166,6 +167,11 @@ const About = () => {
   const { t } = useI18n();
   return (
     <Layout>
+      <SEO
+        title="About Us — Shree Balaji Agro Industries"
+        description="Learn about Shree Balaji Agro Industries — 15+ years of trusted crop protection solutions from Dhule, Maharashtra. Leadership, milestones, and our commitment to Indian farmers."
+        path="/about"
+      />
       {/* Hero */}
       <section className="bg-primary py-20">
         <div className="container mx-auto px-4 lg:px-8 text-center">

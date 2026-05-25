@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
+import SEO from "@/components/seo/SEO";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Clock, User, Tag, BookOpen, Share2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -62,6 +63,22 @@ const ArticleDetail = () => {
 
   return (
     <Layout>
+      <SEO
+        title={article.title}
+        description={article.excerpt || article.title}
+        path={`/resources/${article.slug}`}
+        type="article"
+        image={article.heroImageUrl || undefined}
+        jsonLd={{
+          "@type": "Article",
+          headline: article.title,
+          description: article.excerpt,
+          datePublished: article.date,
+          image: article.heroImageUrl || undefined,
+          author: { "@type": "Person", name: article.author || "Editorial Team" },
+          publisher: { "@type": "Organization", name: "Shree Balaji Agro Industries" },
+        }}
+      />
       {/* Breadcrumb */}
       <div className="bg-muted border-b border-border">
         <div className="container mx-auto px-4 lg:px-8 py-3">

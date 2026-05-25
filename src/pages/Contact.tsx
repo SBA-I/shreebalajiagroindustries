@@ -1,4 +1,5 @@
 import Layout from "@/components/layout/Layout";
+import SEO from "@/components/seo/SEO";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,32 @@ const Contact = () => {
 
   return (
     <Layout>
+      <SEO
+        title="Contact Us — Shree Balaji Agro Industries"
+        description="Get in touch with Shree Balaji Agro Industries. Phone, email, and office address in Dhule, Maharashtra. Distributor and farmer inquiries welcome."
+        path="/contact"
+        jsonLd={[
+          {
+            "@type": "LocalBusiness",
+            name: "Shree Balaji Agro Industries",
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: "Dhule",
+              addressRegion: "Maharashtra",
+              addressCountry: "IN",
+            },
+            email: "info@shreebalajiagroindustries.com",
+          },
+          {
+            "@type": "FAQPage",
+            mainEntity: faqs.map((f) => ({
+              "@type": "Question",
+              name: f.question,
+              acceptedAnswer: { "@type": "Answer", text: f.answer },
+            })),
+          },
+        ]}
+      />
       <section className="bg-primary py-16">
         <div className="container mx-auto px-4 lg:px-8 text-center">
           <h1 className="font-heading text-4xl md:text-5xl font-bold text-primary-foreground mb-4">{t("contact.title")}</h1>
