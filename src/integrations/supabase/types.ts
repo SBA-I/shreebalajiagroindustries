@@ -1166,6 +1166,39 @@ export type Database = {
         }
         Relationships: []
       }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          updated_at: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       spray_logs: {
         Row: {
           created_at: string
@@ -1306,6 +1339,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_push_internal_secret: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1368,6 +1402,10 @@ export type Database = {
           taluka: string
           whatsapp: string
         }[]
+      }
+      set_push_internal_secret: {
+        Args: { _secret: string }
+        Returns: undefined
       }
     }
     Enums: {

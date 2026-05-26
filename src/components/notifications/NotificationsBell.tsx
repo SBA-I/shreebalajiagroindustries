@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Bell, Check, Loader2, Trash2 } from "lucide-react";
+import { Bell, BellOff, Check, Loader2, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,12 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
+import {
+  isPushSupported,
+  isCurrentlySubscribed,
+  subscribeToPush,
+  unsubscribeFromPush,
+} from "@/lib/push";
 
 type Message = {
   id: string;
@@ -25,6 +31,9 @@ const NotificationsBell = () => {
   const { user } = useAuth();
   const [items, setItems] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
+  const [pushOn, setPushOn] = useState(false);
+  const [pushBusy, setPushBusy] = useState(false);
+  const pushSupported = isPushSupported();
 
   const unread = items.filter((m) => !m.read).length;
 
@@ -44,6 +53,7 @@ const NotificationsBell = () => {
   useEffect(() => {
     if (!user) return;
     load();
+    isCurrentlySubscribed().then(setPushOn).catch(() => setPushOn(false));
     const channel = supabase
       .channel(`messages-${user.id}`)
       .on(
@@ -78,6 +88,26 @@ const NotificationsBell = () => {
     await supabase.from("messages").delete().eq("id", id);
   };
 
+  const togglePush = async () => {
+    if (!user) return;
+    setPushBusy(true);
+    try {
+      if (pushOn) {
+        await unsubscribeFromPush();
+        setPushOn(false);
+        toast.success("Browser notifications turned off");
+      } else {
+        await subscribeToPush(user.id);
+        setPushOn(true);
+        toast.success("Browser notifications enabled");
+      }
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not change notification setting");
+    } finally {
+      setPushBusy(false);
+    }
+  };
+
   if (!user) return null;
 
   return (
@@ -95,11 +125,32 @@ const NotificationsBell = () => {
       <PopoverContent align="end" className="w-[340px] p-0">
         <div className="flex items-center justify-between border-b border-border p-3">
           <p className="font-semibold text-sm">Notifications</p>
-          {unread > 0 && (
-            <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={markAllRead}>
-              <Check className="h-3 w-3 mr-1" /> Mark all read
-            </Button>
-          )}
+          <div className="flex items-center gap-1">
+            {pushSupported && (
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-7 text-xs"
+                onClick={togglePush}
+                disabled={pushBusy}
+                title={pushOn ? "Turn off browser push" : "Enable browser push"}
+              >
+                {pushBusy ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : pushOn ? (
+                  <BellOff className="h-3 w-3 mr-1" />
+                ) : (
+                  <Bell className="h-3 w-3 mr-1" />
+                )}
+                {pushOn ? "Push on" : "Enable push"}
+              </Button>
+            )}
+            {unread > 0 && (
+              <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={markAllRead}>
+                <Check className="h-3 w-3 mr-1" /> Mark all read
+              </Button>
+            )}
+          </div>
         </div>
         <ScrollArea className="max-h-[400px]">
           {loading ? (
