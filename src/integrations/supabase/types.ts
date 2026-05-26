@@ -1339,6 +1339,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_push_internal_secret: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1401,6 +1402,10 @@ export type Database = {
           taluka: string
           whatsapp: string
         }[]
+      }
+      set_push_internal_secret: {
+        Args: { _secret: string }
+        Returns: undefined
       }
     }
     Enums: {
