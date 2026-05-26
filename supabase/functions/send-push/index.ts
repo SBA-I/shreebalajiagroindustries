@@ -55,7 +55,12 @@ Deno.serve(async (req) => {
         const { data: u } = await userClient.auth.getUser();
         if (u?.user) {
           const { data: roles } = await admin.from("user_roles").select("role").eq("user_id", u.user.id);
-          if ((roles ?? []).some((r: any) => r.role === "admin")) authorized = true;
+          if ((roles ?? []).some((r: any) => r.role === "admin")) {
+            authorized = true;
+            if (envInternal) {
+              await admin.rpc("set_push_internal_secret", { _secret: envInternal }).catch(() => null);
+            }
+          }
         }
       }
     }
