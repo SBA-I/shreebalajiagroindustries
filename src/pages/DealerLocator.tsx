@@ -134,8 +134,26 @@ const DealerLocator = () => {
     setLoading(false);
   };
 
-  const useMyLocation = () => {
+  const useMyLocation = async () => {
     if (!navigator.geolocation) return toast.error("Geolocation not supported on this device");
+
+    // Pre-check permission so we can give the user a clear, actionable message
+    // instead of a generic "Please allow location access" toast when the browser
+    // has previously blocked the site.
+    try {
+      const perm = await (navigator as any).permissions?.query?.({ name: "geolocation" as PermissionName });
+      if (perm?.state === "denied") {
+        toast.error("Location is blocked for this site", {
+          description:
+            "Tap the lock/⋮ icon in your browser's address bar → Site settings → Location → Allow, then try again. You can also search by pincode below.",
+          duration: 8000,
+        });
+        return;
+      }
+    } catch {
+      // Permissions API not available — fall through and let the prompt appear.
+    }
+
     setGeoBusy(true);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
@@ -150,7 +168,19 @@ const DealerLocator = () => {
       },
       (err) => {
         setGeoBusy(false);
-        toast.error(err.code === err.PERMISSION_DENIED ? "Please allow location access" : "Could not detect location");
+        if (err.code === err.PERMISSION_DENIED) {
+          toast.error("Location permission denied", {
+            description:
+              "Allow location for this site from your browser's address-bar icon, or search by pincode below.",
+            duration: 8000,
+          });
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          toast.error("Location unavailable. Turn on GPS / location services and try again.");
+        } else if (err.code === err.TIMEOUT) {
+          toast.error("Location request timed out. Please try again or search by pincode.");
+        } else {
+          toast.error("Could not detect location");
+        }
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
