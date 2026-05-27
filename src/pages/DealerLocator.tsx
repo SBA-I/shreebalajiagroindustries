@@ -134,26 +134,12 @@ const DealerLocator = () => {
     setLoading(false);
   };
 
-  const useMyLocation = async () => {
+  const useMyLocation = () => {
     if (!navigator.geolocation) return toast.error("Geolocation not supported on this device");
 
-    // Pre-check permission so we can give the user a clear, actionable message
-    // instead of a generic "Please allow location access" toast when the browser
-    // has previously blocked the site.
-    try {
-      const perm = await (navigator as any).permissions?.query?.({ name: "geolocation" as PermissionName });
-      if (perm?.state === "denied") {
-        toast.error("Location is blocked for this site", {
-          description:
-            "Tap the lock/⋮ icon in your browser's address bar → Site settings → Location → Allow, then try again. You can also search by pincode below.",
-          duration: 8000,
-        });
-        return;
-      }
-    } catch {
-      // Permissions API not available — fall through and let the prompt appear.
-    }
-
+    // IMPORTANT: call getCurrentPosition synchronously inside the click handler
+    // so the browser shows its native "Allow location?" prompt. Any `await`
+    // before this call breaks the user-gesture chain and the prompt never appears.
     setGeoBusy(true);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
@@ -171,7 +157,7 @@ const DealerLocator = () => {
         if (err.code === err.PERMISSION_DENIED) {
           toast.error("Location permission denied", {
             description:
-              "Allow location for this site from your browser's address-bar icon, or search by pincode below.",
+              "You previously blocked location for this site. Tap the lock icon in your browser's address bar → Site settings → Location → Allow, then try again. Or search by pincode below.",
             duration: 8000,
           });
         } else if (err.code === err.POSITION_UNAVAILABLE) {
