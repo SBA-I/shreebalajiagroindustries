@@ -363,6 +363,8 @@ const RoleAuthForm = ({
                     password={loginPassword}
                     setEmail={setLoginEmail}
                     setPassword={setLoginPassword}
+                    showPassword={showLoginPassword}
+                    onTogglePassword={() => setShowLoginPassword((v) => !v)}
                     onSubmit={handleLogin}
                     busy={busy}
                     showGoogle={showGoogle}
@@ -439,6 +441,8 @@ const RoleAuthForm = ({
                 password={loginPassword}
                 setEmail={setLoginEmail}
                 setPassword={setLoginPassword}
+                showPassword={showLoginPassword}
+                onTogglePassword={() => setShowLoginPassword((v) => !v)}
                 onSubmit={handleLogin}
                 busy={busy}
                 showGoogle={showGoogle && role !== "admin"}
