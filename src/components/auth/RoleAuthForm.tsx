@@ -107,8 +107,19 @@ const RoleAuthForm = ({
           setLinking(true);
           (async () => {
             try {
+              // Make sure we still have a live session before calling the
+              // edge function (OAuth flow can race with sign-out from a
+              // previous failed attempt and produce a 401).
+              const { data: sessData } = await supabase.auth.getSession();
+              const token = sessData.session?.access_token;
+              if (!token) {
+                toast.error("Session expired. Please sign in again.");
+                setLinking(false);
+                return;
+              }
               const { data, error } = await supabase.functions.invoke("link-oauth-role", {
                 body: { requested_role: role },
+                headers: { Authorization: `Bearer ${token}` },
               });
               if (!error && (data as any)?.linked) {
                 toast.success("Account linked. Welcome back!");
