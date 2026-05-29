@@ -403,17 +403,27 @@ const RoleAuthForm = ({
                         )}
                       </>
                     )}
-                    <div>
+                    <div className="relative">
                       <Label htmlFor="signup-password">Password</Label>
                       <Input
                         id="signup-password"
-                        type="password"
+                        type={showSignupPassword ? "text" : "password"}
                         autoComplete="new-password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         minLength={8}
+                        className="pr-10"
                       />
+                      <button
+                        type="button"
+                        tabIndex={-1}
+                        onClick={() => setShowSignupPassword((v) => !v)}
+                        className="absolute right-2 top-[26px] text-muted-foreground hover:text-foreground"
+                        aria-label={showSignupPassword ? "Hide password" : "Show password"}
+                      >
+                        {showSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
                       <p className="text-xs text-muted-foreground mt-1">At least 8 characters</p>
                     </div>
                     {renderExtraFields?.({ value: extras, onChange: setExtras })}
