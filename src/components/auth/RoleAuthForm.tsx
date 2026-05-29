@@ -183,10 +183,12 @@ const RoleAuthForm = ({
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
   const [extras, setExtras] = useState<ExtraFieldsData>({});
 
   const handleLogin = async (e: React.FormEvent) => {
