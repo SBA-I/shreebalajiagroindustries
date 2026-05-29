@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { z } from "zod";
-import { Loader2, ArrowLeft, type LucideIcon } from "lucide-react";
+import { Loader2, ArrowLeft, Eye, EyeOff, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
