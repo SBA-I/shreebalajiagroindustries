@@ -465,6 +465,8 @@ interface LoginFieldsProps {
   password: string;
   setEmail: (v: string) => void;
   setPassword: (v: string) => void;
+  showPassword: boolean;
+  onTogglePassword: () => void;
   onSubmit: (e: React.FormEvent) => void;
   busy: boolean;
 }
@@ -474,6 +476,8 @@ const LoginFormFields = ({
   password,
   setEmail,
   setPassword,
+  showPassword,
+  onTogglePassword,
   onSubmit,
   busy,
   showGoogle,
