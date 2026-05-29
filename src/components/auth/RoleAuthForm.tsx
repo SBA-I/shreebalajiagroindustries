@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { z } from "zod";
-import { Loader2, ArrowLeft, type LucideIcon } from "lucide-react";
+import { Loader2, ArrowLeft, Eye, EyeOff, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -183,10 +183,12 @@ const RoleAuthForm = ({
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
   const [extras, setExtras] = useState<ExtraFieldsData>({});
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -361,6 +363,8 @@ const RoleAuthForm = ({
                     password={loginPassword}
                     setEmail={setLoginEmail}
                     setPassword={setLoginPassword}
+                    showPassword={showLoginPassword}
+                    onTogglePassword={() => setShowLoginPassword((v) => !v)}
                     onSubmit={handleLogin}
                     busy={busy}
                     showGoogle={showGoogle}
@@ -401,17 +405,27 @@ const RoleAuthForm = ({
                         )}
                       </>
                     )}
-                    <div>
+                    <div className="relative">
                       <Label htmlFor="signup-password">Password</Label>
                       <Input
                         id="signup-password"
-                        type="password"
+                        type={showSignupPassword ? "text" : "password"}
                         autoComplete="new-password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         minLength={8}
+                        className="pr-10"
                       />
+                      <button
+                        type="button"
+                        tabIndex={-1}
+                        onClick={() => setShowSignupPassword((v) => !v)}
+                        className="absolute right-2 top-[26px] text-muted-foreground hover:text-foreground"
+                        aria-label={showSignupPassword ? "Hide password" : "Show password"}
+                      >
+                        {showSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
                       <p className="text-xs text-muted-foreground mt-1">At least 8 characters</p>
                     </div>
                     {renderExtraFields?.({ value: extras, onChange: setExtras })}
@@ -427,6 +441,8 @@ const RoleAuthForm = ({
                 password={loginPassword}
                 setEmail={setLoginEmail}
                 setPassword={setLoginPassword}
+                showPassword={showLoginPassword}
+                onTogglePassword={() => setShowLoginPassword((v) => !v)}
                 onSubmit={handleLogin}
                 busy={busy}
                 showGoogle={showGoogle && role !== "admin"}
@@ -453,6 +469,8 @@ interface LoginFieldsProps {
   password: string;
   setEmail: (v: string) => void;
   setPassword: (v: string) => void;
+  showPassword: boolean;
+  onTogglePassword: () => void;
   onSubmit: (e: React.FormEvent) => void;
   busy: boolean;
 }
@@ -462,6 +480,8 @@ const LoginFormFields = ({
   password,
   setEmail,
   setPassword,
+  showPassword,
+  onTogglePassword,
   onSubmit,
   busy,
   showGoogle,
@@ -496,7 +516,18 @@ const LoginFormFields = ({
           </button>
         )}
       </div>
-      <Input id="login-password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+      <div className="relative">
+        <Input id="login-password" type={showPassword ? "text" : "password"} autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required className="pr-10" />
+        <button
+          type="button"
+          tabIndex={-1}
+          onClick={onTogglePassword}
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          aria-label={showPassword ? "Hide password" : "Show password"}
+        >
+          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </button>
+      </div>
     </div>
     <Button type="submit" className="w-full" disabled={busy}>
       {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Log In"}
