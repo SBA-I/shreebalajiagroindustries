@@ -23,6 +23,16 @@ const ArticleDetail = () => {
   const { data: article, isLoading } = useResourceBySlug(slug || "");
   const { data: allArticles = [] } = useResources();
 
+  useJsonLd("ld-article", article ? {
+    "@type": "Article",
+    headline: article.title,
+    description: article.excerpt,
+    image: (article as any).heroImageUrl,
+    datePublished: (article as any).publishedAt || (article as any).published_at,
+    author: { "@type": "Person", name: article.author || "Shree Balaji Agro Industries" },
+    publisher: { "@type": "Organization", name: "Shree Balaji Agro Industries" },
+  } : null);
+
   if (isLoading) {
     return (
       <Layout>
@@ -45,16 +55,6 @@ const ArticleDetail = () => {
   }
 
   const related = allArticles.filter((a) => a.id !== article.id && a.category === article.category).slice(0, 3);
-
-  useJsonLd("ld-article", article ? {
-    "@type": "Article",
-    headline: article.title,
-    description: article.excerpt,
-    image: (article as any).heroImageUrl,
-    datePublished: (article as any).publishedAt || (article as any).published_at,
-    author: { "@type": "Person", name: article.author || "Shree Balaji Agro Industries" },
-    publisher: { "@type": "Organization", name: "Shree Balaji Agro Industries" },
-  } : null);
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
